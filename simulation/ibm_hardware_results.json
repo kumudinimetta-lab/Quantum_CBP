@@ -1,0 +1,242 @@
+{
+  "experiment": "IBM Quantum Hardware Validation",
+  "timestamp": "2026-05-01T21:27:09.866499",
+  "backend": "ibm_fez",
+  "shots": 8192,
+  "optimization_level": 3,
+  "hw_failed": false,
+  "instances": [
+    {
+      "name": "Core-3A (Easy)",
+      "n": 3,
+      "optimal_value": 7,
+      "optimal_states": [
+        "011"
+      ],
+      "grover_iterations": 2,
+      "sim_success_prob": 0.9453124999999969,
+      "transpiled_depth": 301,
+      "two_qubit_gates": 78,
+      "hw_success_prob": 0.67431640625,
+      "hw_optimal_is_top": true,
+      "hw_found_optimal": true,
+      "hw_noise_penalty": 0.2709960937499969,
+      "hw_top_counts": {
+        "011": 5524,
+        "010": 433,
+        "001": 428,
+        "110": 405,
+        "000": 376,
+        "101": 361,
+        "111": 353,
+        "100": 312
+      },
+      "total_shots": 8192
+    },
+    {
+      "name": "Core-3B (Medium)",
+      "n": 3,
+      "optimal_value": 9,
+      "optimal_states": [
+        "011"
+      ],
+      "grover_iterations": 2,
+      "sim_success_prob": 0.9453124999999969,
+      "transpiled_depth": 294,
+      "two_qubit_gates": 72,
+      "hw_success_prob": 0.6671142578125,
+      "hw_optimal_is_top": true,
+      "hw_found_optimal": true,
+      "hw_noise_penalty": 0.2781982421874969,
+      "hw_top_counts": {
+        "011": 5465,
+        "001": 471,
+        "010": 453,
+        "110": 385,
+        "000": 382,
+        "111": 380,
+        "101": 338,
+        "100": 318
+      },
+      "total_shots": 8192
+    },
+    {
+      "name": "Core-4A (Hard)",
+      "n": 4,
+      "optimal_value": 12,
+      "optimal_states": [
+        "1010"
+      ],
+      "grover_iterations": 3,
+      "sim_success_prob": 0.9613189697265546,
+      "transpiled_depth": 2106,
+      "two_qubit_gates": 661,
+      "hw_success_prob": 0.12353515625,
+      "hw_optimal_is_top": true,
+      "hw_found_optimal": true,
+      "hw_noise_penalty": 0.8377838134765546,
+      "hw_top_counts": {
+        "1010": 1012,
+        "0000": 532,
+        "1111": 519,
+        "1100": 518,
+        "1011": 497,
+        "1110": 492,
+        "0011": 490,
+        "1001": 478,
+        "1000": 476,
+        "1101": 473
+      },
+      "total_shots": 8192
+    },
+    {
+      "name": "Core-4B (Subset-Sum)",
+      "n": 4,
+      "optimal_value": 13,
+      "optimal_states": [
+        "1010"
+      ],
+      "grover_iterations": 3,
+      "sim_success_prob": 0.9613189697265546,
+      "transpiled_depth": 2102,
+      "two_qubit_gates": 659,
+      "hw_success_prob": 0.1343994140625,
+      "hw_optimal_is_top": true,
+      "hw_found_optimal": true,
+      "hw_noise_penalty": 0.8269195556640546,
+      "hw_top_counts": {
+        "1010": 1101,
+        "1110": 575,
+        "1011": 517,
+        "1101": 501,
+        "1111": 496,
+        "1100": 494,
+        "0010": 480,
+        "0000": 470,
+        "1000": 459,
+        "0110": 459
+      },
+      "total_shots": 8192
+    },
+    {
+      "name": "Core-5A (Uncorrelated)",
+      "n": 5,
+      "optimal_value": 20,
+      "optimal_states": [
+        "10101"
+      ],
+      "grover_iterations": 4,
+      "sim_success_prob": 0.9991823155432596,
+      "transpiled_depth": 12512,
+      "two_qubit_gates": 4017,
+      "hw_success_prob": 0.023681640625,
+      "hw_optimal_is_top": false,
+      "hw_found_optimal": true,
+      "hw_noise_penalty": 0.9755006749182596,
+      "hw_top_counts": {
+        "00111": 341,
+        "01101": 324,
+        "00101": 315,
+        "01111": 307,
+        "01001": 301,
+        "01010": 300,
+        "00001": 300,
+        "01011": 297,
+        "01100": 296,
+        "00100": 294
+      },
+      "total_shots": 8192
+    },
+    {
+      "name": "Core-5B (Correlated)",
+      "n": 5,
+      "optimal_value": 20,
+      "optimal_states": [
+        "01011",
+        "10100"
+      ],
+      "grover_iterations": 3,
+      "sim_success_prob": 0.9613189697265376,
+      "transpiled_depth": 9273,
+      "two_qubit_gates": 3012,
+      "hw_success_prob": 0.063720703125,
+      "hw_optimal_is_top": false,
+      "hw_found_optimal": true,
+      "hw_noise_penalty": 0.8975982666015376,
+      "hw_top_counts": {
+        "01110": 326,
+        "00011": 324,
+        "00111": 312,
+        "01111": 308,
+        "01011": 305,
+        "01010": 302,
+        "00110": 300,
+        "00010": 298,
+        "01000": 290,
+        "01100": 279
+      },
+      "total_shots": 8192
+    },
+    {
+      "name": "Core-6A (Hard)",
+      "n": 6,
+      "optimal_value": 28,
+      "optimal_states": [
+        "011011",
+        "100111"
+      ],
+      "grover_iterations": 4,
+      "sim_success_prob": 0.9991823155432489,
+      "transpiled_depth": 50520,
+      "two_qubit_gates": 16579,
+      "hw_success_prob": 0.03125,
+      "hw_optimal_is_top": false,
+      "hw_found_optimal": true,
+      "hw_noise_penalty": 0.9679323155432489,
+      "hw_top_counts": {
+        "000110": 264,
+        "001111": 260,
+        "001110": 257,
+        "001100": 242,
+        "000100": 231,
+        "000111": 226,
+        "001001": 224,
+        "000101": 222,
+        "000011": 221,
+        "000000": 214
+      },
+      "total_shots": 8192
+    },
+    {
+      "name": "Core-6B (Subset-Sum)",
+      "n": 6,
+      "optimal_value": 24,
+      "optimal_states": [
+        "011010",
+        "101001",
+        "110000"
+      ],
+      "grover_iterations": 3,
+      "sim_success_prob": 0.9981388254090786,
+      "transpiled_depth": 38129,
+      "two_qubit_gates": 12456,
+      "hw_success_prob": 0.032958984375,
+      "hw_optimal_is_top": false,
+      "hw_found_optimal": true,
+      "hw_noise_penalty": 0.9651798410340786,
+      "hw_top_counts": {
+        "001110": 277,
+        "000110": 269,
+        "001010": 257,
+        "000111": 246,
+        "001111": 243,
+        "001000": 242,
+        "000100": 240,
+        "001101": 240,
+        "001011": 240,
+        "000011": 235
+      },
+      "total_shots": 8192
+    }
+  ]
+}
