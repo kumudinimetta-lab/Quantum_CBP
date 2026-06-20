@@ -1,28 +1,38 @@
 """
-IBM Quantum Hardware Experiment: LP-Pruned Quantum B&B Knapsack
-================================================================
-Runs the quantum oracle + amplitude amplification (Phase 2) on
-real IBM quantum hardware for small core instances (3-4 items).
+IBM Quantum Hardware Experiment: amplitude amplification with a GENUINE
+(answer-agnostic) reversible knapsack oracle
+=======================================================================
+Runs one amplitude-amplification stage of the Durr-Hoyer optimization loop on
+real IBM hardware for small core instances.  The oracle is the gate-level
+reversible circuit from knapsack_oracle.build_knapsack_oracle, which COMPUTES the
+predicate (feasible AND value>=tau) internally -- it does NOT hard-code the
+optimal solution (unlike the previous diagonal-Operator oracle).  The classical
+solver is used ONLY to verify measured outcomes, never to build the circuit.
 
-This validates that the quantum phase of our algorithm works on
-actual quantum processors, not just simulation.
+The threshold tau is chosen from the LP/greedy bound (part of the algorithm),
+not from the brute-force optimum.
+
+Setup:  set your token in the environment before running, e.g. (PowerShell)
+    $env:IBM_QUANTUM_TOKEN = "<your token>"
 """
 
 import numpy as np
 import json
+import os
 import time
 import sys
 from datetime import datetime
 
 from qiskit import QuantumCircuit
-from qiskit.quantum_info import Statevector, Operator
 from qiskit.transpiler.preset_passmanagers import generate_preset_pass_manager
 from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2
+
+from knapsack_oracle import build_knapsack_oracle, oracle_marked_set
 
 # ============================================================
 # CONFIGURATION
 # ============================================================
-IBM_TOKEN = "TWijs-f4bzHyoIXNBjH2qBjBWWg2EmXDIbwYbq9SYpl8"
+IBM_TOKEN = os.environ.get("IBM_QUANTUM_TOKEN")  # never hard-code secrets
 SHOTS = 8192
 OPTIMIZATION_LEVEL = 3
 
@@ -122,116 +132,91 @@ def solve_classical(weights, values, capacity):
     return best_val, best_mask, optimal_states
 
 # ============================================================
-# BUILD QUANTUM CIRCUIT
+# THRESHOLD SELECTION (answer-agnostic: from greedy/LP, not brute force)
 # ============================================================
-def build_grover_circuit(weights, values, capacity, best_val):
-    """
-    Build Grover/amplitude amplification circuit for the knapsack oracle.
-    Marks states that achieve the optimal value.
+def greedy_threshold(weights, values, capacity):
+    """A feasible greedy value used as the amplitude-amplification threshold tau.
+
+    This uses only the problem data (a standard greedy pack by efficiency) -- it
+    does NOT use the optimal solution.  The Durr-Hoyer loop would raise tau from
+    here; for a single hardware stage we mark "feasible AND value >= tau"."""
+    n = len(weights)
+    order = sorted(range(n), key=lambda i: values[i] / weights[i], reverse=True)
+    rem, val = capacity, 0
+    for i in order:
+        if weights[i] <= rem:
+            rem -= weights[i]
+            val += values[i]
+    return val
+
+
+def _diffuser(n):
+    d = QuantumCircuit(n, name="diffuser")
+    d.h(range(n)); d.x(range(n)); d.h(n - 1)
+    if n > 1:
+        d.mcx(list(range(n - 1)), n - 1)
+    else:
+        d.z(0)
+    d.h(n - 1); d.x(range(n)); d.h(range(n))
+    return d
+
+
+# ============================================================
+# BUILD QUANTUM CIRCUIT (genuine reversible oracle)
+# ============================================================
+def build_grover_circuit(weights, values, capacity, tau):
+    """Amplitude-amplification circuit using the answer-agnostic oracle.
+
+    Marks states with feasible weight AND value >= tau, where tau comes from the
+    greedy bound (not the optimum).  Returns the measured circuit plus metadata.
     """
     n = len(weights)
-    N = 2**n
-    
-    # Count target states
-    target_indices = []
-    for i in range(N):
-        w, v = 0, 0
-        for j in range(n):
-            if i & (1 << j):
-                w += weights[j]
-                v += values[j]
-        if w <= capacity and v >= best_val:
-            target_indices.append(i)
-    
-    t = len(target_indices)
-    
-    # Build oracle as diagonal matrix
-    diagonal = np.ones(N)
-    for idx in target_indices:
-        diagonal[idx] = -1
-    oracle_op = Operator(np.diag(diagonal))
-    
-    # Build diffuser
-    diffuser = QuantumCircuit(n)
-    diffuser.h(range(n))
-    diffuser.x(range(n))
-    diffuser.h(n-1)
-    diffuser.mcx(list(range(n-1)), n-1)
-    diffuser.h(n-1)
-    diffuser.x(range(n))
-    diffuser.h(range(n))
-    diff_op = Operator(diffuser)
-    
-    # Calculate optimal iterations
+    N = 2 ** n
+
+    target_indices = oracle_marked_set(weights, values, capacity, tau)
+    t = max(1, len(target_indices))
+
+    oracle, sel = build_knapsack_oracle(weights, values, capacity, tau)
+    total = oracle.num_qubits
+    diff = _diffuser(n)
+
     iterations = max(1, int(np.floor((np.pi / 4) * np.sqrt(N / t))))
-    
-    # Build full circuit
-    qc = QuantumCircuit(n)
-    qc.h(range(n))  # Uniform superposition
-    
+
+    qc = QuantumCircuit(total)
+    qc.h(range(n))
     for _ in range(iterations):
-        qc.append(oracle_op, range(n))
-        qc.append(diff_op, range(n))
-    
-    # Add measurements
+        qc.compose(oracle, range(total), inplace=True)
+        qc.compose(diff, range(n), inplace=True)
     qc.measure_all()
-    
-    return qc, iterations, t, target_indices
+    return qc, iterations, t, target_indices, n
 
 # ============================================================
 # SIMULATOR BASELINE
 # ============================================================
-def run_simulator(weights, values, capacity, best_val):
-    """Run on local simulator for comparison."""
+def run_simulator(weights, values, capacity, tau):
+    """Ideal statevector baseline using the genuine oracle (ancillae traced)."""
+    from qiskit.quantum_info import Statevector
+
     n = len(weights)
-    N = 2**n
-    
-    # Build circuit WITHOUT measurements for statevector
-    target_indices = []
-    for i in range(N):
-        w, v = 0, 0
-        for j in range(n):
-            if i & (1 << j):
-                w += weights[j]
-                v += values[j]
-        if w <= capacity and v >= best_val:
-            target_indices.append(i)
-    
-    t = len(target_indices)
-    diagonal = np.ones(N)
-    for idx in target_indices:
-        diagonal[idx] = -1
-    oracle_op = Operator(np.diag(diagonal))
-    
-    diffuser = QuantumCircuit(n)
-    diffuser.h(range(n))
-    diffuser.x(range(n))
-    diffuser.h(n-1)
-    diffuser.mcx(list(range(n-1)), n-1)
-    diffuser.h(n-1)
-    diffuser.x(range(n))
-    diffuser.h(range(n))
-    diff_op = Operator(diffuser)
-    
+    N = 2 ** n
+    target_indices = oracle_marked_set(weights, values, capacity, tau)
+    t = max(1, len(target_indices))
+
+    oracle, sel = build_knapsack_oracle(weights, values, capacity, tau)
+    total = oracle.num_qubits
+    diff = _diffuser(n)
     iterations = max(1, int(np.floor((np.pi / 4) * np.sqrt(N / t))))
-    
-    qc = QuantumCircuit(n)
+
+    qc = QuantumCircuit(total)
     qc.h(range(n))
     for _ in range(iterations):
-        qc.append(oracle_op, range(n))
-        qc.append(diff_op, range(n))
-    
-    sv = Statevector(qc)
-    probs = sv.probabilities_dict()
-    
-    # Calculate success probability
-    success_prob = 0.0
-    for idx in target_indices:
-        # Qiskit probabilities_dict() keys are big-endian: key = format(idx, '0nb')
-        # No reversal needed — idx directly maps to the state vector index
-        state = format(idx, f'0{n}b')
-        success_prob += probs.get(state, 0.0)
-    
+        qc.compose(oracle, range(total), inplace=True)
+        qc.compose(diff, range(n), inplace=True)
+    sv = Statevector.from_instruction(qc)
+    sel_probs = sv.probabilities(qargs=list(range(n)))  # marginal over selection
+
+    success_prob = float(sum(sel_probs[idx] for idx in target_indices))
+    probs = {format(i, f'0{n}b'): float(sel_probs[i]) for i in range(N)}
     return success_prob, probs, iterations
 
 # ============================================================
@@ -246,6 +231,9 @@ def main():
     
     # ----- Step 1: Connect to IBM Quantum -----
     print("\n[1/5] Connecting to IBM Quantum...")
+    if not IBM_TOKEN:
+        print("  [FAIL] Set the IBM_QUANTUM_TOKEN environment variable first.")
+        sys.exit(1)
     try:
         service = QiskitRuntimeService(
             channel="ibm_quantum_platform",
@@ -289,18 +277,23 @@ def main():
         name = inst["name"]
         n = len(w)
         
-        # Classical solution
+        # Classical solution (for VERIFICATION only, not used to build the oracle)
         best_val, best_mask, optimal_states = solve_classical(w, v, cap)
-        
-        # Simulator
-        sim_prob, sim_probs, iterations = run_simulator(w, v, cap, best_val)
-        
-        # Build hardware circuit
-        qc, iters, t, target_indices = build_grover_circuit(w, v, cap, best_val)
+
+        # Threshold from greedy bound (answer-agnostic)
+        tau = greedy_threshold(w, v, cap)
+
+        # Simulator baseline (genuine oracle)
+        sim_prob, sim_probs, iterations = run_simulator(w, v, cap, tau)
+
+        # Build hardware circuit (genuine oracle)
+        qc, iters, t, target_indices, n_sel = build_grover_circuit(w, v, cap, tau)
         circuits_for_hw.append(qc)
         instance_meta.append({
             "name": name,
             "n": n,
+            "n_sel": n_sel,
+            "tau": tau,
             "optimal_value": best_val,
             "optimal_states": optimal_states,
             "target_count": t,
@@ -308,11 +301,11 @@ def main():
             "target_indices": target_indices,
             "sim_success_prob": sim_prob,
         })
-        
+
         print(f"\n  {name} (n={n}):")
         print(f"    Items: w={w}, v={v}, cap={cap}")
-        print(f"    Optimal value: {best_val}")
-        print(f"    Optimal states: {optimal_states}")
+        print(f"    Greedy threshold tau: {tau}  (optimal value: {best_val})")
+        print(f"    Marked (feasible & value>=tau) states: {len(target_indices)}")
         print(f"    Grover iterations: {iterations}")
         print(f"    Simulator success prob: {sim_prob*100:.1f}%")
     
@@ -373,38 +366,29 @@ def main():
         pub_result = result[0]
         counts = pub_result.data.meas.get_counts()
         total_shots = sum(counts.values())
-        
-        # Calculate hardware success probability
-        hw_success_shots = 0
+        n_sel = meta["n_sel"]
+
+        # The full register includes arithmetic ancillae; the selection register
+        # is qubits 0..n_sel-1, i.e. the LAST n_sel chars of the (little-endian)
+        # bitstring. Marginalize onto the selection register.
+        sel_counts = {}
         for state_str, count in counts.items():
-            # Check if this measured state corresponds to an optimal solution
-            # Qiskit returns states in the measurement register order
-            idx = int(state_str, 2)
-            if idx in target_indices:
-                hw_success_shots += count
-        
+            bits = state_str.replace(" ", "")
+            sel_bits = bits[-n_sel:]
+            idx = int(sel_bits, 2)
+            sel_counts[idx] = sel_counts.get(idx, 0) + count
+
+        hw_success_shots = sum(c for idx, c in sel_counts.items()
+                               if idx in target_indices)
         hw_success_prob = hw_success_shots / total_shots
         sim_prob = meta["sim_success_prob"]
-        
-        # Get top measured states
-        sorted_counts = sorted(counts.items(), key=lambda x: x[1], reverse=True)
-        
-        # Find the most measured optimal state
-        best_hw_state = None
-        best_hw_count = 0
-        for state_str, count in sorted_counts:
-            idx = int(state_str, 2)
-            if idx in target_indices:
-                if count > best_hw_count:
-                    best_hw_state = state_str
-                    best_hw_count = count
-        
-        # Determine if correct solution was found
+
+        sorted_counts = sorted(
+            ((format(idx, f'0{n_sel}b'), c) for idx, c in sel_counts.items()),
+            key=lambda x: x[1], reverse=True)
+
         found_optimal = hw_success_prob > 0
-        
-        # Check if optimal state is the TOP measured state
-        top_state = sorted_counts[0][0]
-        top_idx = int(top_state, 2)
+        top_idx = int(sorted_counts[0][0], 2)
         optimal_is_top = top_idx in target_indices
         
         print(f"\n{'-' * 70}")
