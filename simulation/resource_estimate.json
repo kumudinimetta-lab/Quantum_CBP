@@ -1,0 +1,138 @@
+{
+  "montanaro_query_slope": 2.9459288323880517,
+  "rs_slope": 3.02,
+  "toffoli_t": 7,
+  "per_oracle_profiles": [
+    {
+      "m": 4,
+      "logical_qubits": 31,
+      "rz": 1874,
+      "cx": 1725,
+      "depth": 582,
+      "t_per_rz": 100.32222846559834,
+      "t_count_per_oracle": 188003.85614453128,
+      "eps": 1e-10
+    },
+    {
+      "m": 6,
+      "logical_qubits": 34,
+      "rz": 2269,
+      "cx": 2065,
+      "depth": 657,
+      "t_per_rz": 100.32222846559834,
+      "t_count_per_oracle": 227631.13638844265,
+      "eps": 1e-10
+    },
+    {
+      "m": 8,
+      "logical_qubits": 36,
+      "rz": 2496,
+      "cx": 2241,
+      "depth": 707,
+      "t_per_rz": 100.32222846559834,
+      "t_count_per_oracle": 250404.28225013346,
+      "eps": 1e-10
+    },
+    {
+      "m": 10,
+      "logical_qubits": 38,
+      "rz": 2755,
+      "cx": 2473,
+      "depth": 768,
+      "t_per_rz": 100.32222846559834,
+      "t_count_per_oracle": 276387.7394227234,
+      "eps": 1e-10
+    },
+    {
+      "m": 12,
+      "logical_qubits": 41,
+      "rz": 3165,
+      "cx": 2805,
+      "depth": 868,
+      "t_per_rz": 100.32222846559834,
+      "t_count_per_oracle": 317519.85309361876,
+      "eps": 1e-10
+    },
+    {
+      "m": 14,
+      "logical_qubits": 44,
+      "rz": 3620,
+      "cx": 3225,
+      "depth": 869,
+      "t_per_rz": 100.32222846559834,
+      "t_count_per_oracle": 363166.467045466,
+      "eps": 1e-10
+    },
+    {
+      "m": 16,
+      "logical_qubits": 45,
+      "rz": 3697,
+      "cx": 3253,
+      "depth": 873,
+      "t_per_rz": 100.32222846559834,
+      "t_count_per_oracle": 370891.27863731707,
+      "eps": 1e-10
+    }
+  ],
+  "subset_sum_gamma": 0.9462927154821481,
+  "breakeven_projection": [
+    {
+      "m": 16,
+      "T_lp": 36124.335960656164,
+      "Q": 2239.6604381924353,
+      "quantum_T_total": 850796124.2497346,
+      "classical_ops": 577989.3753704986,
+      "quantum_wins": false
+    },
+    {
+      "m": 24,
+      "T_lp": 6865936.917548444,
+      "Q": 37816.19043164348,
+      "quantum_T_total": 19156544817.43513,
+      "classical_ops": 164782486.02116266,
+      "quantum_wins": false
+    },
+    {
+      "m": 32,
+      "T_lp": 1304967648.5983562,
+      "Q": 602000.8614755122,
+      "quantum_T_total": 381224612420.55646,
+      "classical_ops": 41758964755.1474,
+      "quantum_wins": false
+    },
+    {
+      "m": 48,
+      "T_lp": 47141089755754.63,
+      "Q": 140133728.9070893,
+      "quantum_T_total": 124249270173700.36,
+      "classical_ops": 2262772308276222.5,
+      "quantum_wins": true
+    },
+    {
+      "m": 64,
+      "T_lp": 1.7029405638883228e+18,
+      "Q": 30754734570.716297,
+      "quantum_T_total": 3.506141664679228e+16,
+      "classical_ops": 1.0898819608885266e+20,
+      "quantum_wins": true
+    },
+    {
+      "m": 96,
+      "T_lp": 2.2222823433601143e+27,
+      "Q": 1360684649470328.5,
+      "quantum_T_total": 2.2407805316223837e+21,
+      "classical_ops": 2.1333910496257098e+29,
+      "quantum_wins": true
+    },
+    {
+      "m": 128,
+      "T_lp": 2.900006564136279e+36,
+      "Q": 5.675795328771732e+19,
+      "quantum_T_total": 1.222324685692107e+26,
+      "classical_ops": 3.712008402094437e+38,
+      "quantum_wins": true
+    }
+  ],
+  "breakeven_core_size": 48,
+  "note": "Honest FT estimate; arbitrary rz synthesized via Ross-Selinger at eps=1e-10. Classical ops = T_LP * m (poly work per node)."
+}

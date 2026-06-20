@@ -1,0 +1,508 @@
+{
+  "results": [
+    {
+      "n": 3,
+      "w": [
+        6,
+        3,
+        7
+      ],
+      "v": [
+        1,
+        2,
+        9
+      ],
+      "cap": 8,
+      "opt": 9,
+      "found": 9,
+      "correct": true,
+      "oracle_calls_to_optimum": 10,
+      "rounds": 4
+    },
+    {
+      "n": 3,
+      "w": [
+        2,
+        6,
+        1
+      ],
+      "v": [
+        9,
+        4,
+        1
+      ],
+      "cap": 4,
+      "opt": 10,
+      "found": 10,
+      "correct": true,
+      "oracle_calls_to_optimum": 5,
+      "rounds": 3
+    },
+    {
+      "n": 3,
+      "w": [
+        2,
+        7,
+        7
+      ],
+      "v": [
+        2,
+        4,
+        2
+      ],
+      "cap": 8,
+      "opt": 4,
+      "found": 4,
+      "correct": true,
+      "oracle_calls_to_optimum": 1,
+      "rounds": 2
+    },
+    {
+      "n": 3,
+      "w": [
+        9,
+        7,
+        1
+      ],
+      "v": [
+        2,
+        4,
+        1
+      ],
+      "cap": 8,
+      "opt": 5,
+      "found": 5,
+      "correct": true,
+      "oracle_calls_to_optimum": 4,
+      "rounds": 3
+    },
+    {
+      "n": 3,
+      "w": [
+        7,
+        1,
+        4
+      ],
+      "v": [
+        1,
+        9,
+        3
+      ],
+      "cap": 6,
+      "opt": 12,
+      "found": 12,
+      "correct": true,
+      "oracle_calls_to_optimum": 1,
+      "rounds": 2
+    },
+    {
+      "n": 3,
+      "w": [
+        5,
+        7,
+        3
+      ],
+      "v": [
+        9,
+        2,
+        5
+      ],
+      "cap": 7,
+      "opt": 9,
+      "found": 9,
+      "correct": true,
+      "oracle_calls_to_optimum": 2,
+      "rounds": 2
+    },
+    {
+      "n": 3,
+      "w": [
+        9,
+        3,
+        2
+      ],
+      "v": [
+        4,
+        6,
+        2
+      ],
+      "cap": 7,
+      "opt": 8,
+      "found": 8,
+      "correct": true,
+      "oracle_calls_to_optimum": 3,
+      "rounds": 3
+    },
+    {
+      "n": 3,
+      "w": [
+        9,
+        2,
+        1
+      ],
+      "v": [
+        4,
+        8,
+        9
+      ],
+      "cap": 6,
+      "opt": 17,
+      "found": 17,
+      "correct": true,
+      "oracle_calls_to_optimum": 10,
+      "rounds": 4
+    },
+    {
+      "n": 4,
+      "w": [
+        7,
+        6,
+        8,
+        8
+      ],
+      "v": [
+        6,
+        5,
+        4,
+        3
+      ],
+      "cap": 14,
+      "opt": 11,
+      "found": 11,
+      "correct": true,
+      "oracle_calls_to_optimum": 14,
+      "rounds": 4
+    },
+    {
+      "n": 4,
+      "w": [
+        4,
+        2,
+        5,
+        9
+      ],
+      "v": [
+        8,
+        6,
+        8,
+        5
+      ],
+      "cap": 10,
+      "opt": 16,
+      "found": 16,
+      "correct": true,
+      "oracle_calls_to_optimum": 9,
+      "rounds": 3
+    },
+    {
+      "n": 4,
+      "w": [
+        2,
+        2,
+        9,
+        7
+      ],
+      "v": [
+        3,
+        6,
+        3,
+        8
+      ],
+      "cap": 10,
+      "opt": 14,
+      "found": 14,
+      "correct": true,
+      "oracle_calls_to_optimum": 15,
+      "rounds": 4
+    },
+    {
+      "n": 4,
+      "w": [
+        7,
+        1,
+        2,
+        9
+      ],
+      "v": [
+        6,
+        6,
+        6,
+        8
+      ],
+      "cap": 9,
+      "opt": 12,
+      "found": 12,
+      "correct": true,
+      "oracle_calls_to_optimum": 4,
+      "rounds": 3
+    },
+    {
+      "n": 4,
+      "w": [
+        8,
+        2,
+        2,
+        5
+      ],
+      "v": [
+        8,
+        2,
+        1,
+        5
+      ],
+      "cap": 8,
+      "opt": 8,
+      "found": 8,
+      "correct": true,
+      "oracle_calls_to_optimum": 18,
+      "rounds": 5
+    },
+    {
+      "n": 4,
+      "w": [
+        8,
+        5,
+        7,
+        6
+      ],
+      "v": [
+        1,
+        8,
+        6,
+        3
+      ],
+      "cap": 13,
+      "opt": 14,
+      "found": 14,
+      "correct": true,
+      "oracle_calls_to_optimum": 3,
+      "rounds": 4
+    },
+    {
+      "n": 4,
+      "w": [
+        2,
+        8,
+        1,
+        4
+      ],
+      "v": [
+        5,
+        3,
+        4,
+        7
+      ],
+      "cap": 7,
+      "opt": 16,
+      "found": 16,
+      "correct": true,
+      "oracle_calls_to_optimum": 2,
+      "rounds": 2
+    },
+    {
+      "n": 4,
+      "w": [
+        7,
+        8,
+        2,
+        3
+      ],
+      "v": [
+        8,
+        7,
+        9,
+        5
+      ],
+      "cap": 10,
+      "opt": 17,
+      "found": 17,
+      "correct": true,
+      "oracle_calls_to_optimum": 1,
+      "rounds": 2
+    },
+    {
+      "n": 5,
+      "w": [
+        3,
+        7,
+        9,
+        5,
+        7
+      ],
+      "v": [
+        6,
+        7,
+        4,
+        3,
+        2
+      ],
+      "cap": 15,
+      "opt": 16,
+      "found": 16,
+      "correct": true,
+      "oracle_calls_to_optimum": 3,
+      "rounds": 2
+    },
+    {
+      "n": 5,
+      "w": [
+        3,
+        3,
+        4,
+        4,
+        1
+      ],
+      "v": [
+        8,
+        3,
+        5,
+        5,
+        1
+      ],
+      "cap": 7,
+      "opt": 13,
+      "found": 13,
+      "correct": true,
+      "oracle_calls_to_optimum": 2,
+      "rounds": 2
+    },
+    {
+      "n": 5,
+      "w": [
+        3,
+        7,
+        9,
+        6,
+        6
+      ],
+      "v": [
+        3,
+        9,
+        1,
+        8,
+        9
+      ],
+      "cap": 15,
+      "opt": 20,
+      "found": 20,
+      "correct": true,
+      "oracle_calls_to_optimum": 11,
+      "rounds": 4
+    },
+    {
+      "n": 5,
+      "w": [
+        7,
+        7,
+        7,
+        7,
+        2
+      ],
+      "v": [
+        8,
+        7,
+        1,
+        4,
+        2
+      ],
+      "cap": 15,
+      "opt": 15,
+      "found": 15,
+      "correct": true,
+      "oracle_calls_to_optimum": 8,
+      "rounds": 3
+    },
+    {
+      "n": 5,
+      "w": [
+        4,
+        8,
+        3,
+        2,
+        6
+      ],
+      "v": [
+        1,
+        2,
+        1,
+        3,
+        9
+      ],
+      "cap": 11,
+      "opt": 13,
+      "found": 13,
+      "correct": true,
+      "oracle_calls_to_optimum": 13,
+      "rounds": 3
+    },
+    {
+      "n": 5,
+      "w": [
+        2,
+        6,
+        1,
+        2,
+        4
+      ],
+      "v": [
+        7,
+        3,
+        5,
+        6,
+        6
+      ],
+      "cap": 7,
+      "opt": 18,
+      "found": 18,
+      "correct": true,
+      "oracle_calls_to_optimum": 8,
+      "rounds": 4
+    },
+    {
+      "n": 5,
+      "w": [
+        8,
+        2,
+        2,
+        8,
+        8
+      ],
+      "v": [
+        8,
+        8,
+        5,
+        2,
+        3
+      ],
+      "cap": 14,
+      "opt": 21,
+      "found": 21,
+      "correct": true,
+      "oracle_calls_to_optimum": 14,
+      "rounds": 4
+    },
+    {
+      "n": 5,
+      "w": [
+        2,
+        6,
+        5,
+        8,
+        3
+      ],
+      "v": [
+        9,
+        1,
+        4,
+        9,
+        6
+      ],
+      "cap": 12,
+      "opt": 19,
+      "found": 19,
+      "correct": true,
+      "oracle_calls_to_optimum": 24,
+      "rounds": 5
+    }
+  ]
+}

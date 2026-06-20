@@ -1,0 +1,47 @@
+{
+  "rows": [
+    {
+      "n": 3,
+      "qubits": 18,
+      "depth": 249,
+      "two_qubit_gates": 529,
+      "total_gates": 1239
+    },
+    {
+      "n": 4,
+      "qubits": 19,
+      "depth": 266,
+      "two_qubit_gates": 573,
+      "total_gates": 1353
+    },
+    {
+      "n": 5,
+      "qubits": 21,
+      "depth": 287,
+      "two_qubit_gates": 685,
+      "total_gates": 1599
+    },
+    {
+      "n": 6,
+      "qubits": 22,
+      "depth": 300,
+      "two_qubit_gates": 773,
+      "total_gates": 1788
+    },
+    {
+      "n": 7,
+      "qubits": 24,
+      "depth": 325,
+      "two_qubit_gates": 917,
+      "total_gates": 2093
+    },
+    {
+      "n": 8,
+      "qubits": 25,
+      "depth": 327,
+      "two_qubit_gates": 977,
+      "total_gates": 2243
+    }
+  ],
+  "note": "Answer-agnostic QFT-arithmetic knapsack oracle; counts are for ONE oracle call (one amplitude-amp iteration uses one oracle + one diffuser)."
+}
