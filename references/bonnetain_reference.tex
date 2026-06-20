@@ -1,0 +1,49 @@
+%% ============================================================
+%% REFERENCE [35] — Bonnetain et al. (2020)
+%% Add this entry to your \begin{thebibliography}{} section
+%% ============================================================
+
+\bibitem{bonnetain2020improved}
+X. Bonnetain, R. Bricout, A. Schrottenloher, and Y. Shen, ``Improved classical
+and quantum algorithms for subset-sum,'' in \textit{Advances in Cryptology --
+EUROCRYPT}, 2020, pp. 633--660.
+
+
+%% ============================================================
+%% LITERATURE REVIEW — Research Gap Paragraph
+%% Add this at the END of your Related Work / Literature Review section
+%% ============================================================
+
+% The literature reveals a critical unresolved tension. The best
+% quantum exact algorithm for knapsack (Helm and May, 2018) achieves
+% $O(2^{0.226n})$ but relies on Heuristic~2---an unproven assumption
+% about quantum walk update times that has been shown to be
+% mathematically unsound in general~\cite{bonnetain2020improved}.
+% Furthermore, it requires QRAQM, a hardware model that does not
+% currently exist. Simpler quantum approaches based on Grover search
+% achieve only $O(2^{n/2})$, offering no improvement over classical
+% meet-in-the-middle. This paper addresses this gap by proposing a
+% hybrid algorithm that achieves a provable speedup over classical
+% meet-in-the-middle using only QRACM memory and without invoking
+% any unproven heuristic assumptions, targeting implementability on
+% near-term NISQ hardware.
+
+
+%% ============================================================
+%% FULL CITATION (for your records)
+%% ============================================================
+% Paper: "Improved Classical and Quantum Algorithms for Subset-Sum"
+% Authors: Xavier Bonnetain, Rémi Bricout, André Schrottenloher, Yixin Shen
+% Published: EUROCRYPT 2020 (Lecture Notes in Computer Science, vol 12106)
+% arXiv: 2002.05276
+% URL: https://arxiv.org/abs/2002.05276
+%
+% KEY CONTRIBUTION: This paper proves that Heuristic 2 (used by Helm & May
+% 2018 to claim O(2^{0.226n}) for subset-sum) is mathematically unsound
+% in general. Specifically, they show the heuristic assumption about
+% quantum walk update complexity does not hold for arbitrary instances.
+%
+% WHY IT MATTERS FOR YOUR PAPER: Your entire research gap rests on the
+% fact that Helm & May's result is invalid without this heuristic.
+% Bonnetain et al. is the proof. Without this citation, reviewers will
+% ask "who proved Heuristic 2 is wrong?" and you have no answer.
