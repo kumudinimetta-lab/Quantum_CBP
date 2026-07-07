@@ -1,0 +1,927 @@
+Date of publication xxxx 00, 0000, date of current version xxxx 00, 0000.
+Digital Object Identifier 10.1109/TQE.2020.DOI
+Hybrid classical–quantum
+branch–and–bound algorithm for solving
+integer linear problems
+CLAUDIO SANAVIO1,2,3, EDOARDO TIGNONE4, AND ELISA ERCOLESSI2,3
+1Fondazione Istituto Italiano di Tecnologia, Center for Life Nano-Neuroscience at la Sapienza, Viale Regina Elena 291, 00161 Roma, Italy
+2Dipartimento di Fisica e Astronomia dell’Università di Bologna, I-40127 Bologna, Italy
+3INFN, Sezione di Bologna, I-40127 Bologna, Italy
+4Leithà S.r.l. | Unipol Group, Bologna, Italy
+Corresponding author: Claudio Sanavio (email: claudio.sanavio@iit.it).
+This research is funded by the International Foundation Big Data and Artificial Intelligence for Human Development (IFAB) through the
+project “Quantum Computing for Applications”. E. E. is partially supported by INFN through the project “QUANTUM”. C. S. and E. E.
+acknowledge financial support from the National Centre for HPC, Big Data and Quantum Computing (Spoke 10, CN00000013).
+ABSTRACT Quantum annealers are suited to solve several logistic optimization problems expressed in the
+QUBO formulation. However, the solutions proposed by the quantum annealers are generally not optimal,
+as thermal noise and other disturbing effects arise when the number of qubits involved in the calculation is
+too large. In order to deal with this issue, we propose the use of the classical branch–and–bound algorithm,
+that divides the problem into sub-problems which are described by a lower number of qubits. We analyze the
+performance of this method on two problems, the knapsack problem and the traveling salesman problem.
+Our results show the advantages of this method, that balances the number of steps that the algorithm has to
+make with the amount of error in the solution found by the quantum hardware that the user is willing to risk.
+All the results are actual runs on the quantum annealer D-Wave Advantage.
+INDEX TERMS Quantum annealing, binary linear problem, knapsack problem, traveling salesman
+problem, branch and bound
+I. INTRODUCTION
+Logistic optimization problems, whose goal is to find the
+solution which minimizes a suitable cost function given a
+set of constraints, can often be expressed in terms of binary
+combinatorial problems. One way to tackle this kind of
+problems consists of exploring all possible solutions, thus
+pursuing a brute-force strategy. A better strategy is found
+in the so called branch–and–bound (BB) algorithm [1], that
+explores sub-combinations of the problem and excludes those
+that either do not satisfy the constraints or those whose value
+of the cost function is higher than the solutions previously
+investigated. Paradigmatic examples, that can be both solved
+with the BB algorithm [2]–[5], are given by:
+i) the Knapsack Problem (KP) [2], in which one searches
+for the selection of objects (from a predefined set) that
+maximizes the load’s value while adhering to the capacity
+constraint of the carrier;
+ii) the Traveling Salesman Problem (TSP) [3], [6], which
+aims at finding the minimal route that passes through differ-ent cities, with the constraint that the path crosses all of the
+cities exactly once.
+In recent times, with physical platforms that have been
+made available to researchers, attention has been driven by
+the possibility that quantum computers can speed-up the
+resolution of several NP-hard problems [7]. In this work we
+analyze a particular quantum computer, the quantum annealer
+of D-Wave, which is expected to be particularly suitable
+for solving binary optimization problems. The two problems
+mentioned above are perfect examples of combinatorial prob-
+lems that may benefit from the use of a quantum computer.
+However, few works have been done on the actual resolution
+on the D-wave machine. In Ref. [8] the authors tried to solve
+small KP using the D-wave quantum annealer, finding results
+far from the global optimum. In Ref. [9] the authors have
+analyzed the shortest path problem, a slight variant of the
+TSP. They successfully determined the optimal solution for
+graphs composed of up to six nodes, a limitation that may
+not align with current practical requirements. In fact, the
+VOLUME 4, 2016 1arXiv:2311.09700v1  [quant-ph]  16 Nov 2023
+Claudio Sanavio et al. : Hybrid classical–quantum branch–and–bound algorithm ...
+quantum annealer is still a developing technology, currently
+affected by noise that makes it unable to find the global
+solution even to simple problems.
+In order to overcome the apparent failure of the fruitful
+use of this device in the near period, we propose to use a
+classical-hybrid protocol, in which the quantum hardware
+is used as a subroutine for a variant of the classical BB
+algorithm. In particular, we show that thanks to the BB
+algorithm we can reduce the size of the problem down to
+a number of instances that are feasible for the quantum
+computer. With this strategy, the quantum computer can fully
+show its potential and find an optimal solution to the problem.
+Our findings show that we can exploit near-term quantum
+computers to speed up the solution of a problem reducing
+the number of queries to both the quantum and the classical
+computer. However, there is a trade off between the quality
+of the found solution, measured in terms of its proximity
+to the global optimal solution, and the achievable speed-
+up. A similar idea has been proposed in Ref. [10], the BB
+algorithm was applied to a large number of QUBO problems,
+by simulating the quantum annealer on a classical computer.
+In the paper, we apply a hybrid algorithm to study both the
+KP and the TSP making use of the real D-Wave machine Ad-
+vantage [11]–[13]. The content is as follows. In Section II we
+review the definition of the TSP and the KP and we explain
+how they can be solved using the BB algorithm. In Section III
+we show how we can encode the optimal solution of the TSP
+and the KP as the ground state of a suitable Hamiltonian
+for the quantum annealer. In Section IV we first discuss the
+issues related to directly solve the integer linear problems via
+unrestricted algorithm on the quantum hardware. Next, we
+define our hybrid classical-quantum algorithm and study its
+performance on examples of the KP and TSP problems. In
+Section V we draw our conclusions and present outlooks.
+II. THE BINARY LINEAR PROBLEM
+The binary linear optimization problem (BLOP) aims to
+find the minimum of the cost function z(x)over the set of
+possible solutions Ω, namely
+minx∈Ω(x) =cTx (1a)
+s.t. Ax≤b (1b)
+x∈ {0,1}N, (1c)
+withcbeing an N-dimensional vector, Abeing an N×m
+matrix and bbeing an mdimensional vector. xis an N
+dimensional vector whose components take value 0or1.
+Although the simple form of Eqs. (1), the BLOP is generally
+NP-hard [14].
+In this section we explore one algorithm that is used to
+solve BLOPs, the BB algorithm. The core procedure of the
+BB algorithm for finding the solution of the problem PΩon
+the set Ωconsists into analyzing the restrictions R¯Ωof the
+original set ¯Ω⊂Ω.
+The lowest value of the cost function of the original problem
+minx∈Ωz(x)is a lower bound of the minimum of the costfunction of the restricted problem minx∈¯Ωz(x). As we are
+dealing with a linear problem, the minimum and the maxi-
+mum of the cost function is to be found at the borders of the
+setΩ. However the optimal solution could have non-binary
+values.
+Dividing the original problem into sub-problems allows us
+to consider the restricted problems separately and choose the
+one with minimum cost. Fig. 1a shows the procedure of the
+BB algorithm when applied to a 3-dimensional system. In
+Fig. 1b the procedure is represented as a tree, where each
+branch represents a restriction of the problem into a selected
+subset.
+We define zPas the current upper bound of the cost
+function. We initialize it to the upper bound of the cost
+function over the set Ω. This is done at the root of the tree and
+is equivalent to initialize zPto the value ∞. In the example
+shown in Fig. 1, we analyze the restricted problem R0, where
+¯Ωis a lower dimensional set that has the value of the first
+variable fixed to zero, i.e. x1= 0. The lower bound of the
+cost function in the restricted region is zR0< zP, because of
+the original large value of zP. We then proceed by restricting
+the second variable x2= 0so defining the problem R00, and
+finally the third one x3= 0 in order to specify the problem
+R000, and find the value of the cost function z(0,0,0)for
+this restriction. This procedure is called branching and stands
+for the subsequent restriction of the problem into different
+sub-problems. Once the value of the cost function for a
+certain branch has been found, we proceed with the bounding
+procedure. The current upper bound zPis updated to zR000.
+From now on, we consider only subsets where the optimal
+cost function is less than the updated zP. We now relax the
+problem, going back to R00, and set x3= 1. IfzR001< zP,
+the latter is updated to this value.
+We analyze other values of the variables relaxing the
+problem and applying different restrictions, as long as we
+explore all the solutions. If the lower bound of the cost
+function zRiin the follow-up restriction Riis greater than
+the current upper bound zP, we do not need to investigate
+that restricted region, and we can skip to another branch. If
+a node in the tree (a restricted subset) does not satisfy the
+constraints, the node is not considered valid and the bounding
+process does not take place.
+In the tree of Fig. 1a each branch develops on the assumption
+that the value of a variable is fixed to either 0or1, but the
+same method can be applied to integer values of the variables.
+Finally, the optimal solution will minimize the cost function
+while satisfying the constraints.
+A. THE KNAPSACK PROBLEM
+In the KP, we have Nobjects, each with a value viand
+a weight wi, for i= 1, . . . , N . The problem consists of
+choosing the items to put in the knapsack so that their
+total value is maximum while not exceeding the knapsack
+capacity. This problem can be formulated by using Nbinary
+variables xi= 1(i= 1,···, N), with xi= 1if the object i
+enters in the knapsack, and xi= 0 if it does not. The values
+2 VOLUME 4, 2016
+Claudio Sanavio et al. : Hybrid classical–quantum branch–and–bound algorithm ...
+(a)
+(b)
+FIGURE 1: (a) Visualization of the BB algorithm in the 3
+dimensional space [0,1]3with constraint Ax≤b. Each
+restriction Rrepresents a subset of [0,1]3where one or
+more variables have been constrained to a binary value. (b)
+Schematic representation of the BB algorithm as a tree. At
+each step BB checks if the constraints are satisfied and if
+the cost function of the node is lower than the current upper
+bound. When the branching has terminated, the bounding
+process takes place and the value of the upper bound zP
+is updated (green node). If the next branch finds a value of
+z > z P(yellow nodes) the branch is not explored further.
+The same happens if the constraints are violated (red node).and the weights can be collected in two vectors vandw
+respectively. The BLOP (1) is written as
+minxz(x) =−vTx (2a)
+s.t. w(x) =wTx≤W, (2b)
+x∈ {0,1}N. (2c)
+The KP can be solved using the BB algorithm. As we
+assume that all the weights wiand the values viare positive
+numbers for all i= 1, . . . , N , we can slightly modify the
+BB algorithm in order to make it more efficient. We call this
+version KP-BB. We start from the string x0= (0, . . . , 0),
+which describes the empty knapsack. The value function z
+and the weight function ware both zero. The first branch
+has the value of the first variable set, x1= 1. The value
+function zis updated to −v1and the weight function takes
+value w1. The k-th branch sets the k-th variable xk= 1
+and sets the previous (k−1)variables to zero. At each k-th
+branch, the value function is −vkand the weight function is
+wk. With this ordering, each of the kbranches defines a new
+knapsack problem, where the k-th object has been chosen
+and the problem is to choose among the remaining N−k
+objects. The loading capacity of the new problem is W−wk
+and the value of the empty knapsack is initialized to −vk.
+The KP-BB algorithm recursively applies this restriction of
+the problem to each branch, following a so-called depth-
+first search, where the search scouts a tree till it ends, then
+traces back its steps. At this point, the algorithm passes to
+another branch. In Fig. 2 we show the tree representation of
+the KP-BB algorithm for a problem with three objects. In the
+node’s box the value of the upper bound of the cost function
+is shown. When a new solution is explored, the algorithm
+identifies it as optimal (green), valid but not optimal (yellow)
+or not valid (red). It stops either when all the variables have
+been considered, or when the total weight of the knapsack
+has exceeded its limit.
+B. THE TRAVELING SALESMAN PROBLEM
+The traveling salesman problem describes an agent that has
+to visit different cities starting from the depot and returning
+to it at the end of the journey. The problem consists of finding
+the route with the lowest cost that visits all the nodes exactly
+once, where the cost can describe time, distance or money
+used in the travel. TSP can be modeled by a weighted graph,
+where the nodes are the cities and the weights of the edges
+represent the transportation cost from one node to another
+one. One can always assume the graph to be fully connected,
+by putting the corresponding cost to be very high (possibly
+infinity) if two cities are not actually connected by a direct
+path.
+The graph is represented by the pair G= (V, C)with
+V={d,1,2, . . . , N −1}being the set of Nvertices and
+Cbeing the weighted adjacency N×Nmatrix of the graph.
+The component Cijrepresents the cost of traveling from node
+ito node jand it is not necessarily symmetric. A solution
+VOLUME 4, 2016 3
+Claudio Sanavio et al. : Hybrid classical–quantum branch–and–bound algorithm ...
+FIGURE 2: Schematic representation of the KP-BB algo-
+rithm as a tree, when applied to a knapsack problem with
+three objects. The nodes represent a solution as written
+above them. In the boxes we write the value of the cost
+function for that solution. The knapsack is initially empty
+x= (0 ,0,0), z= 0 and it is filled with the first object,
+described by the solution vector (1,0,0). The value function
+is updated to −v1and the weight to w1. Hence, a new KP
+problem is defined as described in the text. A green node
+represents a valid solution that is currently optimal. A yellow
+node represents a solution that is valid, but not optimal. A red
+node represents a non-valid solution, where the constraints
+are not satisfied.
+for the TSP is the cycle path along the edges of the graph
+that starts from the depot node, named d, passes through
+all the other N−1nodes exactly once and ends in the
+initial node d. One mathematical description of TSP is given
+by the Dantzig–Fulkerson–Johnson formulation [15], which
+considers N2binary variables xij, each representing the edge
+that connects the node iwith the node j. The corresponding
+linear problem is obtained in the form of Eq. (1) collecting
+the binary variables xijinto a N×Nmatrix x.
+minxz(x) =Tr[Cx] =P
+i̸=jCijxij, (3a)
+s.t.Pn
+j=1xij= 1,∀i (3b)Pn
+i=1xij= 1,∀j (3c)P
+i,j∈Sxij≤ |S|, (3d)
+∀S⊂V,2≤ |S| ≤N−2,
+xij∈ {0,1}. (3e)
+The first line, Eq. (3a) is the objective function that we
+want to minimize. The other equations are the constraints
+given by the TSP. In particular, Eqs. (3b),(3c) state that
+each vertex must have one inward and one outward edge
+respectively. Eq. (3d) avoids the presence of sub-paths that
+do not cover the whole set of vertices. Here Sis a subset of
+V, and|S|is the number of elements in S. Eq.(3e) states that
+thexijare binary variables.
+The TSP can be solved with the BB algorithm [3], [4].
+Similar to the knapsack problem, the BB algorithm offers
+a strategy to systematically explore all solutions, which can
+be tailored for the specific problem at hand. We refer to thiscustomized version of the branch–and–bound algorithm as
+TSP-BB.
+We start from the depot with initial cost function z= 0, and
+we choose the path to one of the N−1cities, that we denote
+with k. Then, the TSP-BB algorithm defines a new TSP
+made of N−2cities, where the cost matrix is modified to
+include the previous choice. The new TSP has N−1vertices
+and new adjacency matrix C′with adjacency components
+C′
+ik=Cid. Thus the initial cost of the new TSP has the
+updated value z→z+Cdk. Different from the KP-BB
+defined before, the TSP-BB has a best-first search approach,
+where the next node analyzed by the algorithm is the one
+with current best zvalue. When all the variables have been
+explored in one branch, we define the upper bound of the
+travel cost z. Any time the initial travel cost of a branch ex-
+ceeds z, we neglect that branch. On the contrary, we explore
+the branches with travel cost lower than z, until we find the
+optimal solution. Fig. 3 shows a schematic representation of
+the TSP-BB algorithm as a tree, when applied to a graph with
+5cities.
+FIGURE 3: Schematic representation of the TSP-BB algo-
+rithm applied to a traveling salesman problem with 5nodes.
+Once an edge is chosen, the problem reduces to another
+TSP with one node less. The initial travel cost is obtained
+summing up the partial travel costs written on the branches.
+The travel cost of the colored path is z=cd2+c24+c43+
+c31+c1d. Then, this value is compared to the travel cost of
+the unexplored branches. If a branch has an initial travel cost
+lower than the current optimal value, the branch is explored
+next by the algorithm.
+III. THE QUBO AND ISING FORMULATION
+In this work we analyze the use of the D-wave Advan-
+tage quantum computer to solve the combinatorial problems
+introduced in the previous sections. The D-wave machine
+belongs to the class of quantum annealers, that work through
+the application of a global time-dependent Hamiltonian. An
+introduction to quantum annealers is presented in Appendix
+A.
+The D-Wave machine evolves with an Ising-like Hamilto-
+nian,
+4 VOLUME 4, 2016
+Claudio Sanavio et al. : Hybrid classical–quantum branch–and–bound algorithm ...
+H(s) = −A(s)X
+iˆσi
+x (4)
++B(s)X
+ihiˆσi
+z+X
+i>jJijˆσi
+zˆσj
+z
+.
+The coefficient A(s), B(s)have the role of the schedule func-
+tionfin Eq. (18), and sis the adimensional time s=t/ta,
+normalized with respect to the annealing time .
+We can write any binary linear problem with constraints
+as an Ising problem. In fact, any BLOP can be written
+as a quadratic unconstrained binary optimization (QUBO)
+problem. This defines a new cost function
+Q=−N+n′X
+i=1cixi+mX
+j=1λj(bj−N+n′X
+i=1Aijxi)2,(5)
+where we have introduced new n′= log2(max( bj) + 1)
+binary slack variables, that make the problem unconstrained.
+Each additional i-th slack variable, with i=N+1, . . . , N +
+n′has cost coefficient ci= 0 and constraint matrix compo-
+nents Aij= 2i−1/2N, with j= 1, . . . , m . The mparameters
+λjare called Lagrange multipliers. Generally speaking, if λj
+are too small, the minimization of the first term is favored,
+which corresponds to the minimization of the cost function,
+without any constraints. On the other hand, if λjis too large,
+the second term acquires more importance and the optimal
+solution tends to satisfy the j-th constraint, ignoring the other
+terms. There is a range of values for each λjs.t. the optimal
+solution of Qis the optimal solution of Eq.(1). However, this
+range of values is both problem and size dependent.
+In order to pass from binary variables into spin variables
+we define M=N+n′new variables
+si=2xi−1
+2, s i∈ {−1
+2,1
+2}, (6)
+and set
+hi=ci
+2+mX
+j=1λjbjAij−mX
+j=1λj
+2AijMX
+k=iAkj
+Jij=mX
+k=1λk
+2AikAjk, (7)
+that transform the QUBO function Qof Eq.(5) into
+HQ=X
+ihisi+X
+i>jJijsisj, (8)
+whose minimal energy solution corresponds to the ground
+state of the quantum Hamiltonian (4) at t=ta.
+Although we have a variety of results that show the power
+of quantun annealers, other results show that when the num-
+ber of qubits is large the D-Wave machine has difficulty into
+finding the global solution [8]. In the next section we are
+going to propose a way to circumvent this problem.IV. EFFICIENT USE OF QUANTUM ANNEALERS IN
+HYBRID CLASSICAL-QUANTUM ALGORITHM
+In this section we propose an hybrid way to use the currently
+available quantum annealers to produce reliable solution to
+some NP-hard problems. In Section II we explained how the
+BB algorithm can be used to treat either the KP and the TSP.
+Here, we apply this algorithm to both the problems, stopping
+when the restricted sub-problems have a size that is small
+enough that the optimal solution can be obtained by the D-
+Wave machine.
+A. THE KNAPSACK PROBLEM
+Suppose we want to solve a KP with Nobjects and capacity
+W. In order to be able to tract the optimal solution of prob-
+lem (2), we choose Nobjects with increasing value vi=i,
+and with same weight wi= 1, fori= 1, . . . , N . Thus, the
+optimal solution is the knapsack filled with just the last W
+objects with highest value, xopt= (0, . . . , 0,eW), with eW
+being the W-dimensional vector of ones, eW= (1, . . . , 1),
+and with the total value zopt=W[N+1
+2(1−W)]. After
+including the slack variables, the vector xopthasM=
+N+⌈log2(W+ 1)⌉components.
+The QUBO function (5) is
+Q=−MX
+i=1vixi+λ(W−MX
+i=1wixi)2. (9)
+Using Eqs. (2) and (6) we can write the Ising Hamiltonian
+of the problem. Because Eq. (2) has only one constraint, we
+just need to adjust the one parameter λ. In order to find the
+optimal value of λwe proceed as follows.
+We suppose yis a solution that satisfies the constraint. If
+we add a single object, say xlthat overloads the knapsack,
+the QUBO function should be s.t.
+Q(y+xl)> Q(y). (10)
+As it has to be valid for any possible solution, we need to
+take the maximum of the right side of Eq. (10). Thus, we set
+λ= max ivi+ 1. This choice ensures that the Hamiltonian
+ground state is also the optimal solution of the KP.
+We have performed an analysis of the bandgap for this
+particular configuration and we have seen that it scales poly-
+nomially with the size of the problem as M−αfor some
+exponent α, see Appendix B. This is a promising feature,
+that means the total annealing time scales as ta∼Mαand
+therefore makes the problem solvable in polynomial time.
+We have to stress the fact that the polynomial scaling refers
+to this particular configuration of the problem, and it is not
+applicable to all the possible KPs.
+Let us first examine what happens when we solve the unre-
+stricted BLOP on the D-Wave machine. In this case, we find
+that not only the solution is not the optimal one but also the
+constraint is not satisfied. Indeed, when the number of qubits
+is too large, the system is not able to act as an ideal quantum
+annealer [8], as the results are affected by thermal noise [16].
+One may think of increasing the value of the parameter λ
+VOLUME 4, 2016 5
+Claudio Sanavio et al. : Hybrid classical–quantum branch–and–bound algorithm ...
+FIGURE 4: Measured probability p0as a function of the
+annealing time for different N-objects knapsack problems
+withW=N. The value is an average over 20 runs, with
+1000 measurements per run.
+FIGURE 5: Mean value of the minimal energy found for the
+N-objects knapsack problems with W=Nfor different
+annealing times. The value is an average over 20 runs, with
+1000 measurements per run.
+in order to force the system to prefer the fulfillment of the
+constraint. After several trials we have seen that this is not
+enough. Furthermore, the effect of thermal fluctuations leads
+the quantum annealers solution to be almost independent
+on the annealing time, reaching a plateau of the probability
+p0of measuring the ground state. This is shown in Fig. 4,
+where we plot p0obtained as the frequency of the ground
+state appearing as outcome, measured out of 1000 reads for
+different annealing times ta, calculated for a KP with N-
+objects and capacity W=N.
+In Fig. 5 we show also the mean value of the minimal energy
+found on 20 runs of the quantum annealer, each with 1000
+measurements. We see the that the result is independent of
+the annealing time. A similar result was found in [9]. The
+authors analyzed another combinatorial problem, the shortest
+path problem, with the D-Wave quantum processor and they
+did not find correspondence between the annealing time and
+the frequency nor the energy distribution. This means that the
+FIGURE 6: The figure shows ∆˜v,˜w, andHof Eqs. (11),(12)
+and (13) respectively, between the solution found by the
+quantum annealer xaand the optimal solution xopt. The
+shaded regions accounts for the variances calculated over 20
+runs.
+behavior of the processor is not dependent on the annealing
+time, although the theory says otherwise. These results allow
+us to fix our annealing time to the value of 10µs.
+To better analyze the quality of the results obtained by
+the quantum annealer, we can introduce the following three
+figures of merit that estimate the quality of the obtained
+solution xawith respect to the optimal one xopt:
+- the normalized knapsack value distance
+∆˜v=z(xa)−z(xopt)
+z(xopt), (11)
+- the normalized knapsack weight
+˜w=w(xa)
+W, (12)
+- the Hamming distance H[7]
+H(xa,xopt) =MX
+i=1(xi
+a⊕xi
+opt), (13)
+where Mis the string length of the solutions and ⊕stands
+for the sum modulo 2.
+Fig. 6 shows these metrics as a function of the number
+of qubits Mused by the quantum annealer. The width of
+the shaded region is the variance calculated over 20 different
+runs. We see that already for M > 8the result can differ from
+the optimal solution and have a variance different from zero.
+A good trade-off between the certainty of the result and
+the size of the problem can be provided by the BB algorithm ,
+that divides the problem into sub-problems that are described
+by a lower number of qubits, for which the quantum annealer
+can provide more reliable solutions.
+The BB algorithm applied to the knapsack problem, as
+explained in section II, explores a number of nodes that goes
+asO(2N), since any time it explores a new branch, it creates
+a new KP with one less object and an updated knapsack
+capacity. In the toy problem we are considering, the number
+6 VOLUME 4, 2016
+Claudio Sanavio et al. : Hybrid classical–quantum branch–and–bound algorithm ...
+FIGURE 7: The number of steps of the hybrid-BB algorithm
+performed on the classical (green square points) and quantum
+(red circle points) computers for a KP with W= 10 andN=
+25as a function of the maximum number of qubits Mused by
+the quantum annealer. The classical calls count the branching
+and the bounding procedures, while the quantum calls count
+the queries to the quantum annealer. This has to be compared
+with the number of times the fully classical KP-BB algorithm
+performs branch–and–bound (dotted horizontal blue line).
+of nodes that saturate the constraint areN
+W
+=N!
+W!(N−W)!,
+that is the number of combinations with Wobjects chosen
+from a set of N. This corresponds to the exploration by the
+KP-BB algorithm of a number of branches
+nb=WX
+k=1N
+k
+. (14)
+This value is lower than the exponential value obtained
+by applying the BB algorithm depicted in Fig. 1, and the
+reason why is that the optimized KP-BB algorithm makes
+restrictions on more than one variable at once. But there is
+no point to make use of a quantum processor, since, for each
+node, all the variables have been set to a fixed value.
+Here, we propose an alternative scheme: we can devise
+a hybrid classical-quantum protocol by first exploiting the
+advantage of the BB algorithm to reduce the problem down to
+a chosen size N′, which corresponds to a number of variables
+M=N′+ log2(W′+ 1), given by the number of remaining
+objects N′and by the remaining loading capacity of the
+knapsack W′. Then we solve the residual problem with the
+quantum annealer, which might be efficient to solve problems
+with a relatively small number of qubits.
+We consider a KP with N= 25 objects and loading
+capacity W= 10 . The problem can be described as QUBO
+by a number of binary variables MP= 29 .
+Fig. 7 shows the number of branches explored by the BB
+algorithm (green squares) and the number of calls made to
+the quantum annealer (red dots) as a function of the chosen
+sizeMThe horizontal dotted blue line represents the number
+of branches explored by the optimized KP-BB algorithm,
+which is constant since it depends on N, W only. We see thatwhen the number of qubits M > 14, the number of times
+the branch–and–bound procedure is applied in the hybrid
+algorithm is lower than the number of times this is done in
+the optimized KP-BB algorithm. Each reduced problem is
+eventually solved by the quantum annealer. In the extreme
+case of M=MP, the number of branches operated by the
+classical algorithm is one, as the original problem is defined
+and promptly sent to the quantum annealer.
+Figs. 8a, 8b, and 8c show the metrics defined in Eq.ns
+(11,12,13) for the best obtained solution xaas a function of
+the number of available qubits M, for a KP with N= 25
+andW= 10 . The width of the shaded region is the variance
+obtained over 20 different runs. The results are compared
+with a random outcome of strings, constructed as follows.
+In order to make a proper comparison, we extract randomly
+1000 strings, as many as the number of measurements taken
+per sample. Then we choose as optimal solution the one that
+has a lower energy, in analogy with the procedure of the D-
+Wave machine. We then repeat the procedure 1000 times in
+order to get the statistics.
+We see that the outcomes of the quantum annealer are not
+comparable with random guesses. Figs. 8a and 8b show that
+the solution found by the D-wave machine has cost value
+closer to the optimal one and loading closer to the threshold
+set by the loading capacity. Finally, Fig. 8c shows that the
+Hamming distance is lower than the one reached by random
+outcomes.
+Depending on what is our tolerance with respect to the
+different quality measures ∆˜v,˜w, and H, we may decide
+to restrict our problem till a certain number of qubits, thus
+speeding up the resolution of the problem.
+Figs. 9a, 9b, and 9c show the same experiment performed
+keeping W= 10 and varying the number of objects N, using
+the maximum number of necessary qubits M=N+ 4.
+Although the optimal solution is never reached, the D-wave
+machine performs better than random guessing even in this
+case, as it is evident from the results of the metrics. In
+fact, although the average ∆˜vof the D-wave outcomes is
+larger then the corresponding value for random guessing,
+Fig. 9a, this is mainly due to the fact that the machine tries
+to satisfy the capacity constraint, as shown in Fig. 9b. Hence,
+it prioritizes a lower number of objects over the desire for
+a higher load value. The better performance of the D-wave
+machine is captured by the lower value of the Hamming
+distance in Fig. 9c.
+B. THE TRAVELING SALESMAN PROBLEM
+Let us move now to solve a TSP with Ncities using the
+quantum annealer, by means of a hybrid classical-quantum
+protocol similar (but not equal) to the one presented for the
+KP.
+The first step is to write the QUBO formulation of the
+problem as a function of a N2binary vector xwith compo-
+nents xi,j, with i, j= 1, . . . , N . We use here the formulation
+suggested in Ref. [27], such that the first subscript indicates
+the city, and the second indicates the step. Thus, xi,j= 1
+VOLUME 4, 2016 7
+Claudio Sanavio et al. : Hybrid classical–quantum branch–and–bound algorithm ...
+(a)
+(b)
+(c)
+FIGURE 8: (a)The normalized value distance ∆˜v, (b) the
+normalized knapsack weight ˜w, and (c) the Hamming dis-
+tance H, between the best solution obtained by the quantum
+annealer and the optimal solution obtained for a KP with
+N= 25 ,W= 10 , solved with the hybrid BB algorithm with
+Mqubits and averaged over 20 runs. The result is compared
+to what is obtained by random instances as described in the
+text.
+(a)
+(b)
+(c)
+FIGURE 9: (a)The normalized value distance ∆˜v, (b) the
+normalized knapsack weight ˜w, and (c) the Hamming dis-
+tance H, between the best solution obtained by the quantum
+annealer and the optimal solution obtained for a KP with
+varying Nand fixed W= 10 , solved with the hybrid BB
+algorithm with M=N+ 4 qubits and averaged over 20
+runs. The result is compared to what is obtained by random
+instances as described in the text.
+8 VOLUME 4, 2016
+Claudio Sanavio et al. : Hybrid classical–quantum branch–and–bound algorithm ...
+if the i-th city is visited at step j. Followig Eqs. (3) we can
+write the QUBO function (5) as [27]
+QTSP(x) =NX
+i,j=1CijNX
+k=1xi,kxj,k+1
++λNX
+i=1
+1−NX
+j=1xi,j2
++λNX
+j=1
+1−NX
+i=1xi,j2
+, (15)
+where the choice λ >max ijCijensures that the state with
+minimal energy is the optimal solution of the TSP.
+The TSP-BB algorithm differs from the KP-BB algo-
+rithm as it has to cross all the Ncities. The maximum
+number of branches explored by the TSP-BB algorithm isPN−1
+n=1(N−n)!. If we decide to stop the BB algorithm when
+the total size of the problem is M2(with Mcities left), the
+number of branches explored by the BB algorithm would be
+at maximumPN−1
+n=M(N−n)!, and the total number of calls
+to the D-Wave machine will be in the worst case scenario
+N!/M!. However, for the large majority of the problems we
+have examined, the D-Wave processor is called a very small
+number of times.
+Let’s consider a scenario of N= 10 cities, all connected
+together by a route, with a non symmetric cost matrix given
+byCij= (i−j)modN. The optimal solution xoptof this
+problem has components xij= 1 ifi=j, and 0otherwise.
+This means that the nodes are crossed in the same order that
+they are labeled.
+We have applied the hybrid algorithm to solve this problem
+and we have obtained a number of calls of the quantum
+hardware equal to 10for a number of qubits between 36
+(M= 6 ) and 81(M= 9 ). Clearly these numbers are
+problem-dependent, but they give a good indication of the
+small number of calls to the quantum hardware when the
+hybrid approach is used.
+For this problem, as figure of merits of the quality of the
+protocol we now use:
+- the travel cost of the found solution xa, normalized to the
+travel cost to the optimal solution xopt:
+˜c=z(xa)
+z(xopt)(16)
+- and the Hamming distance H=H(xa,xopt)of Eq. (13).
+These two metrics are shown in Fig. 10a and Fig. 10b respec-
+tively, as function of the chosen number of qubits M. As in
+the previous section, the results are compared with a random
+path throughout the cities. Contrary to the KP problem, the
+random solutions can be chosen here to strictly satisfy the
+constraints, since it suffices to generate the solution with a
+random ordering of the Mcities.
+The normalized travel cost is lower than the one obtained
+for random paths for all the instances analyzed, up to a
+maximum of 100 qubits ( M= 10 ). We see that the optimal
+(a)
+(b)
+FIGURE 10: (a)The normalized travel cost ˜c, (b) the Ham-
+ming distance H, between the best solution obtained by the
+quantum annealer and the optimal solution, obtained for a
+TSP with Ncities solved with the hybrid BB algorithm with
+M2qubits and averaged over 20 runs. The result is compared
+to what is obtained by random instances as described in the
+text.
+solution has been obtained only for the cases with M= 3,4,
+whereas for larger TSP the D-wave machine was not able
+to find it. Also, comparing Figs. 10a and 10b, we see that
+the Hamming distance alone does not effectively measure the
+quality of the solution. Already for a TSP with M= 7cities,
+the results are not distinguishable from random outcomes in
+terms of H, yet they exhibit a significantly lower travel cost
+value.
+V. CONCLUSION
+In this paper we have investigated the resolution of two bi-
+nary linear problems, the knapsack problem and the traveling
+salesman problem, that are known to be NP-hard. Those are
+often solved with the branch–and–bound algorithm that we
+have described in Sec. II. After introducing the two problems
+we have moved our attention to the quantum annealer in
+Sec.III, that is a quantum computer that offers a global
+method for resolution of binary linear problems. In this
+VOLUME 4, 2016 9
+Claudio Sanavio et al. : Hybrid classical–quantum branch–and–bound algorithm ...
+work we have merged the classical and quantum method for
+resolution of those NP-hard problems, in order to show the
+advantage of a hybrid approach. In fact, branch–and–bounds
+algorithm do not offer a significant speed up with respect
+to brute force strategies, whereas quantum annealers suffer
+from a low reliability when the number of instances is large.
+However, when merged together, branch–and–bound defines
+a new problem with a smaller size that can be handled by the
+global quantum solver. Although there is a long way to go
+with quantum annealers, we believe this work shows a good
+strategy to use them.
+APPENDIX A
+QUANTUM ANNEALERS
+Quantum annealers are a class of quantum computers which
+make use of a time-dependent evolution Hamiltonian to solve
+combinatorial problems.
+The adiabatic theorem [17], [18] is the basis of the com-
+putation with quantum annealers. Suppose that a quantum
+system is subject to a time evolving Hamiltonian H(t), and
+at time t, the system is in the j-th eigenstate |ϵj(t)⟩, such
+thatH(t)|ϵj(t)⟩=ϵj|ϵj(t)⟩. The eigenvalues ϵjare sorted
+in increasing order and non-degenerate. The adiabatic theo-
+rem states the if the evolution is performed slowly enough ,
+the quantum system stays in the evolved j-th instantaneous
+eigenstate of the Hamiltonian H(t). Understanding what
+"slowly enough” means is the role of the adiabatic theorem.
+Several versions of the theorem have been developed during
+the years, depending on the initial conditions of the system.
+The Kato version [17] of the adiabatic theorem gives a lower
+bound for the annealing time tain terms of the first and
+second derivatives of the Hamiltonian H(t), and in terms
+of the minimum value assumed during the evolution by the
+energy gap ∆ij=|ϵj−ϵi|,∀i̸=j. An approximate version
+of the theorem yields the inequality [18]
+max
+s∈[0,1]|⟨ϵi(s)|∂sH(s)|ϵj(s)⟩|
+∆ij(s)2≤ta,∀i̸=j. (17)
+Since we are interested in the ground state, for our pur-
+poses, we consider only the energy gap between the instanta-
+neous ground state and the first energy level ∆ =|ϵ1−ϵ0|.
+The time-dependent Hamiltonian H(t)is composed by
+two terms, namely
+H(t) = [1 −f(t/ta)]H0+f(t/ta)H1, (18)
+where H0andH1are two non-commuting Hamiltonians and
+tais the total annealing time. The evolution function f, also
+called schedule, is such that f(s) : [0,1]→[0,1],f(0) = 0
+andf(1) = 1 .
+The Hamiltonian H0has a ground state that is easy to
+prepare, whereas H1is a Hamiltonian for which the ground
+state corresponds to the classical optimal solution of the
+combinatorial problem. Thus H1is the term that encodes our
+optimization problem.At time t= 0 the system is prepared in the ground state
+of the Hamiltonian H0. For a sufficiently long t=ta, the
+adiabatic theorem ensures that the state of the system is
+the solution of our classical problem, that we will recover
+measuring the system at this time.
+The energy gap plays a crucial role in adiabatic quantum
+computation, and understanding how it scales with problem
+size is essential. The efficiency of a quantum annealer com-
+pared to a classical algorithm largely hinges on the scaling
+of the band gap. However, it is important to note that the
+schedule influences the derivative of the Hamiltonian and,
+consequently, impacts the satisfaction of the inequality (17).
+A modification to the schedule could either enhance or di-
+minish the quantum annealer’s performance. In this study,
+we focus on the linear schedule f(t/ta) = t/tadeferring
+optimal schedule analysis to future research.
+In order to understand the computational advantage of the
+quantum annealer we need to define the quantum speed up .
+One definition [18] takes into account the speed up with
+respect to existing algorithms. Another useful definition is the
+limited quantum speed up [18], which compares a quantum
+algorithm with its classical analogue, that is an algorithm
+that proceeds through the same steps in the classical regimes.
+The classical version of the adiabatic quantum computation is
+the simulated annealing where the thermal fluctuations allow
+the exploration of different solutions. Both the classical and
+quantum annealing algorithms usually find approximations to
+the global solutions, although we have evidence that quantum
+annealing reaches the global solutions more often [23] and
+with shorter annealing time [24]–[26].
+APPENDIX B
+THE ENERGY GAP
+In this appendix we consider the Knapsack problem with
+fixed loading capacity Wand increasing number of objects
+N≥W. As in we did in the main text, all the objects have
+weight 1 and they are sorted by increasing value vi=i,
+fori= 1, . . . , N . The number of qubits needed to describe
+the problem is M=N+⌈log2(W+ 1)⌉. In order to be
+general, we have calculated the minimum value of the energy
+band gap ∆, considering a one to one embedding into the
+hardware and considering the schedule functions A, B of
+Eq.(18) and their magnitudes as provided by D-Wave [19].
+Fig. 11 shows the minimum of the band gap that is reached
+during the annealing process. From our simulations, we see
+that the minimum of the band gap goes as a polynomial of
+the number of qubits ∆E∝M−c. The polynomial scaling
+of∆Eis promising, as it reflects the polynomial scaling of
+the annealing time needed to find the optimal solution.
+However, this result is affected by the topology of the D-
+Wave quantum annealer. In fact, the results that we found are
+applicable to an ideal completely connected quantum com-
+puter, where Hamiltonian (18) can be directly implemented.
+Because of the constrained topology [19] of the machine,
+several ancillary qubits are used to embed the problem into
+the quantum annealer, therefore changing the scaling of the
+10 VOLUME 4, 2016
+Claudio Sanavio et al. : Hybrid classical–quantum branch–and–bound algorithm ...
+FIGURE 11: The minimum of the ground state energy band
+gap∆Evarying the number of qubits Mfor some KPs with
+fixed loading capacity W.
+band gap. In this work we have used the embedding tool
+that is implemented in the SDK D-Wave Ocean. Hence we
+averaged the results over 20 runs, each with a different
+embedding onto the machine.
+Because of the embedding, We can not use the results that we
+have shown in this appendix to obtain the minimum value of
+the annealing time through the adiabatic theorem. However,
+we believe they provide an understanding of the problem and
+an hardware-agnostic analysis of the energy band gap.
+ACKNOWLEDGMENT
+This research is funded by the International Foundation Big
+Data and Artificial Intelligence for Human Development
+(IFAB) through the project “Quantum Computing for Appli-
+cations”. E. E. is partially supported by INFN through the
+project “QUANTUM”. C. S. and E. E. acknowledge financial
+support from the National Centre for HPC, Big Data and
+Quantum Computing (Spoke 10, CN00000013).
+REFERENCES
+[1] A. H. Land and A. G. Doig, “An Automatic Method of Solving Discrete
+Programming Problems,” Econometrica, vol. 28, no. 3, pp. 497–520, 1960,
+doi: 10.2307/1910129.
+[2] S. Martello and P. Toth, Knapsack problems: algorithms and computer
+implementations. Chichester ; New York: J. Wiley &Sons, 1990.
+[3] P. Toth and D. Vigo, Eds., The vehicle routing problem. Philadelphia, Pa:
+Society for Industrial and Applied Mathematics, 2002.
+[4] G. Laporte and Y . Nobert, “A branch and bound algorithm for the capac-
+itated vehicle routing problem,” OR Spektrum, vol. 5, no. 2, pp. 77–85,
+Jun. 1983, doi: 10.1007/BF01720015.
+[5] P. J. Kolesar, “A Branch and Bound Algorithm for the Knapsack Prob-
+lem,” Management Science, vol. 13, no. 9, pp. 723–735, May 1967, doi:
+10.1287/mnsc.13.9.723.
+[6] G. Laporte, “The traveling salesman problem: An overview of exact and
+approximate algorithms,” European Journal of Operational Research, vol.
+59, no. 2, Art. no. 2, Jun. 1992, doi: 10.1016/0377-2217(92)90138-Y .
+[7] M. A. Nielsen and I. L. Chuang, Quantum Computation and Quantum
+Information: 10th Anniversary Edition. Cambridge University Press, 2010.
+[Online]. Available: https://books.google.it/books?id=-s4DEy7o-a0C
+[8] L. Pusey-Nazzaro and P. Date, “Adiabatic Quantum Optimization Fails to
+Solve the Knapsack Problem.” arXiv:2008.07456, [quant-ph] (2020)
+[9] T. Krauss and J. McCollum, “Solving the Network Shortest Path Problem
+on a Quantum Annealer,” IEEE Transactions on Quantum Engineering,
+vol. 1, pp. 1–12, 2020, doi: 10.1109/TQE.2020.3021921.[10] G. Rosenberg, M. Vazifeh, B. Woods, and E. Haber, “Building an iterative
+heuristic solver for a quantum annealer,” Comput Optim Appl, vol. 65, no.
+3, pp. 845–869, Dec. 2016, doi: 10.1007/s10589-016-9844-y.
+[11] C. McGeoch, P. Farré, and W. Bernoudy, "D-Wave Hybrid Solver Service
++ Advantage: Technology Update", Tech. Rep. (D-Wave Systems Inc,
+Burnaby, BC, Canada, 2020), D-Wave User Manual 09-1109A-V .
+[12] D-Wave Systems, "Technical Description of the D-Wave Quantum Pro-
+cessing Unit", Tech. Rep. (D-Wave Systems Inc., Burnaby, BC, Canada,
+2020) D-Wave User Manual 09-1109A-V .
+[13] K. Boothby, P. Bunyk, J. Raymond, and A. Roy, "Next Generation
+Topology of D-Wave Quantum Processors", arXiv:2003.00133 [quant-ph]
+(2020).
+[14] D. S. Johnson, “Combinatorial Optimization: Algorithms and Complexity.
+By Christos H. Papadimitriou and Kenneth Steiglitz,” The American
+Mathematical Monthly, vol. 91, no. 3, pp. 209–211, Mar. 1984, doi:
+10.1080/00029890.1984.11971383.
+[15] G. Dantzig, R. Fulkerson, and S. Johnson, “Solution of a Large-Scale
+Traveling-Salesman Problem,” OR, vol. 2, no. 4, pp. 393–410, Nov. 1954,
+doi: 10.1287/opre.2.4.393.
+[16] M. H. Amin, “Searching for quantum speedup in quasistatic quantum
+annealers,” Phys. Rev. A, vol. 92, no. 5, Art. no. 5, Nov. 2015, doi:
+10.1103/PhysRevA.92.052323.
+[17] T. Kato, “On the Adiabatic Theorem of Quantum Mechanics,” J. Phys.
+Soc. Jpn., vol. 5, no. 6, pp. 435–439, Nov. 1950, doi: 10.1143/JPSJ.5.435.
+[18] T. Albash and D. A. Lidar, “Adiabatic Quantum Computing,” Rev. Mod.
+Phys., vol. 90, no. 1, Art. no. 1, Jan. 2018, doi: 10.1103/RevMod-
+Phys.90.015002.
+[19] R. Harris et al., “Experimental investigation of an eight-qubit unit cell in
+a superconducting optimization processor,” Phys. Rev. B, vol. 82, no. 2, p.
+024511, Jul. 2010, doi: 10.1103/PhysRevB.82.024511.
+[20] M. W. Johnson et al., “Quantum annealing with manufactured spins,”
+Nature, vol. 473, no. 7346, Art. no. 7346, May 2011, doi: 10.1038/na-
+ture10012.
+[21] S. Boixo, T. Albash, F. M. Spedalieri, N. Chancellor, and D. A. Lidar, “Ex-
+perimental signature of programmable quantum annealing,” Nat Commun,
+vol. 4, no. 1, Art. no. 1, Jun. 2013, doi: 10.1038/ncomms3067.
+[22] T. Lanting et al., “Entanglement in a Quantum Annealing Processor,”
+Phys. Rev. X, vol. 4, no. 2, p. 021041, May 2014, doi: 10.1103/Phys-
+RevX.4.021041.
+[23] T. Kadowaki and H. Nishimori, “Quantum Annealing in the Transverse
+Ising Model,” Phys. Rev. E, vol. 58, no. 5, pp. 5355–5363, Nov. 1998, doi:
+10.1103/PhysRevE.58.5355.
+[24] S. Suzuki, “A comparison of classical and quantum annealing dynamics,”
+J. Phys.: Conf. Ser., vol. 143, p. 012002, Dec. 2009, doi: 10.1088/1742-
+6596/143/1/012002.
+[25] G. E. Santoro and E. Tosatti, “Optimization using quantum mechan-
+ics: quantum annealing through adiabatic evolution,” J. Phys. A: Math.
+Theor., vol. 41, no. 20, p. 209801, May 2008, doi: 10.1088/1751-
+8121/41/20/209801.
+[26] B. Heim, T. F. Rønnow, S. V . Isakov, and M. Troyer, “Quantum versus
+classical annealing of Ising spin glasses,” Science, vol. 348, no. 6231, pp.
+215–217, Apr. 2015, doi: 10.1126/science.aaa4170.
+[27] A. Lucas, “Ising formulations of many NP problems,” Frontiers in
+Physics, vol. 2, 2014, Accessed: Apr. 28, 2022. [Online]. Available:
+https://www.frontiersin.org/article/10.3389/fphy.2014.00005
+VOLUME 4, 2016 11
