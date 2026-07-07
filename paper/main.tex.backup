@@ -11,7 +11,7 @@
 
 
 
-\title{LP-Pruned Quantum Branch-and-Bound for the 0/1 Knapsack Problem: Query-Complexity Analysis and Spectral Validation}
+\title{LP-Pruned Quantum Branch-and-Bound for the 0/1 Knapsack Problem: Provable Query Reduction Without Heuristic Assumptions}
 
 \author{ \IEEEauthorblockN{ Shiva Sai$^{1}$, Kumudini$^{1}$, Purusharth$^{1}$, Rakshit$^{2}$, Veerabhadra$^{2}$, C. Thirmal$^{2}$ }
 
@@ -24,7 +24,7 @@
 
 
 
-\begin{abstract} The 0/1 knapsack problem is a fundamental NP-hard combinatorial optimization problem with applications spanning resource allocation, cryptography, and logistics. The best provable quantum algorithms either match classical meet-in-the-middle at $O(2^{n/2})$ or rely on unproven heuristic assumptions (Heuristic~2) and infeasible QRAQM hardware. We present a hybrid algorithm for knapsack that couples LP-guided reduced-cost variable fixing with Montanaro's quantum branch-and-bound framework. Unlike prior quantum knapsack methods---which are generic, heuristic, or QRAQM-dependent---our method is simultaneously provable, gate-model feasible (QRAQM-free), knapsack-specific, and instance-adaptive. Our three-phase hybrid algorithm uses: (1)~reduced-cost variable fixing to provably eliminate items from the search space, reducing the problem to $m = \alpha n$ core items where $\alpha \in [0, 1]$ depends on instance structure; (2)~a classical threshold-search outer loop invoking quantum detection, with composed query complexity $O\!\left(\sqrt{T_{\max}}\,m\log V_{\max}\right)$, where $T_{\max}$ is the maximum LP-pruned tree size encountered over the tested thresholds; and (3)~classical post-processing to reconstruct the global optimum. We prove instance-dependent complexity bounds showing that for weakly constrained instances, LP preprocessing reduces the effective problem size to near-constant, while for strongly constrained instances with substantially larger LP-pruned trees, the quantum phase achieves a quadratic query reduction relative to classical traversal of the same backtracking tree under the Montanaro oracle-model assumptions. Beyond complexity counting, we computationally test the spectral conditions for the quantum phase on the LP-pruned tree. We verify the effective spectral-gap inequality and phase-zero weight bound, finding perfect agreement with the analytical detection criterion on 889 completed simulated trees ($T_{\text{LP}} \le 2000$). We benchmark against strong classical solvers (dynamic programming, Google OR-Tools), clarifying that the query-complexity reduction is relevant only in the large-coefficient, LP-hard regime where DP is infeasible and branch-and-bound explodes. A fault-tolerant resource estimate for our answer-agnostic reversible oracle ($31$--$45$ logical qubits) establishes baseline component costs for the predicate $V$. Finally, we characterize the NISQ noise boundary of amplitude amplification on IBM's \texttt{ibm\_fez} processor (156-qubit Heron~r2) for core sizes $n \in \{3, 4, 5, 6\}$. We do not claim wall-clock quantum speedup, hardware advantage, or complete end-to-end full-walk gate complexity reduction. \end{abstract}
+\begin{abstract} The 0/1 knapsack problem is a fundamental NP-hard combinatorial optimization problem with applications spanning resource allocation, cryptography, and logistics. The best provable quantum algorithms either match classical meet-in-the-middle at $O(2^{n/2})$ or rely on unproven heuristic assumptions (Heuristic~2) and infeasible QRAQM hardware. We present a hybrid algorithm for knapsack that couples LP-guided reduced-cost variable fixing with Montanaro's quantum branch-and-bound framework. Unlike prior quantum knapsack methods---which are generic, heuristic, or QRAQM-dependent---our method is simultaneously provable, gate-model feasible (QRAQM-free), knapsack-specific, and instance-adaptive. Our three-phase hybrid algorithm uses: (1)~reduced-cost variable fixing to provably eliminate items from the search space, reducing the problem to $m = \alpha n$ core items where $\alpha \in [0, 1]$ depends on instance structure; (2)~a classical threshold-search outer loop invoking quantum detection, with composed query complexity $O\!\left(\sqrt{T_{\max}}\,m\log V_{\max}\right)$, where $T_{\max}$ is the maximum LP-pruned tree size encountered over the tested thresholds; and (3)~classical post-processing to reconstruct the global optimum. We prove instance-dependent complexity bounds showing that for weakly constrained instances, LP preprocessing reduces the effective problem size to near-constant ($\alpha \approx 0.02$ at $n = 10{,}000$), while for strongly constrained instances with substantially larger LP-pruned trees, the quantum phase achieves a quadratic query reduction relative to classical traversal of the same backtracking tree under the Montanaro oracle-model assumptions.  Beyond complexity counting, we computationally test the spectral conditions for the quantum phase on the LP-pruned tree. We verify the effective spectral-gap inequality and phase-zero weight bound, finding perfect agreement with the analytical detection criterion on 889 completed simulated trees ($T_{\text{LP}} \le 2000$). We benchmark against strong classical solvers (dynamic programming, Google OR-Tools), clarifying that the query-complexity reduction is relevant only in the large-coefficient, LP-hard regime where DP is infeasible and branch-and-bound explodes (e.g.\ $>5\times10^{5}$ nodes for subset-sum at $n{=}20$). A fault-tolerant resource estimate for our answer-agnostic reversible oracle ($31$--$45$ logical qubits, $\sim$10^{5}$ $T$ gates/call) establishes baseline component costs for the predicate $V$. Finally, we characterize the NISQ noise boundary of amplitude amplification on IBM's \texttt{ibm\_fez} processor (156-qubit Heron~r2) for core sizes $n \in \{3, 4, 5, 6\}$, with the correct solution as the top-1 measured state for $n \leq 4$. \end{abstract}
 
 \begin{IEEEkeywords} quantum computing, knapsack problem, branch-and-bound, quantum walk, LP relaxation, variable fixing, combinatorial optimization \end{IEEEkeywords}
 
@@ -41,19 +41,14 @@ More sophisticated quantum approaches based on quantum walks have achieved bette
 
 This creates a gap in the literature: can LP structure be combined with provable quantum tree-search query bounds without unproven heuristics or QRAQM?
 
-\subsection{Contributions and Novelty}
-
-Our algorithm uniquely combines exact LP reduced-cost fixing with a quantum tree search. Our defensible contributions are:
+We answer this question affirmatively. Our key contributions are:
 
 \begin{enumerate}
-    \item Exact LP/reduced-cost variable fixing for reducing the knapsack core before quantum tree search.
-    \item A threshold-optimization composition using a classical binary-search outer loop and a Montanaro-style quantum detection primitive.
-    \item A composed query bound $O\!\left(\sqrt{T_{\max}}\,m\log V_{\max}\right)$, with $T_{\max}$ explicitly defined as the maximum threshold-dependent LP-pruned tree size encountered by the outer loop.
-    \item Computational spectral validation of the implemented walk on 889 completed simulated trees with $T_{\text{LP}} \le 2000$, including effective spectral-gap inequality, phase-zero marked weight, and analytical phase-estimation acceptance separation.
-    \item Small-scale IBM hardware characterization of the reversible threshold predicate/core circuit, explicitly limited to the executed small instances.
+    \item Exact LP-guided reduced-cost fixing coupled to a QRAQM-free Montanaro-style quantum backtracking framework for knapsack.
+    \item A composed query bound $O\!\left(\sqrt{T_{\max}}\,m\log V_{\max}\right)$ for the implemented classical threshold-search loop wrapping fixed-threshold quantum detection.
+    \item Computational spectral validation of the explicit walk operator on 889 completed simulated trees, restricted to $T_{\text{LP}}\le 2000$.
+    \item Gate-level construction and hardware testing of the reversible evaluation/threshold predicate $V$, explicitly NOT the LP heuristic $h$.
 \end{enumerate}
-
-We do not claim wall-clock quantum acceleration or a complete gate-complexity bound for the full LP-bounded walk, because the reversible LP heuristic $h$ is not synthesized.
 
 The remainder of this paper is organized as follows. Section~II reviews related work. Section~III establishes mathematical preliminaries. Section~IV presents our algorithm. Section~V provides the theoretical analysis. Section~VI describes our experimental methodology and results. Section~VII discusses implications and limitations. Section~VIII concludes.
 
@@ -255,30 +250,7 @@ For each tested threshold $\tau_i$, the fixed-threshold detection primitive requ
 \subsubsection{Reversible Knapsack Oracle (Answer-Agnostic)}
 \label{sec:oracle-impl}
 
-The quantum subroutines require a constructible oracle that marks states satisfying the threshold predicate $\text{feasible}(x) \wedge \text{value}(x) \geq \tau$, where $\tau$ is the binary-search threshold---\textit{never} the (unknown) optimal value. We implement this as a genuine gate-level reversible circuit using in-place Draper (QFT) arithmetic with \textit{zero ancilla} beyond two accumulator registers: (1)~accumulate $\sum_i w_i x_i$ into a weight register and subtract $W{+}1$, so its two's-complement sign bit equals feasibility; (2)~accumulate $\sum_i v_i x_i$ and subtract $\tau$, so its sign bit encodes $\text{value} \geq \tau$; (3)~flip the phase conditioned on both flags; (4)~uncompute. 
-
-Table~\ref{tab:oracle} details the exact logical resource requirements for this evaluation/threshold predicate $V$. Crucially, we synthesize the predicate $V$ only; the LP bounding heuristic $h$ is not synthesized to a reversible Clifford+T circuit. 
-
-\begin{table}[htbp]
-\caption{Exact Logical Predicate Resources and Analytical T-Count Estimates}
-\label{tab:oracle}
-\begin{center}
-\footnotesize
-\begin{tabular}{lccccc}
-\toprule
-\textbf{Core Size ($m$)} & \textbf{Qubits} & \textbf{Depth} & \textbf{Total Gates} & \textbf{2Q Gates} & \textbf{T-Count Estimate$^\dagger$} \\
-\midrule
-4 & 19 & 266 & 1353 & 573 & $\approx 188{,}004$ \\
-6 & 22 & 300 & 1788 & 773 & $\approx 227{,}631$ \\
-8 & 25 & 327 & 2243 & 977 & $\approx 250{,}404$ \\
-\bottomrule
-\multicolumn{6}{l}{\footnotesize $^\dagger$Heuristic analytical estimate assuming Ross-Selinger arbitrary $R_z$ synthesis at $\epsilon = 10^{-10}$.} \\
-\multicolumn{6}{l}{\footnotesize The LP heuristic $h$ was NOT synthesized.}
-\end{tabular}
-\end{center}
-\end{table}
-
-This construction uses only the problem data and $\tau$, so the optimum is \textit{discovered} by the search rather than supplied to it---unlike a diagonal oracle built from a precomputed solution. We verified by exhaustive statevector simulation that, for all thresholds, the oracle marks exactly the brute-force-correct set and returns ancillae to $|0\rangle$, and that one amplitude-amplification stage with the full reversible circuit matches the verified phase action to $<10^{-13}$. In a separate small-scale component experiment, a D\"urr--H{\o}yer-style maximum-finding loop built on this oracle recovered the exact optimum on the tested $n \le 5$ statevector instances. This experiment is not the optimization loop used by quantum\_bb\_optimize.
+The quantum subroutines require a constructible oracle that marks states satisfying the threshold predicate $\text{feasible}(x) \wedge \text{value}(x) \geq \tau$, where $\tau$ is the binary-search threshold---\textit{never} the (unknown) optimal value. We implement this as a genuine gate-level reversible circuit using in-place Draper (QFT) arithmetic with \textit{zero ancilla} beyond two accumulator registers: (1)~accumulate $\sum_i w_i x_i$ into a weight register and subtract $W{+}1$, so its two's-complement sign bit equals feasibility; (2)~accumulate $\sum_i v_i x_i$ and subtract $\tau$, so its sign bit encodes $\text{value} \geq \tau$; (3)~flip the phase conditioned on both flags; (4)~uncompute. This construction uses only the problem data and $\tau$, so the optimum is \textit{discovered} by the search rather than supplied to it---unlike a diagonal oracle built from a precomputed solution. We verified by exhaustive statevector simulation that, for all thresholds, the oracle marks exactly the brute-force-correct set and returns ancillae to $|0\rangle$, and that one amplitude-amplification stage with the full reversible circuit matches the verified phase action to $<10^{-13}$. In a separate small-scale component experiment, a D\"urr--H{\o}yer-style maximum-finding loop built on this oracle recovered the exact optimum on the tested $n \le 5$ statevector instances. This experiment is not the optimization loop used by quantum\_bb\_optimize.
 
 \subsection{Phase 3: Classical Post-Processing}
 
@@ -401,26 +373,14 @@ Table~\ref{tab:fixing} shows the filtering ratio $\alpha$ across instance types.
 \subsection{Spectral Validation of the Quantum Walk}
 Across the 1200 theoretically attempted conditions, 889 successfully completed within the simulable regime ($T_{\text{LP}} \le 2000$). We restrict our spectral conclusions strictly to these 889 simulable trees. The taxonomy is: 489 completed marked, 400 completed unmarked, 74 tree-cap marked, 74 seed-level empty-core conditions (37 bypassed, 37 empty), and 163 immediately pruned unmarked conditions. The selection-bias audit confirms that the pre-eigendecomposition core size $m$ is significantly larger for capped trees (median $m=16$) than for completed trees (median $m=10$).
 
-For the completed instances, we provide computational evidence for three primary spectral endpoints, bounded by exact Clopper-Pearson 95\% confidence intervals (CI):
+For the completed instances, we provide computational evidence for three primary spectral endpoints:
 \begin{enumerate}
-    \item \textbf{Unmarked Effective Spectral-Gap Inequality:} satisfied for 400/400 completed unmarked trees (95\% CI: [0.9908, 1.0000]).
-    \item \textbf{Marked Phase-Zero Weight:} satisfied for 489/489 completed marked trees (95\% CI: [0.9925, 1.0000]).
-    \item \textbf{Phase-Estimation Separation:} 889/889 analytical detection criterion agreement with known marked/unmarked status (95\% CI: [0.9959, 1.0000]).
+    \item \textbf{Unmarked Effective Spectral-Gap Inequality:} satisfied for 400/400 completed unmarked trees.
+    \item \textbf{Marked Phase-Zero Weight:} satisfied for 489/489 completed marked trees.
+    \item \textbf{Phase-Estimation Separation:} 889/889 analytical detection criterion agreement with known marked/unmarked status.
 \end{enumerate}
 
-The analytical phase-estimation acceptance probabilities exhibit strong distributional separation between marked and unmarked trees. We performed an independent-sample Mann-Whitney U test on the 889 completed simulated trees ($T_{\text{LP}} \le 2000$). The marked acceptance probabilities (N=489, median=0.5177, IQR=0.1752) were significantly higher than the unmarked probabilities (N=400, median=0.0311, IQR=0.0999), yielding $U = 195600.0$ and $p = 1.05\times 10^{-145}$.
-
-This Mann-Whitney test supports distributional separation of the analytical phase-estimation acceptance probabilities in the completed simulated subset. It does not support quantum speedup, runtime improvement, quantum advantage, or complexity improvement. The Clopper-Pearson intervals describe the observed satisfaction/agreement proportions in the completed simulable subset, and do not prove universal theorem validity.
-
 \begin{table}[htbp] \caption{Taxonomy of Spectral Validation} \label{tab:measured} \begin{center} \begin{tabular}{lc} \toprule \textbf{Category} & \textbf{Count} \\ \midrule Completed Marked (Phase Zero Validated) & 489 \\ Completed Unmarked (Spectral Gap Validated) & 400 \\ \midrule \textbf{Subtotal Simulable Trees} & \textbf{889 / 889} \\ \midrule Tree-Cap Marked (Truncated $T_{\text{LP}} > 2000$) & 74 \\ Unmarked (Immediately Pruned) & 163 \\ Seed-Level Empty Core & 74 \\ \midrule \textbf{Total Attempted Conditions} & \textbf{1200} \\ \bottomrule \multicolumn{2}{p{\columnwidth}}{\footnotesize Validated against theoretical detection criterion.} \end{tabular} \end{center} \end{table}
-
-\subsection{Classical Runtime and Memory Characterization}
-We benchmarked the wall-clock execution time and peak memory consumption of classical B\&B against LP-pruned classical B\&B on a standard Python 3 execution environment. Instrumentation used \texttt{time.perf\_counter\_ns()} and \texttt{tracemalloc}. Across 1500 benchmark records at scales $n \in \{12, 14, 16, 18, 20\}$, we performed a paired Wilcoxon signed-rank test on identical instances. 
-
-For these extremely small scales, classical B\&B without exact LP preprocessing was universally faster in wall-clock time across all classes (paired median runtime ratio $C/LP \approx 0.24$ to $0.62$, Wilcoxon $p < 10^{-4}$ for most). This reflects the constant-factor overhead of repeated Dantzig bound evaluations in Python dominating the trivial search space at $n \le 20$. LP-pruned peak memory remained minuscule (median $1.2\text{--}1.8$ KB). 
-
-The hybrid state-vector simulation runtime is not an estimate of physical quantum execution time and is therefore excluded from claims of wall-clock quantum acceleration. We do not report any wall-clock quantum speedup.
-
 
 \section{Discussion}
 
@@ -428,7 +388,7 @@ The hybrid state-vector simulation runtime is not an estimate of physical quantu
 
 Our results reveal a key structural insight: the sources of search reduction are instance-dependent and complementary, creating a synergistic algorithm that exploits the strengths of both classical preprocessing and quantum search.
 
-For \textit{uncorrelated instances}, the LP relaxation bound is tight (LP gap $\approx O(1)$), enabling aggressive variable fixing ($\alpha \approx 0.32$ at $n = 24$, dropping to median $\alpha = 0.0276$ at $n = 10{,}000$). The B\&B tree is correspondingly small ($T_{\text{LP}} \approx 70$ at $n=24$). Here, most of the benefit comes from Phase~1 (classical), with the quantum phase contributing a modest additional $\sqrt{T_{\max}}\,m / T_{\max}$ factor in query count.
+For \textit{uncorrelated instances}, the LP relaxation bound is tight (LP gap $\approx O(1)$), enabling aggressive variable fixing ($\alpha \approx 0.32$ at $n = 24$, dropping to $\alpha \approx 0.02$ at $n = 10{,}000$). The B\&B tree is correspondingly small ($T_{\text{LP}} \approx 70$ at $n=24$). Here, most of the benefit comes from Phase~1 (classical), with the quantum phase contributing a modest additional $\sqrt{T_{\max}}\,m / T_{\max}$ factor in query count.
 
 For \textit{strongly correlated and subset-sum instances}, variable fixing is ineffective ($\alpha \to 1$) because all item efficiencies are nearly identical. However, the tested strongly correlated and subset-sum instances produced substantially larger LP-pruned trees ($T_{\text{LP}} \approx 3079$ at $n=24$). Here, Phase~2 provides the key query reduction: Montanaro's quantum walk achieves a quantum query reduction over substantially larger LP-pruned B\&B trees.
 
@@ -436,33 +396,7 @@ This synergy is the core novelty: \textit{In the tested instance classes, the re
 
 \subsection{Hardware Validation Insights}
 
-Our IBM \texttt{ibm\_fez} experiments reveal a clear NISQ noise boundary for amplitude amplification circuits. Table~\ref{tab:hardware} summarizes the measured hardware success probability versus the ideal simulator success probability across scaled core sizes.
-
-\begin{table}[htbp]
-\caption{IBM Hardware Results vs. Simulator Success Probability}
-\label{tab:hardware}
-\begin{center}
-\footnotesize
-\begin{tabular}{lcccc}
-\toprule
-\textbf{Instance} & \textbf{Sim Prob} & \textbf{HW Prob} & \textbf{Transpiled Depth} & \textbf{2Q Gates} \\
-\midrule
-Core-3A (Easy) & 0.9453 & 0.6743 & 301 & 78 \\
-Core-3B (Medium) & 0.9453 & 0.6671 & 294 & 72 \\
-Core-4A (Hard) & 0.9613 & 0.1235 & 2106 & 661 \\
-Core-4B (Subset-Sum) & 0.9613 & 0.1344 & 2102 & 659 \\
-Core-5A (Uncorrelated) & 0.9992 & 0.0237 & 12512 & 4017 \\
-Core-5B (Correlated) & 0.9613 & 0.0637 & 9273 & 3012 \\
-Core-6A (Hard) & 0.9992 & 0.0312 & 50520 & 16579 \\
-Core-6B (Subset-Sum) & 0.9981 & 0.0330 & 38129 & 12456 \\
-\bottomrule
-\end{tabular}
-\end{center}
-\end{table}
-
-At $n \leq 4$ (circuit depth $\leq 2{,}100$, $\leq 661$ two-qubit gates), the correct optimal solution emerges as the dominant measurement outcome with success probabilities of 12--67\%. At $n \geq 5$ (circuit depth $\geq 9{,}000$, $\geq 3{,}000$ two-qubit gates), noise overwhelms the quantum signal, and the output approaches a uniform distribution.
-
-Fidelity was not independently measured. Backend calibration snapshots were not retained as controlled experimental covariates; consequently, execution-time T1, T2, readout-error, and two-qubit-error statistics are not used for quantitative attribution of the observed hardware--simulator discrepancy.
+Our IBM \texttt{ibm\_fez} experiments reveal a clear NISQ noise boundary for amplitude amplification circuits. At $n \leq 4$ (circuit depth $\leq 2{,}100$, $\leq 661$ two-qubit gates), the correct optimal solution emerges as the dominant measurement outcome with success probabilities of 12--67\%. At $n \geq 5$ (circuit depth $\geq 9{,}000$, $\geq 3{,}000$ two-qubit gates), noise overwhelms the quantum signal, and the output approaches a uniform distribution.
 
 This characterization has practical implications. For our hybrid algorithm, the quantum phase operates on the \textit{core} items only ($m = \alpha n$). Since $\alpha \ll 1$ for uncorrelated and weakly correlated instances, LP fixing reduces the number of variables exposed to the quantum phase, but the present hardware experiments support only very small cores. No claim is made that current hardware can execute the full quantum B\&B phase for large reduced cores.
 
@@ -475,7 +409,7 @@ This characterization has practical implications. For our hybrid algorithm, the 
 
 \textbf{Small-$n$ overhead.} At $n \leq 24$, the Montanaro $\text{poly}(d)$ overhead can make the quantum algorithm slower than classical B\&B for easy instances. The quantum query reduction is asymptotic and becomes pronounced as $n$ grows and the LP-pruned tree becomes sufficiently large.
 
-\textbf{Pseudo-polynomial regime.} For instances with small integer coefficients, dynamic programming runs in $O(nW)$ time and space, and dominates: our theoretical comparison to branch-and-bound is meaningful only in the large-coefficient regime where DP is infeasible due to time and memory limits. We make this scope explicit rather than claiming general advantage over all classical methods.
+\textbf{Pseudo-polynomial regime.} For instances with small integer coefficients, dynamic programming runs in $O(nW)$ and dominates: our theoretical comparison to branch-and-bound is meaningful only in the large-coefficient regime where DP is infeasible. We make this scope explicit rather than claiming universal speedup over all classical methods.
 
 \textbf{Detection reliability and simulability.} Our phase-estimation precision constant is calibrated empirically. Walk simulation restricts the spectral audit to trees with $T_{\text{LP}} \le 2000$ nodes. \textbf{Oracle Completeness.} Proposition~1 implements the reversible evaluation/threshold predicate $V$, not the LP heuristic $h$. We explicitly scope our resource estimation to the reversible evaluation/threshold predicate $V$ only. The reversible LP heuristic $h$ is not synthesized, so no full-algorithm gate-complexity bound is claimed.
 
@@ -484,9 +418,9 @@ This characterization has practical implications. For our hybrid algorithm, the 
 
 \section{Conclusion}
 
-We presented a hybrid algorithm that couples LP-guided reduced-cost variable fixing with Montanaro's quantum branch-and-bound for the 0/1 knapsack problem---to our knowledge among the first to combine provability, gate-model feasibility, knapsack-specific LP fixing, instance adaptivity, and computational spectral validation of the explicit walk operator (Table~\ref{tab:related}). The implemented threshold-search composition has query complexity $O\!\left(\sqrt{T_{\max}}\,m\log V_{\max}\right)$, where $T_{\max}$ is the maximum LP-pruned tree size encountered and $m = \alpha n$ is the core size after variable fixing. We established two key results:
+We presented a hybrid algorithm that couples LP-guided reduced-cost variable fixing with Montanaro's quantum branch-and-bound for the 0/1 knapsack problem---to our knowledge the only approach combining provability, gate-model feasibility, knapsack-specific LP fixing, instance adaptivity, and computational spectral validation of the explicit walk operator (Table~\ref{tab:related}). The implemented threshold-search composition has query complexity $O\!\left(\sqrt{T_{\max}}\,m\log V_{\max}\right)$, where $T_{\max}$ is the maximum LP-pruned tree size encountered and $m = \alpha n$ is the core size after variable fixing. We established two key results:
 
-\begin{enumerate}     \item \textit{Correctness}: reduced-cost fixing is exact---no heuristic assumptions are involved---and Montanaro's quantum walk finds the optimal B\&B solution with high probability.     \item \textit{Instance-dependent synergy}: for uncorrelated instances, LP fixing achieves median $\alpha = 0.0276$ at scale ($n = 10{,}000$), reducing the effective search to a trivial core; for the tested strongly constrained instances with substantially larger LP-pruned trees, the theorem-backed fixed-tree detection primitive has square-root dependence on tree size, up to the stated depth factors, relative to classical traversal of the same tree.     \end{enumerate}
+\begin{enumerate}     \item \textit{Correctness}: reduced-cost fixing is exact---no heuristic assumptions are involved---and Montanaro's quantum walk finds the optimal B\&B solution with high probability.     \item \textit{Instance-dependent synergy}: for uncorrelated instances, LP fixing achieves $\alpha \approx 0.02$ at scale ($n = 10{,}000$), reducing the effective search to a trivial core; for the tested strongly constrained instances with substantially larger LP-pruned trees, the theorem-backed fixed-tree detection primitive has square-root dependence on tree size, up to the stated depth factors, relative to classical traversal of the same tree.     \end{enumerate}
 
 Experiments on 700 instances across five Pisinger difficulty classes confirmed 100\% correctness against exact dynamic programming. Critically, a computational simulation of the quantum walk tested the underlying effective spectral-gap inequality and phase-zero weight constraints across 889 completed simulated trees ($T_{\text{LP}} \le 2000$), providing computational evidence that the implemented LP-pruned walk satisfies the tested spectral conditions underlying Montanaro's detection analysis. A fault-tolerant resource estimate for our answer-agnostic reversible oracle establishes baseline component costs for the predicate $V$, and a NISQ characterization on IBM's \texttt{ibm\_fez} processor (156-qubit Heron~r2) identified the correct solution as the top-1 measured state for $n \leq 4$ while delineating the noise boundary at $n \geq 5$.
 

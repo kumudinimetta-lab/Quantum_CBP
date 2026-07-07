@@ -7,7 +7,7 @@
       "std_alpha": 0.06794115100585212,
       "avg_core": 18.8,
       "std_core": 6.794115100585211,
-      "avg_time_ms": 0.46639442443847656
+      "avg_time_ms": 0.42090415954589844
     },
     {
       "type": "uncorrelated",
@@ -16,7 +16,7 @@
       "std_alpha": 0.05745258914966322,
       "avg_core": 52.0,
       "std_core": 28.726294574831613,
-      "avg_time_ms": 14.020490646362305
+      "avg_time_ms": 12.652730941772461
     },
     {
       "type": "uncorrelated",
@@ -25,7 +25,7 @@
       "std_alpha": 0.03397293040054095,
       "avg_core": 71.2,
       "std_core": 33.97293040054095,
-      "avg_time_ms": 62.38698959350586
+      "avg_time_ms": 50.47116279602051
     },
     {
       "type": "uncorrelated",
@@ -34,7 +34,7 @@
       "std_alpha": 0.01802771200124963,
       "avg_core": 186.2,
       "std_core": 90.13856000624816,
-      "avg_time_ms": 1532.24778175354
+      "avg_time_ms": 8423.134469985962
     },
     {
       "type": "uncorrelated",
@@ -43,7 +43,7 @@
       "std_alpha": 0.01055264895654167,
       "avg_core": 225.4,
       "std_core": 105.5264895654167,
-      "avg_time_ms": 6736.063480377197
+      "avg_time_ms": 33355.70750236511
     },
     {
       "type": "weakly-correlated",
@@ -52,7 +52,7 @@
       "std_alpha": 0.2546055773151876,
       "avg_core": 33.6,
       "std_core": 25.460557731518765,
-      "avg_time_ms": 0.45371055603027344
+      "avg_time_ms": 1.7920494079589844
     },
     {
       "type": "weakly-correlated",
@@ -61,7 +61,7 @@
       "std_alpha": 0.07482245652208967,
       "avg_core": 126.0,
       "std_core": 37.41122826104484,
-      "avg_time_ms": 11.14358901977539
+      "avg_time_ms": 41.85304641723633
     },
     {
       "type": "weakly-correlated",
@@ -70,7 +70,7 @@
       "std_alpha": 0.07081073364963819,
       "avg_core": 111.8,
       "std_core": 70.81073364963817,
-      "avg_time_ms": 44.07763481140137
+      "avg_time_ms": 157.3502540588379
     },
     {
       "type": "weakly-correlated",
@@ -79,7 +79,7 @@
       "std_alpha": 0.012126269005757709,
       "avg_core": 315.2,
       "std_core": 60.63134502878853,
-      "avg_time_ms": 1171.5937614440918
+      "avg_time_ms": 4986.800527572632
     },
     {
       "type": "weakly-correlated",
@@ -88,7 +88,7 @@
       "std_alpha": 0.025067508851100463,
       "avg_core": 267.0,
       "std_core": 250.67508851100462,
-      "avg_time_ms": 4798.723936080933
+      "avg_time_ms": 18605.730533599854
     },
     {
       "type": "strongly-correlated",
@@ -97,7 +97,7 @@
       "std_alpha": 0.09200000000000001,
       "avg_core": 95.4,
       "std_core": 9.200000000000001,
-      "avg_time_ms": 0.5288124084472656
+      "avg_time_ms": 0.5368232727050781
     },
     {
       "type": "strongly-correlated",
@@ -106,7 +106,7 @@
       "std_alpha": 0.11031300920562362,
       "avg_core": 466.6,
       "std_core": 55.1565046028118,
-      "avg_time_ms": 15.269327163696289
+      "avg_time_ms": 18.391990661621094
     },
     {
       "type": "strongly-correlated",
@@ -115,7 +115,7 @@
       "std_alpha": 0.22548756063251027,
       "avg_core": 746.6,
       "std_core": 225.48756063251028,
-      "avg_time_ms": 61.13080978393555
+      "avg_time_ms": 75.15778541564941
     },
     {
       "type": "strongly-correlated",
@@ -124,7 +124,7 @@
       "std_alpha": 0.27976,
       "avg_core": 4300.6,
       "std_core": 1398.8,
-      "avg_time_ms": 1562.99409866333
+      "avg_time_ms": 2302.8546810150146
     },
     {
       "type": "strongly-correlated",
@@ -133,7 +133,7 @@
       "std_alpha": 0.15204,
       "avg_core": 9239.8,
       "std_core": 1520.3999999999999,
-      "avg_time_ms": 6896.590614318848
+      "avg_time_ms": 8837.780094146729
     },
     {
       "type": "subset-sum",
@@ -142,7 +142,7 @@
       "std_alpha": 0.0,
       "avg_core": 100.0,
       "std_core": 0.0,
-      "avg_time_ms": 0.4684925079345703
+      "avg_time_ms": 0.45571327209472656
     },
     {
       "type": "subset-sum",
@@ -151,7 +151,7 @@
       "std_alpha": 0.0,
       "avg_core": 500.0,
       "std_core": 0.0,
-      "avg_time_ms": 10.358190536499023
+      "avg_time_ms": 13.834190368652344
     },
     {
       "type": "subset-sum",
@@ -160,7 +160,7 @@
       "std_alpha": 0.0,
       "avg_core": 1000.0,
       "std_core": 0.0,
-      "avg_time_ms": 44.01102066040039
+      "avg_time_ms": 54.28366661071777
     },
     {
       "type": "subset-sum",
@@ -169,7 +169,7 @@
       "std_alpha": 0.0,
       "avg_core": 5000.0,
       "std_core": 0.0,
-      "avg_time_ms": 1146.4857578277588
+      "avg_time_ms": 1444.782543182373
     },
     {
       "type": "subset-sum",
@@ -178,7 +178,7 @@
       "std_alpha": 0.0,
       "avg_core": 10000.0,
       "std_core": 0.0,
-      "avg_time_ms": 4882.95373916626
+      "avg_time_ms": 6066.359090805054
     },
     {
       "type": "inverse-strongly-correlated",
@@ -187,7 +187,7 @@
       "std_alpha": 0.22745549015137007,
       "avg_core": 69.2,
       "std_core": 22.745549015137005,
-      "avg_time_ms": 0.3506183624267578
+      "avg_time_ms": 0.4047393798828125
     },
     {
       "type": "inverse-strongly-correlated",
@@ -196,7 +196,7 @@
       "std_alpha": 0.14962031947566481,
       "avg_core": 201.2,
       "std_core": 74.81015973783241,
-      "avg_time_ms": 7.221174240112305
+      "avg_time_ms": 8.04448127746582
     },
     {
       "type": "inverse-strongly-correlated",
@@ -205,7 +205,7 @@
       "std_alpha": 0.34644445442235033,
       "avg_core": 578.2,
       "std_core": 346.44445442235036,
-      "avg_time_ms": 27.951765060424805
+      "avg_time_ms": 33.52952003479004
     },
     {
       "type": "inverse-strongly-correlated",
@@ -214,7 +214,7 @@
       "std_alpha": 0.29971197907324293,
       "avg_core": 3214.2,
       "std_core": 1498.5598953662147,
-      "avg_time_ms": 1030.805778503418
+      "avg_time_ms": 939.410924911499
     },
     {
       "type": "inverse-strongly-correlated",
@@ -223,7 +223,7 @@
       "std_alpha": 0.11205539701415546,
       "avg_core": 7904.0,
       "std_core": 1120.5539701415546,
-      "avg_time_ms": 3369.0028190612793
+      "avg_time_ms": 4184.193897247314
     }
   ]
 }

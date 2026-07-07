@@ -125,6 +125,7 @@ def run_large_scale_benchmark():
     seeds = range(5) # 5 seeds per configuration
     
     results = []
+    raw_instances = []
     
     print("Starting large-scale Phase 1 benchmark...")
     
@@ -146,6 +147,15 @@ def run_large_scale_benchmark():
                 cores.append(core)
                 times.append((t1 - t0) * 1000)
                 
+                raw_instances.append({
+                    "class": inst_type,
+                    "n": n,
+                    "seed": seed,
+                    "m": core,
+                    "alpha": alpha,
+                    "time_ms": (t1 - t0) * 1000
+                })
+                
             results.append({
                 "type": inst_type,
                 "n": n,
@@ -160,6 +170,9 @@ def run_large_scale_benchmark():
     os.makedirs('../paper/results', exist_ok=True)
     with open('../paper/results/large_scale_benchmark.json', 'w') as f:
         json.dump({"data": results}, f, indent=2)
+        
+    with open('large_scale_alpha_raw.json', 'w') as f:
+        json.dump(raw_instances, f, indent=2)
         
     print("\nBenchmark complete! Generating plots...")
     
