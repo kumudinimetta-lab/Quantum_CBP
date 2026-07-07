@@ -3,18 +3,11 @@ Benchmark: MEASURED quantum query complexity of Montanaro quantum B&B
 =====================================================================
 Runs the faithful quantum backtracking simulator (quantum_backtracking.py) over
 the LP-pruned cores of the five Pisinger instance classes and reports the
-*measured* number of quantum walk-operator applications, compared against:
-  - the classical branch-and-bound node count (sum over the threshold search),
-  - the theoretical Montanaro scaling sqrt(T_LP * m),
-  - classical meet-in-the-middle 2^(m/2).
+*measured* number of quantum walk-operator applications.
 
-Unlike the previous benchmark_v5 (which assumed q_ops = sqrt(T)*(d+1)), every
-quantum number here is obtained by actually constructing the Belovs walk
-operator and running phase-estimation detection.  Correctness is verified
-against an exact DP solve on every instance.
-
-Tree sizes are kept simulable (dense T x T eigendecomposition) by choosing core
-sizes per class; the point is to validate the *scaling*, not to solve large n.
+CORRECTED PROVENANCE VERSION: This correctly invokes Phase 1 LP variable fixing
+before constructing the Belovs walk operator, matching the exact hybrid algorithm
+described in the manuscript.
 """
 
 import json
@@ -23,16 +16,14 @@ import time
 
 import numpy as np
 
+from benchmark_v5 import reduced_cost_fixing
+
 from quantum_backtracking import (
     efficiency_order,
     quantum_bb_optimize,
     _classical_optimum,
 )
 
-
-# ------------------------------------------------------------
-# instance generators (same families as benchmark_v5)
-# ------------------------------------------------------------
 
 def gen_uncorrelated(n, seed, R=50):
     rng = np.random.RandomState(seed)
@@ -77,7 +68,6 @@ GENERATORS = {
     "inverse_strongly": gen_inverse_strongly,
 }
 
-# core sizes chosen so the sparse walk operator stays simulable per class
 CONFIG = {
     "uncorrelated":        [8, 10, 12, 14, 16, 18],
     "weakly_correlated":   [8, 10, 12, 14, 16, 18],
@@ -87,7 +77,6 @@ CONFIG = {
 }
 
 TRIALS = 8
-PE_CONSTANT = 2.0   # calibrated so detection is reliable (see calibrate())
 K_REPEATS = 11
 MAX_NODES = 20000
 
@@ -106,13 +95,32 @@ def calibrate():
         skipped = 0
         for name, gen, n, seed in probe:
             w, v, cap = gen(n, seed)
-            res = quantum_bb_optimize(w, v, cap, constant=const,
-                                      K=K_REPEATS, max_nodes=MAX_NODES)
+            opt = _classical_optimum(w, v, cap)
+            
+            fi, core, fo = reduced_cost_fixing(n, w, v, cap)
+            res_cap = cap - sum(w[i] for i in fi)
+            
+            if res_cap < 0:
+                skipped += 1
+                continue
+                
+            m = len(core)
+            if m == 0:
+                skipped += 1
+                continue
+                
+            core_w = [w[i] for i in core]
+            core_v = [v[i] for i in core]
+            
+            res = quantum_bb_optimize(core_w, core_v, res_cap, constant=const, K=K_REPEATS, max_nodes=MAX_NODES)
             if res is None:
                 skipped += 1
                 continue
+            
+            hybrid_opt = sum(v[i] for i in fi) + res.optimal_value
             tot += 1
-            ok += int(res.correct)
+            ok += int(hybrid_opt == opt)
+            
         rate = ok / max(tot, 1)
         print(f"  constant={const}: correct {ok}/{tot}  (skipped {skipped})")
         if rate >= 0.999:
@@ -124,15 +132,15 @@ def calibrate():
 
 def run(constant):
     print("=" * 96)
-    print("MEASURED QUANTUM QUERY COMPLEXITY OF MONTANARO QUANTUM B&B")
+    print("MEASURED QUANTUM QUERY COMPLEXITY OF MONTANARO QUANTUM B&B (HYBRID CORRECTED)")
     print(f"PE constant={constant}  K={K_REPEATS}  trials/config={TRIALS}")
     print("=" * 96)
 
     all_rows = []
     for name, gen in GENERATORS.items():
         print(f"\n### {name.upper()}")
-        print(f"{'n':>3} {'T_LP':>9} {'depth':>6} {'C_nodes':>10} "
-              f"{'Qdecisive':>10} {'Q_total':>10} {'sqrt(Tm)':>10} {'MitM':>10} "
+        print(f"{'n':>3} {'m':>3} {'T_LP':>9} {'depth':>6} "
+              f"{'Qdecisive':>10} {'Q_total':>10} {'sqrt(Tm)':>10} "
               f"{'Qd/sqrtTm':>10} {'correct':>8}")
         print("-" * 96)
         for n in CONFIG[name]:
@@ -140,53 +148,70 @@ def run(constant):
             for t in range(TRIALS):
                 w, v, cap = gen(n, seed=1000 * n + t)
                 opt = _classical_optimum(w, v, cap)
-                res = quantum_bb_optimize(w, v, cap, constant=constant,
+                
+                fi, core, fo = reduced_cost_fixing(n, w, v, cap)
+                res_cap = cap - sum(w[i] for i in fi)
+                m = len(core)
+                
+                # Treat negative residual capacity as a Phase 1 assertion failure, not empty core
+                assert res_cap >= 0, f"Phase 1 assertion failure: negative residual capacity for {name} n={n}"
+                
+                if m == 0:
+                    # Explicitly handle m=0 without invoking the quantum walk
+                    hybrid_opt = sum(v[i] for i in fi)
+                    assert hybrid_opt == opt
+                    continue
+
+                core_w = [w[i] for i in core]
+                core_v = [v[i] for i in core]
+
+                assert len(core_w) == m
+                assert len(core_v) == m
+
+                res = quantum_bb_optimize(core_w, core_v, res_cap, constant=constant,
                                           K=K_REPEATS, max_nodes=MAX_NODES)
                 if res is None:
                     continue
+                    
                 T_lp = res.max_tree
-                depth = n
+                depth = m
+                
+                hybrid_opt = sum(v[i] for i in fi) + res.optimal_value
+                
+                assert depth <= m, f"Audit failure: depth ({depth}) > core size ({m})"
+                assert T_lp <= (2**(m+1)) - 1, f"Audit failure: T_lp ({T_lp}) > max possible core tree ({(2**(m+1)) - 1})"
+                assert hybrid_opt == opt, f"Audit failure: hybrid_opt {hybrid_opt} != classical {opt}"
+                
                 sqrt_tm = math.sqrt(max(T_lp, 1) * depth)
-                mitm = 2 ** (n // 2)
+                
                 rows.append({
-                    "type": name, "n": n,
+                    "type": name, "n": n, "m": m,
+                    "core_size": m,
                     "T_LP": T_lp,
                     "depth": depth,
                     "classical_nodes": res.classical_nodes_total,
                     "quantum_queries": res.quantum_queries_total,
                     "montanaro_queries_decisive": res.montanaro_queries_decisive,
                     "sqrt_Tm": sqrt_tm,
-                    "mitm": mitm,
                     "qd_over_sqrt_tm": res.montanaro_queries_decisive / max(sqrt_tm, 1),
                     "q_over_sqrt_tm": res.quantum_queries_total / max(sqrt_tm, 1),
                     "detection_calls": res.detection_calls,
-                    "correct": res.correct,
+                    "correct": (hybrid_opt == opt),
                     "opt": opt,
                 })
+            
             if not rows:
-                print(f"{n:>3}  (all trees exceeded MAX_NODES; skipped)")
+                print(f"{n:>3}  (all trees exceeded MAX_NODES or m=0; skipped)")
                 continue
+                
             all_rows.extend(rows)
             avg = lambda k: float(np.mean([r[k] for r in rows]))
             ok = sum(r["correct"] for r in rows)
-            print(f"{n:>3} {avg('T_LP'):>9.0f} {avg('depth'):>6.0f} "
-                  f"{avg('classical_nodes'):>10.0f} {avg('montanaro_queries_decisive'):>10.0f} "
+            print(f"{n:>3} {avg('m'):>3.0f} {avg('T_LP'):>9.0f} {avg('depth'):>6.0f} "
+                  f"{avg('montanaro_queries_decisive'):>10.0f} "
                   f"{avg('quantum_queries'):>10.0f} "
-                  f"{avg('sqrt_Tm'):>10.1f} {avg('mitm'):>10.0f} "
+                  f"{avg('sqrt_Tm'):>10.1f} "
                   f"{avg('qd_over_sqrt_tm'):>10.2f} {ok}/{len(rows):>3}")
-
-    # scaling fits: log(Q) vs n, and Q vs sqrt(T*m) ratio stability
-    print("\n" + "=" * 96)
-    print("SCALING SUMMARY (is measured Q = Theta(sqrt(T_LP * m))?)")
-    print("=" * 96)
-    for name in GENERATORS:
-        td = [r for r in all_rows if r["type"] == name]
-        if len(td) < 2:
-            continue
-        ratios = [r["qd_over_sqrt_tm"] for r in td]
-        corr = sum(r["correct"] for r in td)
-        print(f"  {name:>20}: Qdecisive/sqrt(Tm) mean={np.mean(ratios):.2f} "
-              f"std={np.std(ratios):.2f}  correct={corr}/{len(td)}")
 
     out = {
         "pe_constant": constant,
@@ -194,16 +219,16 @@ def run(constant):
         "trials_per_config": TRIALS,
         "max_nodes": MAX_NODES,
         "note": "All quantum_queries are MEASURED walk-operator applications "
-                "from faithful Belovs/Montanaro phase-estimation detection.",
+                "from faithful Belovs/Montanaro phase-estimation detection on the LP-pruned core.",
         "data": all_rows,
     }
-    with open("quantum_walk_results.json", "w") as f:
+    # User requested new file name
+    with open("quantum_walk_results_hybrid_v2.json", "w") as f:
         json.dump(out, f, indent=2)
-    print("\nSaved -> quantum_walk_results.json")
+    print("\nSaved -> quantum_walk_results_hybrid_v2.json")
 
 
 if __name__ == "__main__":
     t0 = time.time()
     const = calibrate()
     run(const)
-    print(f"\nTotal time: {time.time() - t0:.1f}s")

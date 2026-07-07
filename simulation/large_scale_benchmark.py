@@ -150,7 +150,9 @@ def run_large_scale_benchmark():
                 "type": inst_type,
                 "n": n,
                 "avg_alpha": float(np.mean(alphas)),
+                "std_alpha": float(np.std(alphas)),
                 "avg_core": float(np.mean(cores)),
+                "std_core": float(np.std(cores)),
                 "avg_time_ms": float(np.mean(times))
             })
             

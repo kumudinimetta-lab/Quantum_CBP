@@ -1,0 +1,3113 @@
+{
+  "manifest": {
+    "git_commit": "60b42dcf502de8f7fe15cdde9b7b3f6bfd91830a",
+    "script_sha256": "a2e34dd2da041eef1a2566cbf82e3e018c70ee442b0196e357c83f84ab6b1d1a",
+    "python_version": "3.13.6 (tags/v3.13.6:4e66535, Aug  6 2025, 14:36:00) [MSC v.1944 64 bit (AMD64)]",
+    "package_versions": [
+      "numpy==2.2.6\r",
+      "scipy==1.16.2\r"
+    ],
+    "timestamp": "2026-07-06T20:56:18.818513+00:00",
+    "classes": [
+      "uncorrelated",
+      "weakly_correlated",
+      "strongly_correlated",
+      "subset_sum",
+      "inverse_strongly"
+    ],
+    "n_values": [
+      8,
+      10,
+      12,
+      14,
+      16,
+      18
+    ],
+    "seeds": [
+      "1000 * n + t (t=0..1)"
+    ],
+    "pe_constant": 2.0,
+    "max_nodes": 2000,
+    "output_filename": "quantum_walk_spectral_smoke.json"
+  },
+  "records": [
+    {
+      "class": "uncorrelated",
+      "n": 8,
+      "seed": 8000,
+      "m": 0,
+      "status": "EMPTY_CORE"
+    },
+    {
+      "class": "uncorrelated",
+      "n": 8,
+      "seed": 8001,
+      "m": 7,
+      "T_LP": 19,
+      "d_bound": 7,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.5000000000000007,
+      "p_accepts": {
+        "s-2": 0.7145870798506955,
+        "s-1": 0.5369051483530531,
+        "s0": 0.5160479321849563,
+        "s1": 0.5003332844198298
+      },
+      "s_theoretical": 5,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "uncorrelated",
+      "n": 8,
+      "seed": 8001,
+      "m": 7,
+      "T_LP": 16,
+      "d_bound": 7,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.0236227795630767,
+          "mu": 0.0,
+          "bound": 0.015624999999999997,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.0472455591261534,
+          "mu": 0.0,
+          "bound": 0.062499999999999986,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.0944911182523068,
+          "mu": 0.0,
+          "bound": 0.24999999999999994,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.1889822365046136,
+          "mu": 0.8361993874956324,
+          "bound": 0.9999999999999998,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.3779644730092272,
+          "mu": 0.8361993874956324,
+          "bound": 3.999999999999999,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.17830799624673704,
+      "p_accepts": {
+        "s-2": 0.7109554744608199,
+        "s-1": 0.40447620579020455,
+        "s0": 0.008763033043252016,
+        "s1": 0.007705563843553359
+      },
+      "s_theoretical": 5,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "uncorrelated",
+      "n": 10,
+      "seed": 10000,
+      "m": 5,
+      "T_LP": 14,
+      "d_bound": 5,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.5000000000000003,
+      "p_accepts": {
+        "s-2": 0.5996353528451016,
+        "s-1": 0.5047381469314687,
+        "s0": 0.5029600297518148,
+        "s1": 0.5015405098980935
+      },
+      "s_theoretical": 5,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "uncorrelated",
+      "n": 10,
+      "seed": 10000,
+      "m": 5,
+      "T_LP": 10,
+      "d_bound": 5,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.035355339059327376,
+          "mu": 0.0,
+          "bound": 0.015625,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.07071067811865475,
+          "mu": 0.0,
+          "bound": 0.0625,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.1414213562373095,
+          "mu": 0.0,
+          "bound": 0.25,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.282842712474619,
+          "mu": 0.7468237962977512,
+          "bound": 1.0,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.565685424949238,
+          "mu": 0.7468237962977512,
+          "bound": 4.0,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.25810507997417564,
+      "p_accepts": {
+        "s-2": 0.7262709742048581,
+        "s-1": 0.5299659073516938,
+        "s0": 0.13915588704102655,
+        "s1": 0.03136698789782519
+      },
+      "s_theoretical": 4,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "uncorrelated",
+      "n": 10,
+      "seed": 10001,
+      "m": 0,
+      "status": "EMPTY_CORE"
+    },
+    {
+      "class": "uncorrelated",
+      "n": 12,
+      "seed": 12000,
+      "m": 5,
+      "T_LP": 25,
+      "d_bound": 5,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.4999999999999993,
+      "p_accepts": {
+        "s-2": 0.7469164180525585,
+        "s-1": 0.5745924153454528,
+        "s0": 0.5117694248239809,
+        "s1": 0.5055106132014554
+      },
+      "s_theoretical": 5,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "uncorrelated",
+      "n": 12,
+      "seed": 12000,
+      "m": 5,
+      "T_LP": 25,
+      "d_bound": 5,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.022360679774997897,
+          "mu": 0.0,
+          "bound": 0.015625,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.044721359549995794,
+          "mu": 0.0,
+          "bound": 0.0625,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.08944271909999159,
+          "mu": 0.0,
+          "bound": 0.25,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.17888543819998318,
+          "mu": 0.8565011109377043,
+          "bound": 1.0,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.35777087639996635,
+          "mu": 0.8565011109377043,
+          "bound": 4.0,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.1687278367220097,
+      "p_accepts": {
+        "s-2": 0.7412915768667283,
+        "s-1": 0.44870054055259606,
+        "s0": 0.02163128622919014,
+        "s1": 0.017635028566708993
+      },
+      "s_theoretical": 5,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "uncorrelated",
+      "n": 12,
+      "seed": 12001,
+      "m": 0,
+      "status": "EMPTY_CORE"
+    },
+    {
+      "class": "uncorrelated",
+      "n": 14,
+      "seed": 14000,
+      "m": 3,
+      "T_LP": 6,
+      "d_bound": 3,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.4999999999999996,
+      "p_accepts": {
+        "s-2": 0.6041666666666664,
+        "s-1": 0.5034079218106992,
+        "s0": 0.5016764683387553,
+        "s1": 0.5010503862167838
+      },
+      "s_theoretical": 4,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "uncorrelated",
+      "n": 14,
+      "seed": 14000,
+      "m": 3,
+      "T_LP": 6,
+      "d_bound": 3,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.05892556509887897,
+          "mu": 0.0,
+          "bound": 0.015625,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.11785113019775793,
+          "mu": 0.0,
+          "bound": 0.0625,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.23570226039551587,
+          "mu": 0.0,
+          "bound": 0.25,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.47140452079103173,
+          "mu": 0.7538365412834032,
+          "bound": 1.0,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.9428090415820635,
+          "mu": 0.7538365412834032,
+          "bound": 4.0,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.44159419445076853,
+      "p_accepts": {
+        "s-2": 0.6041666666666656,
+        "s-1": 0.23643261316872408,
+        "s0": 0.009054698001126406,
+        "s1": 0.007742080163923918
+      },
+      "s_theoretical": 4,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "uncorrelated",
+      "n": 14,
+      "seed": 14001,
+      "m": 13,
+      "T_LP": 39,
+      "d_bound": 13,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.4999999999999993,
+      "p_accepts": {
+        "s-2": 0.7558625486715307,
+        "s-1": 0.5563025946235285,
+        "s0": 0.5175875230574667,
+        "s1": 0.5024829693535182
+      },
+      "s_theoretical": 6,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "uncorrelated",
+      "n": 14,
+      "seed": 14001,
+      "m": 13,
+      "T_LP": 20,
+      "d_bound": 13,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.015504341823651058,
+          "mu": 0.0,
+          "bound": 0.015625000000000003,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.031008683647302117,
+          "mu": 0.0,
+          "bound": 0.06250000000000001,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.062017367294604234,
+          "mu": 0.0,
+          "bound": 0.25000000000000006,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.12403473458920847,
+          "mu": 0.8079550393206574,
+          "bound": 1.0000000000000002,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.24806946917841693,
+          "mu": 0.8079550393206574,
+          "bound": 4.000000000000001,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.11470524189607251,
+      "p_accepts": {
+        "s-2": 0.6117899614940578,
+        "s-1": 0.22526797736062645,
+        "s0": 0.015646254222482087,
+        "s1": 0.011502049984173118
+      },
+      "s_theoretical": 6,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "uncorrelated",
+      "n": 16,
+      "seed": 16000,
+      "m": 12,
+      "T_LP": 42,
+      "d_bound": 12,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.6303741051973308,
+      "p_accepts": {
+        "s-2": 0.6971715984565958,
+        "s-1": 0.63284471959639,
+        "s0": 0.632145066125162,
+        "s1": 0.6313316204634702
+      },
+      "s_theoretical": 6,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "uncorrelated",
+      "n": 16,
+      "seed": 16000,
+      "m": 12,
+      "T_LP": 39,
+      "d_bound": 12,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.011556254088025606,
+          "mu": 0.0,
+          "bound": 0.015625,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.023112508176051212,
+          "mu": 0.0,
+          "bound": 0.0625,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.046225016352102424,
+          "mu": 0.0,
+          "bound": 0.25,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.09245003270420485,
+          "mu": 0.7814140920518111,
+          "bound": 1.0,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.1849000654084097,
+          "mu": 0.7814140920518111,
+          "bound": 4.0,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.08292582103904418,
+      "p_accepts": {
+        "s-2": 0.6794768400103934,
+        "s-1": 0.41952511795921515,
+        "s0": 0.024696726315898337,
+        "s1": 0.019095093147092016
+      },
+      "s_theoretical": 6,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "uncorrelated",
+      "n": 16,
+      "seed": 16001,
+      "m": 5,
+      "T_LP": 11,
+      "d_bound": 5,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.4999999999999991,
+      "p_accepts": {
+        "s-2": 0.7926371149511634,
+        "s-1": 0.6318812258587959,
+        "s0": 0.5019189887036695,
+        "s1": 0.50034152617403
+      },
+      "s_theoretical": 4,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "uncorrelated",
+      "n": 16,
+      "seed": 16001,
+      "m": 5,
+      "T_LP": 11,
+      "d_bound": 5,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.033709993123162106,
+          "mu": 0.0,
+          "bound": 0.015625000000000003,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.06741998624632421,
+          "mu": 0.0,
+          "bound": 0.06250000000000001,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.13483997249264842,
+          "mu": 0.0,
+          "bound": 0.25000000000000006,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.26967994498529685,
+          "mu": 0.8561036491956122,
+          "bound": 1.0000000000000002,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.5393598899705937,
+          "mu": 0.8561036491956122,
+          "bound": 4.000000000000001,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.2606777247007742,
+      "p_accepts": {
+        "s-2": 0.7926371149511648,
+        "s-1": 0.5943154858137178,
+        "s0": 0.150978845230654,
+        "s1": 0.03655145885306712
+      },
+      "s_theoretical": 4,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "uncorrelated",
+      "n": 18,
+      "seed": 18000,
+      "m": 4,
+      "T_LP": 10,
+      "d_bound": 4,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.5000000000000006,
+      "p_accepts": {
+        "s-2": 0.7145252248132913,
+        "s-1": 0.5477331037308383,
+        "s0": 0.5151583402905245,
+        "s1": 0.501987454363959
+      },
+      "s_theoretical": 4,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "uncorrelated",
+      "n": 18,
+      "seed": 18000,
+      "m": 4,
+      "T_LP": 7,
+      "d_bound": 4,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.0472455591261534,
+          "mu": 0.0,
+          "bound": 0.015624999999999997,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.0944911182523068,
+          "mu": 0.0,
+          "bound": 0.062499999999999986,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.1889822365046136,
+          "mu": 0.0,
+          "bound": 0.24999999999999994,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.3779644730092272,
+          "mu": 0.8206280601161404,
+          "bound": 0.9999999999999998,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.7559289460184544,
+          "mu": 0.8206280601161404,
+          "bound": 3.999999999999999,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.3675409216971729,
+      "p_accepts": {
+        "s-2": 0.6998933089468069,
+        "s-1": 0.3852201362420859,
+        "s0": 0.00500466844726497,
+        "s1": 0.0040217847244040815
+      },
+      "s_theoretical": 4,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "uncorrelated",
+      "n": 18,
+      "seed": 18001,
+      "m": 8,
+      "T_LP": 31,
+      "d_bound": 8,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.49999999999999706,
+      "p_accepts": {
+        "s-2": 0.6304180562916402,
+        "s-1": 0.5003415654799698,
+        "s0": 0.5002014691850853,
+        "s1": 0.5000266686281899
+      },
+      "s_theoretical": 6,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "uncorrelated",
+      "n": 18,
+      "seed": 18001,
+      "m": 8,
+      "T_LP": 25,
+      "d_bound": 8,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.017677669529663688,
+          "mu": 0.0,
+          "bound": 0.015625,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.035355339059327376,
+          "mu": 0.0,
+          "bound": 0.0625,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.07071067811865475,
+          "mu": 0.0,
+          "bound": 0.25,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.1414213562373095,
+          "mu": 0.8197050121972869,
+          "bound": 1.0,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.282842712474619,
+          "mu": 0.8197050121972869,
+          "bound": 4.0,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.13071584111721324,
+      "p_accepts": {
+        "s-2": 0.7526779860635797,
+        "s-1": 0.5633057925799317,
+        "s0": 0.1418689795770113,
+        "s1": 0.03500246179360244
+      },
+      "s_theoretical": 5,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "weakly_correlated",
+      "n": 8,
+      "seed": 8000,
+      "m": 8,
+      "T_LP": 41,
+      "d_bound": 8,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.500000000000002,
+      "p_accepts": {
+        "s-2": 0.669859821265552,
+        "s-1": 0.5132251667027659,
+        "s0": 0.5093425753968919,
+        "s1": 0.5017745114901262
+      },
+      "s_theoretical": 6,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "weakly_correlated",
+      "n": 8,
+      "seed": 8000,
+      "m": 8,
+      "T_LP": 32,
+      "d_bound": 8,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.015625,
+          "mu": 0.0,
+          "bound": 0.015625,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.03125,
+          "mu": 0.0,
+          "bound": 0.0625,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.0625,
+          "mu": 0.0,
+          "bound": 0.25,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.125,
+          "mu": 0.818920966385515,
+          "bound": 1.0,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.25,
+          "mu": 0.818920966385515,
+          "bound": 4.0,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.11493082407990012,
+      "p_accepts": {
+        "s-2": 0.6146577794829599,
+        "s-1": 0.22569012809405956,
+        "s0": 0.015960501759643107,
+        "s1": 0.011697913824523424
+      },
+      "s_theoretical": 6,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "weakly_correlated",
+      "n": 8,
+      "seed": 8001,
+      "m": 7,
+      "T_LP": 33,
+      "d_bound": 7,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.49999999999999395,
+      "p_accepts": {
+        "s-2": 0.8146507940004535,
+        "s-1": 0.6375887576159329,
+        "s0": 0.5023121094233963,
+        "s1": 0.5020697781286301
+      },
+      "s_theoretical": 5,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "weakly_correlated",
+      "n": 8,
+      "seed": 8001,
+      "m": 7,
+      "T_LP": 23,
+      "d_bound": 7,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.019702760155977515,
+          "mu": 0.0,
+          "bound": 0.015625,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.03940552031195503,
+          "mu": 0.0,
+          "bound": 0.0625,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.07881104062391006,
+          "mu": 0.0,
+          "bound": 0.25,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.15762208124782012,
+          "mu": 0.870731235876932,
+          "bound": 1.0,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.31524416249564025,
+          "mu": 0.870731235876932,
+          "bound": 4.0,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.1504358977777688,
+      "p_accepts": {
+        "s-2": 0.7807613403828407,
+        "s-1": 0.5266909943585969,
+        "s0": 0.06823702166253282,
+        "s1": 0.037375249061611715
+      },
+      "s_theoretical": 5,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "weakly_correlated",
+      "n": 10,
+      "seed": 10000,
+      "m": 8,
+      "T_LP": 48,
+      "d_bound": 8,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.4999999999999925,
+      "p_accepts": {
+        "s-2": 0.701228076417001,
+        "s-1": 0.5151928742779094,
+        "s0": 0.5109819954906106,
+        "s1": 0.5022528990373128
+      },
+      "s_theoretical": 6,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "weakly_correlated",
+      "n": 10,
+      "seed": 10000,
+      "m": 8,
+      "T_LP": 20,
+      "d_bound": 8,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.01976423537605237,
+          "mu": 0.0,
+          "bound": 0.015625,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.03952847075210474,
+          "mu": 0.0,
+          "bound": 0.0625,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.07905694150420949,
+          "mu": 0.0,
+          "bound": 0.25,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.15811388300841897,
+          "mu": 0.7590292144705678,
+          "bound": 1.0,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.31622776601683794,
+          "mu": 0.7590292144705678,
+          "bound": 4.0,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.14173257429958078,
+      "p_accepts": {
+        "s-2": 0.6854428885960836,
+        "s-1": 0.4874326544845604,
+        "s0": 0.08799469857993077,
+        "s1": 0.036096989882984515
+      },
+      "s_theoretical": 5,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "weakly_correlated",
+      "n": 10,
+      "seed": 10001,
+      "m": 10,
+      "T_LP": 107,
+      "d_bound": 10,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.6057711048355895,
+      "p_accepts": {
+        "s-2": 0.6893171742103843,
+        "s-1": 0.6086654771041172,
+        "s0": 0.6081537794721756,
+        "s1": 0.6071009023162316
+      },
+      "s_theoretical": 7,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "weakly_correlated",
+      "n": 10,
+      "seed": 10001,
+      "m": 10,
+      "T_LP": 81,
+      "d_bound": 10,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.008784104611578832,
+          "mu": 0.0,
+          "bound": 0.015625000000000003,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.017568209223157664,
+          "mu": 0.0,
+          "bound": 0.06250000000000001,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.03513641844631533,
+          "mu": 0.0,
+          "bound": 0.25000000000000006,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.07027283689263066,
+          "mu": 0.844340079477093,
+          "bound": 1.0000000000000002,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.1405456737852613,
+          "mu": 0.844340079477093,
+          "bound": 4.000000000000001,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.06507760642018404,
+      "p_accepts": {
+        "s-2": 0.7771476818670646,
+        "s-1": 0.5820472006672684,
+        "s0": 0.14880885416191997,
+        "s1": 0.03553798022089956
+      },
+      "s_theoretical": 6,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "weakly_correlated",
+      "n": 12,
+      "seed": 12000,
+      "m": 0,
+      "status": "EMPTY_CORE"
+    },
+    {
+      "class": "weakly_correlated",
+      "n": 12,
+      "seed": 12001,
+      "m": 12,
+      "T_LP": 153,
+      "d_bound": 12,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.8091921320576445,
+      "p_accepts": {
+        "s-2": 0.9264092513946642,
+        "s-1": 0.811767622056714,
+        "s0": 0.8114715283272107,
+        "s1": 0.8107434971394533
+      },
+      "s_theoretical": 7,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "weakly_correlated",
+      "n": 12,
+      "seed": 12001,
+      "m": 12,
+      "T_LP": 100,
+      "d_bound": 12,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.007216878364870321,
+          "mu": 0.0,
+          "bound": 0.015624999999999993,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.014433756729740642,
+          "mu": 0.0,
+          "bound": 0.06249999999999997,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.028867513459481284,
+          "mu": 0.0,
+          "bound": 0.2499999999999999,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.05773502691896257,
+          "mu": 0.8711780360733821,
+          "bound": 0.9999999999999996,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.11547005383792514,
+          "mu": 0.8711780360733821,
+          "bound": 3.9999999999999982,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.05423103391024286,
+      "p_accepts": {
+        "s-2": 0.6739245135378873,
+        "s-1": 0.2816457245900693,
+        "s0": 0.007583431213270315,
+        "s1": 0.006775447814722471
+      },
+      "s_theoretical": 7,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "weakly_correlated",
+      "n": 14,
+      "seed": 14000,
+      "m": 3,
+      "T_LP": 6,
+      "d_bound": 3,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.5000000000000003,
+      "p_accepts": {
+        "s-2": 0.6005830903790089,
+        "s-1": 0.5173136071826246,
+        "s0": 0.5076407263489963,
+        "s1": 0.500139018249529
+      },
+      "s_theoretical": 4,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "weakly_correlated",
+      "n": 14,
+      "seed": 14000,
+      "m": 3,
+      "T_LP": 1,
+      "d_bound": 3,
+      "case_type": "unmarked",
+      "status": "EMPTY_CORE"
+    },
+    {
+      "class": "weakly_correlated",
+      "n": 14,
+      "seed": 14001,
+      "m": 10,
+      "T_LP": 72,
+      "d_bound": 10,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.7702731678091069,
+      "p_accepts": {
+        "s-2": 0.8318685414732654,
+        "s-1": 0.7705352124133571,
+        "s0": 0.7704175593152519,
+        "s1": 0.770345603875468
+      },
+      "s_theoretical": 6,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "weakly_correlated",
+      "n": 14,
+      "seed": 14001,
+      "m": 10,
+      "T_LP": 28,
+      "d_bound": 10,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.01494035761667992,
+          "mu": 0.0,
+          "bound": 0.015624999999999998,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.02988071523335984,
+          "mu": 0.0,
+          "bound": 0.06249999999999999,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.05976143046671968,
+          "mu": 0.0,
+          "bound": 0.24999999999999997,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.11952286093343936,
+          "mu": 0.8711960948081604,
+          "bound": 0.9999999999999999,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.23904572186687872,
+          "mu": 0.8711960948081604,
+          "bound": 3.9999999999999996,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.11378942925386812,
+      "p_accepts": {
+        "s-2": 0.6566741288379104,
+        "s-1": 0.24715650934317646,
+        "s0": 0.015173286878111146,
+        "s1": 0.011661283479643306
+      },
+      "s_theoretical": 6,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "weakly_correlated",
+      "n": 16,
+      "seed": 16000,
+      "m": 11,
+      "T_LP": 20,
+      "d_bound": 11,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.49999999999999706,
+      "p_accepts": {
+        "s-2": 0.7521793782919919,
+        "s-1": 0.5739580432616487,
+        "s0": 0.5135256714781522,
+        "s1": 0.5054513061535298
+      },
+      "s_theoretical": 5,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "weakly_correlated",
+      "n": 16,
+      "seed": 16000,
+      "m": 11,
+      "T_LP": 10,
+      "d_bound": 11,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.02383656473113981,
+          "mu": 0.0,
+          "bound": 0.015625000000000003,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.04767312946227962,
+          "mu": 0.0,
+          "bound": 0.06250000000000001,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.09534625892455924,
+          "mu": 0.0,
+          "bound": 0.25000000000000006,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.19069251784911848,
+          "mu": 0.8939938399769292,
+          "bound": 1.0000000000000002,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.38138503569823695,
+          "mu": 0.8939938399769292,
+          "bound": 4.000000000000001,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.189758149943689,
+      "p_accepts": {
+        "s-2": 0.7402895139752534,
+        "s-1": 0.3895223135949594,
+        "s0": 0.0010944256996107775,
+        "s1": 0.0010790136971910724
+      },
+      "s_theoretical": 5,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "weakly_correlated",
+      "n": 16,
+      "seed": 16001,
+      "m": 16,
+      "T_LP": 31,
+      "d_bound": 16,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.4999999999999966,
+      "p_accepts": {
+        "s-2": 0.6743508314550611,
+        "s-1": 0.5098555852383856,
+        "s0": 0.5075466651683105,
+        "s1": 0.5026910620182734
+      },
+      "s_theoretical": 6,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "weakly_correlated",
+      "n": 16,
+      "seed": 16001,
+      "m": 16,
+      "T_LP": 14,
+      "d_bound": 16,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.016703827619526525,
+          "mu": 0.0,
+          "bound": 0.015625000000000003,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.03340765523905305,
+          "mu": 0.0,
+          "bound": 0.06250000000000001,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.0668153104781061,
+          "mu": 0.0,
+          "bound": 0.25000000000000006,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.1336306209562122,
+          "mu": 0.8883901352782639,
+          "bound": 1.0000000000000002,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.2672612419124244,
+          "mu": 0.8883901352782639,
+          "bound": 4.000000000000001,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.13071472348192387,
+      "p_accepts": {
+        "s-2": 0.8135471876691449,
+        "s-1": 0.6103868967261066,
+        "s0": 0.15372842307743856,
+        "s1": 0.03790285993841187
+      },
+      "s_theoretical": 5,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "weakly_correlated",
+      "n": 18,
+      "seed": 18000,
+      "m": 17,
+      "T_LP": 140,
+      "d_bound": 17,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.5862301997555763,
+      "p_accepts": {
+        "s-2": 0.7603534330777557,
+        "s-1": 0.6378227678809005,
+        "s0": 0.5948041002335277,
+        "s1": 0.5900675341997113
+      },
+      "s_theoretical": 7,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "weakly_correlated",
+      "n": 18,
+      "seed": 18000,
+      "m": 17,
+      "T_LP": 49,
+      "d_bound": 17,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.008661986608440463,
+          "mu": 0.0,
+          "bound": 0.015625,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.017323973216880926,
+          "mu": 0.0,
+          "bound": 0.0625,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.03464794643376185,
+          "mu": 0.0,
+          "bound": 0.25,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.0692958928675237,
+          "mu": 0.8518575015969776,
+          "bound": 1.0,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.1385917857350474,
+          "mu": 0.8518575015969776,
+          "bound": 4.0,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.06471506117505664,
+      "p_accepts": {
+        "s-2": 0.7892069056188327,
+        "s-1": 0.589079931228601,
+        "s0": 0.15364702474158495,
+        "s1": 0.035252396874533944
+      },
+      "s_theoretical": 6,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "weakly_correlated",
+      "n": 18,
+      "seed": 18001,
+      "m": 1,
+      "T_LP": 3,
+      "d_bound": 1,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.4999999999999998,
+      "p_accepts": {
+        "s-2": 0.6666666666666665,
+        "s-1": 0.5185185185185184,
+        "s0": 0.5112025605852764,
+        "s1": 0.5004934522190434
+      },
+      "s_theoretical": 3,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "weakly_correlated",
+      "n": 18,
+      "seed": 18001,
+      "m": 1,
+      "T_LP": 1,
+      "d_bound": 1,
+      "case_type": "unmarked",
+      "status": "EMPTY_CORE"
+    },
+    {
+      "class": "strongly_correlated",
+      "n": 8,
+      "seed": 8000,
+      "m": 0,
+      "status": "EMPTY_CORE"
+    },
+    {
+      "class": "strongly_correlated",
+      "n": 8,
+      "seed": 8001,
+      "m": 8,
+      "T_LP": 54,
+      "d_bound": 8,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.5517289716069074,
+      "p_accepts": {
+        "s-2": 0.7071216659787622,
+        "s-1": 0.5822002638770324,
+        "s0": 0.5626392657067889,
+        "s1": 0.5526265900541455
+      },
+      "s_theoretical": 6,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "strongly_correlated",
+      "n": 8,
+      "seed": 8001,
+      "m": 8,
+      "T_LP": 30,
+      "d_bound": 8,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.01613743060919757,
+          "mu": 0.0,
+          "bound": 0.015624999999999997,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.03227486121839514,
+          "mu": 0.0,
+          "bound": 0.062499999999999986,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.06454972243679027,
+          "mu": 0.0,
+          "bound": 0.24999999999999994,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.12909944487358055,
+          "mu": 0.7274384943414587,
+          "bound": 0.9999999999999998,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.2581988897471611,
+          "mu": 0.7274384943414587,
+          "bound": 3.999999999999999,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.11230931376803635,
+      "p_accepts": {
+        "s-2": 0.6882759802344475,
+        "s-1": 0.557485104811824,
+        "s0": 0.21571356749029869,
+        "s1": 0.0111179531561965
+      },
+      "s_theoretical": 5,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "strongly_correlated",
+      "n": 10,
+      "seed": 10000,
+      "m": 10,
+      "T_LP": 88,
+      "d_bound": 10,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.49999999999999833,
+      "p_accepts": {
+        "s-2": 0.7383582889158476,
+        "s-1": 0.590634696857935,
+        "s0": 0.5050702297842975,
+        "s1": 0.5036291806170407
+      },
+      "s_theoretical": 6,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "strongly_correlated",
+      "n": 10,
+      "seed": 10000,
+      "m": 10,
+      "T_LP": 49,
+      "d_bound": 10,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.011293848786315641,
+          "mu": 0.0,
+          "bound": 0.015625,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.022587697572631283,
+          "mu": 0.0,
+          "bound": 0.0625,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.045175395145262566,
+          "mu": 0.0,
+          "bound": 0.25,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.09035079029052513,
+          "mu": 0.7279323545930503,
+          "bound": 1.0,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.18070158058105026,
+          "mu": 0.7279323545930503,
+          "bound": 4.0,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.07809435353208515,
+      "p_accepts": {
+        "s-2": 0.6456599526948513,
+        "s-1": 0.4213364014370148,
+        "s0": 0.042639493295173574,
+        "s1": 0.02688309159490108
+      },
+      "s_theoretical": 6,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "strongly_correlated",
+      "n": 10,
+      "seed": 10001,
+      "m": 10,
+      "T_LP": 70,
+      "d_bound": 10,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.5000000000000002,
+      "p_accepts": {
+        "s-2": 0.6857124352709353,
+        "s-1": 0.5670248595818201,
+        "s0": 0.5043725352353017,
+        "s1": 0.5032680827834927
+      },
+      "s_theoretical": 6,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "strongly_correlated",
+      "n": 10,
+      "seed": 10001,
+      "m": 10,
+      "T_LP": 15,
+      "d_bound": 10,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.020412414523193152,
+          "mu": 0.0,
+          "bound": 0.015625000000000003,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.040824829046386304,
+          "mu": 0.0,
+          "bound": 0.06250000000000001,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.08164965809277261,
+          "mu": 0.0,
+          "bound": 0.25000000000000006,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.16329931618554522,
+          "mu": 0.8148676059828673,
+          "bound": 1.0000000000000002,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.32659863237109044,
+          "mu": 0.8148676059828673,
+          "bound": 4.000000000000001,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.1528973611398687,
+      "p_accepts": {
+        "s-2": 0.7258562167354649,
+        "s-1": 0.4856174886408955,
+        "s0": 0.05687833812940636,
+        "s1": 0.03320237618349457
+      },
+      "s_theoretical": 5,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "strongly_correlated",
+      "n": 12,
+      "seed": 12000,
+      "m": 0,
+      "status": "EMPTY_CORE"
+    },
+    {
+      "class": "strongly_correlated",
+      "n": 12,
+      "seed": 12001,
+      "m": 12,
+      "T_LP": 122,
+      "d_bound": 12,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.6050628185891623,
+      "p_accepts": {
+        "s-2": 0.6528046558733464,
+        "s-1": 0.6116291407606895,
+        "s0": 0.6086393038450703,
+        "s1": 0.6051187573603275
+      },
+      "s_theoretical": 7,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "strongly_correlated",
+      "n": 12,
+      "seed": 12001,
+      "m": 12,
+      "T_LP": 72,
+      "d_bound": 12,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.008505172717997146,
+          "mu": 0.0,
+          "bound": 0.015625,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.017010345435994292,
+          "mu": 0.0,
+          "bound": 0.0625,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.034020690871988585,
+          "mu": 0.0,
+          "bound": 0.25,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.06804138174397717,
+          "mu": 0.7181117125803108,
+          "bound": 1.0,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.13608276348795434,
+          "mu": 0.7181117125803108,
+          "bound": 4.0,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.05819354838243389,
+      "p_accepts": {
+        "s-2": 0.67560250801914,
+        "s-1": 0.5369870285639049,
+        "s0": 0.1905378292471347,
+        "s1": 0.015874596139483214
+      },
+      "s_theoretical": 6,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "strongly_correlated",
+      "n": 14,
+      "seed": 14000,
+      "m": 14,
+      "T_LP": 1253,
+      "d_bound": 14,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.8110587275520302,
+      "p_accepts": {
+        "s-2": 0.8118930384182379,
+        "s-1": 0.8114149884734875,
+        "s0": 0.8111181550059682,
+        "s1": 0.8110812222981987
+      },
+      "s_theoretical": 9,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "strongly_correlated",
+      "n": 14,
+      "seed": 14000,
+      "m": 14,
+      "T_LP": 609,
+      "d_bound": 14,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.002707493012781798,
+          "mu": 0.0,
+          "bound": 0.015625,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.005414986025563596,
+          "mu": 0.0,
+          "bound": 0.0625,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.010829972051127191,
+          "mu": 0.0,
+          "bound": 0.25,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.021659944102254382,
+          "mu": 0.7644964632406435,
+          "bound": 1.0,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.043319888204508765,
+          "mu": 0.7644964632406435,
+          "bound": 4.0,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.018965080887248242,
+      "p_accepts": {
+        "s-2": 0.6756654440929983,
+        "s-1": 0.45587291405416375,
+        "s0": 0.055699646994361515,
+        "s1": 0.03180330256740103
+      },
+      "s_theoretical": 8,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "strongly_correlated",
+      "n": 14,
+      "seed": 14001,
+      "m": 12,
+      "T_LP": 230,
+      "d_bound": 12,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.500000000000007,
+      "p_accepts": {
+        "s-2": 0.7395665974749157,
+        "s-1": 0.5788437854974773,
+        "s0": 0.5092256664780276,
+        "s1": 0.5053308285168866
+      },
+      "s_theoretical": 7,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "strongly_correlated",
+      "n": 14,
+      "seed": 14001,
+      "m": 12,
+      "T_LP": 115,
+      "d_bound": 12,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.006729773775727069,
+          "mu": 0.0,
+          "bound": 0.015625,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.013459547551454138,
+          "mu": 0.0,
+          "bound": 0.0625,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.026919095102908276,
+          "mu": 0.0,
+          "bound": 0.25,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.05383819020581655,
+          "mu": 0.7591393092322446,
+          "bound": 1.0,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.1076763804116331,
+          "mu": 0.7591393092322446,
+          "bound": 4.0,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.0471922079552698,
+      "p_accepts": {
+        "s-2": 0.6267755502215706,
+        "s-1": 0.3320634346472074,
+        "s0": 0.00133622201885696,
+        "s1": 0.0012369346445936006
+      },
+      "s_theoretical": 7,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "strongly_correlated",
+      "n": 16,
+      "seed": 16000,
+      "m": 16,
+      "T_LP": 253,
+      "d_bound": 16,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.6936618248109088,
+      "p_accepts": {
+        "s-2": 0.695105108656961,
+        "s-1": 0.6942907077821583,
+        "s0": 0.6940103632826636,
+        "s1": 0.6937175430976409
+      },
+      "s_theoretical": 8,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "strongly_correlated",
+      "n": 16,
+      "seed": 16000,
+      "m": 16,
+      "T_LP": 71,
+      "d_bound": 16,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.007417385363711583,
+          "mu": 0.0,
+          "bound": 0.015624999999999998,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.014834770727423166,
+          "mu": 0.0,
+          "bound": 0.06249999999999999,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.02966954145484633,
+          "mu": 0.0,
+          "bound": 0.24999999999999997,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.05933908290969266,
+          "mu": 0.7010483611387734,
+          "bound": 0.9999999999999999,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.11867816581938533,
+          "mu": 0.7010483611387734,
+          "bound": 3.9999999999999996,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.05022321163006867,
+      "p_accepts": {
+        "s-2": 0.568438616134902,
+        "s-1": 0.27275801583037984,
+        "s0": 0.0005521075926909011,
+        "s1": 0.0003671464238323789
+      },
+      "s_theoretical": 7,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "strongly_correlated",
+      "n": 16,
+      "seed": 16001,
+      "m": 16,
+      "T_LP": 146,
+      "d_bound": 16,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.5811757950427391,
+      "p_accepts": {
+        "s-2": 0.6203010712549762,
+        "s-1": 0.5843723130472196,
+        "s0": 0.5817548348228384,
+        "s1": 0.5816091078185457
+      },
+      "s_theoretical": 7,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "strongly_correlated",
+      "n": 16,
+      "seed": 16001,
+      "m": 16,
+      "T_LP": 47,
+      "d_bound": 16,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.00911656196861841,
+          "mu": 0.0,
+          "bound": 0.015625,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.01823312393723682,
+          "mu": 0.0,
+          "bound": 0.0625,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.03646624787447364,
+          "mu": 0.0,
+          "bound": 0.25,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.07293249574894728,
+          "mu": 0.7047459271332188,
+          "bound": 1.0,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.14586499149789456,
+          "mu": 0.7047459271332188,
+          "bound": 4.0,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.06225803758181961,
+      "p_accepts": {
+        "s-2": 0.6661907740167825,
+        "s-1": 0.5094743508502383,
+        "s0": 0.1479967212624313,
+        "s1": 0.024805175850551784
+      },
+      "s_theoretical": 6,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "strongly_correlated",
+      "n": 18,
+      "seed": 18000,
+      "m": 18,
+      "T_LP": 59,
+      "d_bound": 18,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.5902635069082466,
+      "p_accepts": {
+        "s-2": 0.5921385732201812,
+        "s-1": 0.5909557433925915,
+        "s0": 0.590480849575085,
+        "s1": 0.5904276395640669
+      },
+      "s_theoretical": 7,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "strongly_correlated",
+      "n": 18,
+      "seed": 18000,
+      "m": 18,
+      "T_LP": 1,
+      "d_bound": 18,
+      "case_type": "unmarked",
+      "status": "EMPTY_CORE"
+    },
+    {
+      "class": "strongly_correlated",
+      "n": 18,
+      "seed": 18001,
+      "m": 18,
+      "status": "TREE_CAP",
+      "case_type": "marked"
+    },
+    {
+      "class": "strongly_correlated",
+      "n": 18,
+      "seed": 18001,
+      "m": 18,
+      "T_LP": 754,
+      "d_bound": 18,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.002145942510935853,
+          "mu": 0.0,
+          "bound": 0.015625000000000003,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.004291885021871706,
+          "mu": 0.0,
+          "bound": 0.06250000000000001,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.008583770043743413,
+          "mu": 0.0,
+          "bound": 0.25000000000000006,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.017167540087486825,
+          "mu": 0.7558922839816062,
+          "bound": 1.0000000000000002,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.03433508017497365,
+          "mu": 0.7558922839816062,
+          "bound": 4.000000000000001,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.014950919385367018,
+      "p_accepts": {
+        "s-2": 0.7042111145854817,
+        "s-1": 0.5530497126732333,
+        "s0": 0.18324950172893018,
+        "s1": 0.020777552399915432
+      },
+      "s_theoretical": 8,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "subset_sum",
+      "n": 8,
+      "seed": 8000,
+      "m": 8,
+      "T_LP": 124,
+      "d_bound": 8,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.7625433583483087,
+      "p_accepts": {
+        "s-2": 0.8369849993780888,
+        "s-1": 0.7684644684006409,
+        "s0": 0.7667020483851759,
+        "s1": 0.7632852110563687
+      },
+      "s_theoretical": 6,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "subset_sum",
+      "n": 8,
+      "seed": 8000,
+      "m": 8,
+      "T_LP": 1,
+      "d_bound": 8,
+      "case_type": "unmarked",
+      "status": "EMPTY_CORE"
+    },
+    {
+      "class": "subset_sum",
+      "n": 8,
+      "seed": 8001,
+      "m": 8,
+      "T_LP": 135,
+      "d_bound": 8,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.6930356389095119,
+      "p_accepts": {
+        "s-2": 0.7444399557865254,
+        "s-1": 0.6976454520126254,
+        "s0": 0.6960919756309443,
+        "s1": 0.6934471322967547
+      },
+      "s_theoretical": 7,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "subset_sum",
+      "n": 8,
+      "seed": 8001,
+      "m": 8,
+      "T_LP": 1,
+      "d_bound": 8,
+      "case_type": "unmarked",
+      "status": "EMPTY_CORE"
+    },
+    {
+      "class": "subset_sum",
+      "n": 10,
+      "seed": 10000,
+      "m": 10,
+      "T_LP": 406,
+      "d_bound": 10,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.8583422997758555,
+      "p_accepts": {
+        "s-2": 0.8604003284995421,
+        "s-1": 0.8589429904920807,
+        "s0": 0.8584447894854582,
+        "s1": 0.8583873489330598
+      },
+      "s_theoretical": 8,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "subset_sum",
+      "n": 10,
+      "seed": 10000,
+      "m": 10,
+      "T_LP": 1,
+      "d_bound": 10,
+      "case_type": "unmarked",
+      "status": "EMPTY_CORE"
+    },
+    {
+      "class": "subset_sum",
+      "n": 10,
+      "seed": 10001,
+      "m": 10,
+      "T_LP": 598,
+      "d_bound": 10,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.7603231149964151,
+      "p_accepts": {
+        "s-2": 0.7953260516336009,
+        "s-1": 0.7644000187177415,
+        "s0": 0.7627187323721911,
+        "s1": 0.7604005075856745
+      },
+      "s_theoretical": 8,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "subset_sum",
+      "n": 10,
+      "seed": 10001,
+      "m": 10,
+      "T_LP": 1,
+      "d_bound": 10,
+      "case_type": "unmarked",
+      "status": "EMPTY_CORE"
+    },
+    {
+      "class": "subset_sum",
+      "n": 12,
+      "seed": 12000,
+      "m": 12,
+      "status": "TREE_CAP",
+      "case_type": "marked"
+    },
+    {
+      "class": "subset_sum",
+      "n": 12,
+      "seed": 12000,
+      "m": 12,
+      "T_LP": 1,
+      "d_bound": 12,
+      "case_type": "unmarked",
+      "status": "EMPTY_CORE"
+    },
+    {
+      "class": "subset_sum",
+      "n": 12,
+      "seed": 12001,
+      "m": 12,
+      "T_LP": 1457,
+      "d_bound": 12,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.8766529509337975,
+      "p_accepts": {
+        "s-2": 0.8784263088885245,
+        "s-1": 0.8772934228232171,
+        "s0": 0.8767027966429073,
+        "s1": 0.876687517914154
+      },
+      "s_theoretical": 9,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "subset_sum",
+      "n": 12,
+      "seed": 12001,
+      "m": 12,
+      "T_LP": 1,
+      "d_bound": 12,
+      "case_type": "unmarked",
+      "status": "EMPTY_CORE"
+    },
+    {
+      "class": "subset_sum",
+      "n": 14,
+      "seed": 14000,
+      "m": 14,
+      "status": "TREE_CAP",
+      "case_type": "marked"
+    },
+    {
+      "class": "subset_sum",
+      "n": 14,
+      "seed": 14000,
+      "m": 14,
+      "T_LP": 1,
+      "d_bound": 14,
+      "case_type": "unmarked",
+      "status": "EMPTY_CORE"
+    },
+    {
+      "class": "subset_sum",
+      "n": 14,
+      "seed": 14001,
+      "m": 14,
+      "status": "TREE_CAP",
+      "case_type": "marked"
+    },
+    {
+      "class": "subset_sum",
+      "n": 14,
+      "seed": 14001,
+      "m": 14,
+      "T_LP": 1,
+      "d_bound": 14,
+      "case_type": "unmarked",
+      "status": "EMPTY_CORE"
+    },
+    {
+      "class": "subset_sum",
+      "n": 16,
+      "seed": 16000,
+      "m": 16,
+      "status": "TREE_CAP",
+      "case_type": "marked"
+    },
+    {
+      "class": "subset_sum",
+      "n": 16,
+      "seed": 16000,
+      "m": 16,
+      "T_LP": 1,
+      "d_bound": 16,
+      "case_type": "unmarked",
+      "status": "EMPTY_CORE"
+    },
+    {
+      "class": "subset_sum",
+      "n": 16,
+      "seed": 16001,
+      "m": 16,
+      "status": "TREE_CAP",
+      "case_type": "marked"
+    },
+    {
+      "class": "subset_sum",
+      "n": 16,
+      "seed": 16001,
+      "m": 16,
+      "T_LP": 1,
+      "d_bound": 16,
+      "case_type": "unmarked",
+      "status": "EMPTY_CORE"
+    },
+    {
+      "class": "subset_sum",
+      "n": 18,
+      "seed": 18000,
+      "m": 18,
+      "status": "TREE_CAP",
+      "case_type": "marked"
+    },
+    {
+      "class": "subset_sum",
+      "n": 18,
+      "seed": 18000,
+      "m": 18,
+      "T_LP": 1,
+      "d_bound": 18,
+      "case_type": "unmarked",
+      "status": "EMPTY_CORE"
+    },
+    {
+      "class": "subset_sum",
+      "n": 18,
+      "seed": 18001,
+      "m": 18,
+      "status": "TREE_CAP",
+      "case_type": "marked"
+    },
+    {
+      "class": "subset_sum",
+      "n": 18,
+      "seed": 18001,
+      "m": 18,
+      "T_LP": 1,
+      "d_bound": 18,
+      "case_type": "unmarked",
+      "status": "EMPTY_CORE"
+    },
+    {
+      "class": "inverse_strongly",
+      "n": 8,
+      "seed": 8000,
+      "m": 8,
+      "T_LP": 88,
+      "d_bound": 8,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.7325406823331956,
+      "p_accepts": {
+        "s-2": 0.8091744030414759,
+        "s-1": 0.7343516342990586,
+        "s0": 0.7340741807887056,
+        "s1": 0.7335841266679052
+      },
+      "s_theoretical": 6,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "inverse_strongly",
+      "n": 8,
+      "seed": 8000,
+      "m": 8,
+      "T_LP": 71,
+      "d_bound": 8,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.010489766978708613,
+          "mu": 0.0,
+          "bound": 0.015625,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.020979533957417227,
+          "mu": 0.0,
+          "bound": 0.0625,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.041959067914834454,
+          "mu": 0.0,
+          "bound": 0.25,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.08391813582966891,
+          "mu": 0.890588960691476,
+          "bound": 1.0,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.16783627165933782,
+          "mu": 0.890588960691476,
+          "bound": 4.0,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.07976175254987772,
+      "p_accepts": {
+        "s-2": 0.7785534749638012,
+        "s-1": 0.5014776918688568,
+        "s0": 0.04236451818949846,
+        "s1": 0.029215743073038425
+      },
+      "s_theoretical": 6,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "inverse_strongly",
+      "n": 8,
+      "seed": 8001,
+      "m": 8,
+      "T_LP": 22,
+      "d_bound": 8,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.5000000000000007,
+      "p_accepts": {
+        "s-2": 0.8031662512094736,
+        "s-1": 0.59935275182381,
+        "s0": 0.5116482101594853,
+        "s1": 0.5068074442965133
+      },
+      "s_theoretical": 5,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "inverse_strongly",
+      "n": 8,
+      "seed": 8001,
+      "m": 8,
+      "T_LP": 17,
+      "d_bound": 8,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.021437323142813602,
+          "mu": 0.0,
+          "bound": 0.015624999999999997,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.042874646285627205,
+          "mu": 0.0,
+          "bound": 0.062499999999999986,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.08574929257125441,
+          "mu": 0.0,
+          "bound": 0.24999999999999994,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.17149858514250882,
+          "mu": 0.9164799794858006,
+          "bound": 0.9999999999999998,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.34299717028501764,
+          "mu": 0.9164799794858006,
+          "bound": 3.999999999999999,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.1689208600137581,
+      "p_accepts": {
+        "s-2": 0.7889473713495938,
+        "s-1": 0.47990274057065313,
+        "s0": 0.022725466096064774,
+        "s1": 0.0186095205795695
+      },
+      "s_theoretical": 5,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "inverse_strongly",
+      "n": 10,
+      "seed": 10000,
+      "m": 10,
+      "T_LP": 48,
+      "d_bound": 10,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.6666669299962471,
+      "p_accepts": {
+        "s-2": 0.7694266298934211,
+        "s-1": 0.6687927861599179,
+        "s0": 0.6685466438584466,
+        "s1": 0.6679834732538346
+      },
+      "s_theoretical": 6,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "inverse_strongly",
+      "n": 10,
+      "seed": 10000,
+      "m": 10,
+      "T_LP": 39,
+      "d_bound": 10,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.012659242088545833,
+          "mu": 0.0,
+          "bound": 0.015625,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.025318484177091666,
+          "mu": 0.0,
+          "bound": 0.0625,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.05063696835418333,
+          "mu": 0.0,
+          "bound": 0.25,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.10127393670836667,
+          "mu": 0.8841536071913052,
+          "bound": 1.0,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.20254787341673333,
+          "mu": 0.8841536071913052,
+          "bound": 4.0,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.09652857074164085,
+      "p_accepts": {
+        "s-2": 0.7236390915061932,
+        "s-1": 0.3712169457112259,
+        "s0": 0.00046381349581781436,
+        "s1": 0.0002674036175854447
+      },
+      "s_theoretical": 6,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "inverse_strongly",
+      "n": 10,
+      "seed": 10001,
+      "m": 10,
+      "T_LP": 51,
+      "d_bound": 10,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.5714286460710629,
+      "p_accepts": {
+        "s-2": 0.7021645977737345,
+        "s-1": 0.5812760642762571,
+        "s0": 0.5781199351472982,
+        "s1": 0.57317849131181
+      },
+      "s_theoretical": 6,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "inverse_strongly",
+      "n": 10,
+      "seed": 10001,
+      "m": 10,
+      "T_LP": 14,
+      "d_bound": 10,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.021128856368212913,
+          "mu": 0.0,
+          "bound": 0.015624999999999997,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.042257712736425826,
+          "mu": 0.0,
+          "bound": 0.062499999999999986,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.08451542547285165,
+          "mu": 0.0,
+          "bound": 0.24999999999999994,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.1690308509457033,
+          "mu": 0.8525588486237031,
+          "bound": 0.9999999999999998,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.3380617018914066,
+          "mu": 0.8525588486237031,
+          "bound": 3.999999999999999,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.16194937816362662,
+      "p_accepts": {
+        "s-2": 0.745349105920177,
+        "s-1": 0.4733669023972003,
+        "s0": 0.035072056606056314,
+        "s1": 0.025332742060991606
+      },
+      "s_theoretical": 5,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "inverse_strongly",
+      "n": 12,
+      "seed": 12000,
+      "m": 12,
+      "T_LP": 185,
+      "d_bound": 12,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.9124571222617145,
+      "p_accepts": {
+        "s-2": 0.9252215101836141,
+        "s-1": 0.9181748022017827,
+        "s0": 0.9125499638455765,
+        "s1": 0.9125165731867165
+      },
+      "s_theoretical": 7,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "inverse_strongly",
+      "n": 12,
+      "seed": 12000,
+      "m": 12,
+      "T_LP": 102,
+      "d_bound": 12,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.007145774380937869,
+          "mu": 0.0,
+          "bound": 0.015625,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.014291548761875737,
+          "mu": 0.0,
+          "bound": 0.0625,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.028583097523751475,
+          "mu": 0.0,
+          "bound": 0.25,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.05716619504750295,
+          "mu": 0.8723831878881183,
+          "bound": 1.0,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.1143323900950059,
+          "mu": 0.8723831878881183,
+          "bound": 4.0,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.05370412756165545,
+      "p_accepts": {
+        "s-2": 0.6790808007729929,
+        "s-1": 0.28964866605088463,
+        "s0": 0.006305045094037613,
+        "s1": 0.005757828868397366
+      },
+      "s_theoretical": 7,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "inverse_strongly",
+      "n": 12,
+      "seed": 12001,
+      "m": 12,
+      "T_LP": 116,
+      "d_bound": 12,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.5854224415513801,
+      "p_accepts": {
+        "s-2": 0.7221002634671739,
+        "s-1": 0.5876944871914087,
+        "s0": 0.5874362418045214,
+        "s1": 0.5869444371924276
+      },
+      "s_theoretical": 7,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "inverse_strongly",
+      "n": 12,
+      "seed": 12001,
+      "m": 12,
+      "T_LP": 86,
+      "d_bound": 12,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.007782160079558629,
+          "mu": 0.0,
+          "bound": 0.015625,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.015564320159117259,
+          "mu": 0.0,
+          "bound": 0.0625,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.031128640318234518,
+          "mu": 0.0,
+          "bound": 0.25,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.062257280636469035,
+          "mu": 0.8626652504251662,
+          "bound": 1.0,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.12451456127293807,
+          "mu": 0.8626652504251662,
+          "bound": 4.0,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.058252638482807366,
+      "p_accepts": {
+        "s-2": 0.6408699960513845,
+        "s-1": 0.22802349333630395,
+        "s0": 0.019236061116374107,
+        "s1": 0.013206541270169743
+      },
+      "s_theoretical": 7,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "inverse_strongly",
+      "n": 14,
+      "seed": 14000,
+      "m": 13,
+      "T_LP": 541,
+      "d_bound": 13,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.88547848364428,
+      "p_accepts": {
+        "s-2": 0.8870778846862032,
+        "s-1": 0.8860673482074753,
+        "s0": 0.8855174551344757,
+        "s1": 0.8855003387567454
+      },
+      "s_theoretical": 8,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "inverse_strongly",
+      "n": 14,
+      "seed": 14000,
+      "m": 13,
+      "T_LP": 252,
+      "d_bound": 13,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.004367853486341326,
+          "mu": 0.0,
+          "bound": 0.015625,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.008735706972682653,
+          "mu": 0.0,
+          "bound": 0.0625,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.017471413945365305,
+          "mu": 0.0,
+          "bound": 0.25,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.03494282789073061,
+          "mu": 0.906983122763626,
+          "bound": 1.0,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.06988565578146122,
+          "mu": 0.906983122763626,
+          "bound": 4.0,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.033360080247118985,
+      "p_accepts": {
+        "s-2": 0.8269975972551533,
+        "s-1": 0.6114208235491373,
+        "s0": 0.1422714630977307,
+        "s1": 0.04065977598077348
+      },
+      "s_theoretical": 7,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "inverse_strongly",
+      "n": 14,
+      "seed": 14001,
+      "m": 14,
+      "T_LP": 91,
+      "d_bound": 14,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.7073739491646684,
+      "p_accepts": {
+        "s-2": 0.7586711844784538,
+        "s-1": 0.7124224472740843,
+        "s0": 0.7106188135554279,
+        "s1": 0.7076636509154242
+      },
+      "s_theoretical": 7,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "inverse_strongly",
+      "n": 14,
+      "seed": 14001,
+      "m": 14,
+      "T_LP": 53,
+      "d_bound": 14,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.009177788727679404,
+          "mu": 0.0,
+          "bound": 0.015625,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.018355577455358808,
+          "mu": 0.0,
+          "bound": 0.0625,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.036711154910717615,
+          "mu": 0.0,
+          "bound": 0.25,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.07342230982143523,
+          "mu": 0.9012069714976405,
+          "bound": 1.0,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.14684461964287046,
+          "mu": 0.9012069714976405,
+          "bound": 4.0,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.07041384091872917,
+      "p_accepts": {
+        "s-2": 0.8126367118552238,
+        "s-1": 0.5805421004946644,
+        "s0": 0.10707378754379525,
+        "s1": 0.04261997531852598
+      },
+      "s_theoretical": 6,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "inverse_strongly",
+      "n": 16,
+      "seed": 16000,
+      "m": 16,
+      "T_LP": 34,
+      "d_bound": 16,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.5000000000000024,
+      "p_accepts": {
+        "s-2": 0.7219379416423835,
+        "s-1": 0.5334670016800547,
+        "s0": 0.5161595815889142,
+        "s1": 0.5000845162317786
+      },
+      "s_theoretical": 6,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "inverse_strongly",
+      "n": 16,
+      "seed": 16000,
+      "m": 16,
+      "T_LP": 12,
+      "d_bound": 16,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.018042195912175808,
+          "mu": 0.0,
+          "bound": 0.015625000000000003,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.036084391824351615,
+          "mu": 0.0,
+          "bound": 0.06250000000000001,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.07216878364870323,
+          "mu": 0.0,
+          "bound": 0.25000000000000006,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.14433756729740646,
+          "mu": 0.9067849198432122,
+          "bound": 1.0000000000000002,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.2886751345948129,
+          "mu": 0.9067849198432122,
+          "bound": 4.000000000000001,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.14346487375054745,
+      "p_accepts": {
+        "s-2": 0.8132219465203827,
+        "s-1": 0.573486796881482,
+        "s0": 0.09677157298288912,
+        "s1": 0.04253709919955814
+      },
+      "s_theoretical": 5,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "inverse_strongly",
+      "n": 16,
+      "seed": 16001,
+      "m": 3,
+      "T_LP": 5,
+      "d_bound": 3,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.5000000000000001,
+      "p_accepts": {
+        "s-2": 0.5468749999999999,
+        "s-1": 0.5163574218749999,
+        "s0": 0.5004127025604249,
+        "s1": 0.5002396683585176
+      },
+      "s_theoretical": 4,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "inverse_strongly",
+      "n": 16,
+      "seed": 16001,
+      "m": 3,
+      "T_LP": 1,
+      "d_bound": 3,
+      "case_type": "unmarked",
+      "status": "EMPTY_CORE"
+    },
+    {
+      "class": "inverse_strongly",
+      "n": 18,
+      "seed": 18000,
+      "m": 16,
+      "T_LP": 884,
+      "d_bound": 16,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.9020502571038216,
+      "p_accepts": {
+        "s-2": 0.9029971458433425,
+        "s-1": 0.902211499040884,
+        "s0": 0.9020845903443488,
+        "s1": 0.902065758385685
+      },
+      "s_theoretical": 8,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "inverse_strongly",
+      "n": 18,
+      "seed": 18000,
+      "m": 16,
+      "T_LP": 377,
+      "d_bound": 16,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.0032189137664037797,
+          "mu": 0.0,
+          "bound": 0.015625000000000003,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.0064378275328075595,
+          "mu": 0.0,
+          "bound": 0.06250000000000001,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.012875655065615119,
+          "mu": 0.0,
+          "bound": 0.25000000000000006,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.025751310131230238,
+          "mu": 0.8969419387735618,
+          "bound": 1.0000000000000002,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.051502620262460476,
+          "mu": 0.8969419387735618,
+          "bound": 4.000000000000001,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.024439484327027687,
+      "p_accepts": {
+        "s-2": 0.7286719200148091,
+        "s-1": 0.36679515889821435,
+        "s0": 0.0001262018056906565,
+        "s1": 4.438567158367874e-05
+      },
+      "s_theoretical": 8,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "inverse_strongly",
+      "n": 18,
+      "seed": 18001,
+      "m": 18,
+      "T_LP": 320,
+      "d_bound": 18,
+      "case_type": "marked",
+      "marked": true,
+      "w_0": 0.8896669621950535,
+      "p_accepts": {
+        "s-2": 0.8913830363115757,
+        "s-1": 0.8897189265722583,
+        "s0": 0.8896880170268223,
+        "s1": 0.8896814591367448
+      },
+      "s_theoretical": 8,
+      "status": "COMPLETED"
+    },
+    {
+      "class": "inverse_strongly",
+      "n": 18,
+      "seed": 18001,
+      "m": 18,
+      "T_LP": 88,
+      "d_bound": 18,
+      "case_type": "unmarked",
+      "marked": false,
+      "mu_metrics": {
+        "c_0.125": {
+          "Phi": 0.006281486345370076,
+          "mu": 0.0,
+          "bound": 0.015625,
+          "valid": true
+        },
+        "c_0.25": {
+          "Phi": 0.012562972690740151,
+          "mu": 0.0,
+          "bound": 0.0625,
+          "valid": true
+        },
+        "c_0.5": {
+          "Phi": 0.025125945381480302,
+          "mu": 0.0,
+          "bound": 0.25,
+          "valid": true
+        },
+        "c_1.0": {
+          "Phi": 0.050251890762960605,
+          "mu": 0.860912866550498,
+          "bound": 1.0,
+          "valid": true
+        },
+        "c_2.0": {
+          "Phi": 0.10050378152592121,
+          "mu": 0.860912866550498,
+          "bound": 4.0,
+          "valid": true
+        }
+      },
+      "smallest_accessible_phase": 0.046935554818944986,
+      "p_accepts": {
+        "s-2": 0.7122870101738055,
+        "s-1": 0.3805225529273236,
+        "s0": 0.0018965409764406342,
+        "s1": 0.0018067672102831502
+      },
+      "s_theoretical": 7,
+      "status": "COMPLETED"
+    }
+  ]
+}

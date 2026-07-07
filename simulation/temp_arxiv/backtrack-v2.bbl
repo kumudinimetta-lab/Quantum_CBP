@@ -1,0 +1,328 @@
+\begin{thebibliography}{10}
+
+\bibitem{aaronson05}
+S.~Aaronson and A.~Ambainis.
+\newblock Quantum search of spatial regions.
+\newblock {\em Theory of Computing}, 1:47--79, 2005.
+\newblock {\tt quant-ph/0303041}.
+
+\bibitem{ambainis04}
+A.~Ambainis.
+\newblock Quantum walk algorithm for element distinctness.
+\newblock In {\em Proc. 45\textsuperscript{th} Annual Symp. Foundations of
+  Computer Science}, pages 22--31, 2004.
+\newblock {\tt quant-ph/0311001}.
+
+\bibitem{ambainis10b}
+A.~Ambainis, A.~Childs, B.~Reichardt, R.~\v{S}palek, and S.~Zhang.
+\newblock Any {AND-OR} formula of size $n$ can be evaluated in time
+  $n^{1/2+o(1)}$ on a quantum computer.
+\newblock {\em SIAM J. Comput.}, 39(6):2513--2530, 2010.
+\newblock {\tt quant-ph/0703015}.
+
+\bibitem{ambainis01}
+A.~Ambainis and R.~de~Wolf.
+\newblock Average-case quantum query complexity.
+\newblock {\em J. Phys. A: Math. Gen.}, 34:6741--–6754, 2001.
+\newblock {\tt quant-ph/9904079}.
+
+\bibitem{angelsmark02}
+O.~Angelsmark, V.~{Dahll\"of}, and P.~Jonsson.
+\newblock Finite domain constraint satisfaction using quantum computation.
+\newblock In {\em Proc. Mathematical Foundations of Computer Science 2002},
+  pages 93--103, 2002.
+
+\bibitem{beame02}
+P.~Beame, R.~Karp, T.~Pitassi, and M.~Saks.
+\newblock The efficiency of resolution and {Davis--Putnam} procedures.
+\newblock {\em SIAM J. Comput.}, 31(4):1048--1075, 2002.
+
+\bibitem{vanbeek06}
+P.~van Beek.
+\newblock Backtracking search algorithms.
+\newblock In {\em Handbook of Constraint Programming}. Elsevier, 2006.
+
+\bibitem{belovs13}
+A.~Belovs.
+\newblock Quantum walks and electric networks, 2013.
+\newblock {\tt arXiv:1302.3143}.
+
+\bibitem{belovs13a}
+A.~Belovs, A.~Childs, S.~Jeffery, R.~Kothari, and F.~Magniez.
+\newblock Time-efficient quantum walks for 3-distinctness.
+\newblock In {\em Proc. 40\textsuperscript{th} {I}nternational {C}onference on
+  {A}utomata, {L}anguages and {P}rogramming (ICALP'13)}, pages 105--122, 2013.
+
+\bibitem{bennett97}
+C.~Bennett, E.~Bernstein, G.~Brassard, and U.~Vazirani.
+\newblock Strengths and weaknesses of quantum computing.
+\newblock {\em SIAM J. Comput.}, 26(5):1510--1523, 1997.
+\newblock {\tt quant-ph/9701001}.
+
+\bibitem{bernstein97}
+E.~Bernstein and U.~Vazirani.
+\newblock Quantum complexity theory.
+\newblock {\em SIAM J. Comput.}, 26(5):1411--1473, 1997.
+
+\bibitem{brassard02}
+G.~Brassard, P.~H{\o }yer, M.~Mosca, and A.~Tapp.
+\newblock Quantum amplitude amplification and estimation.
+\newblock {\em Quantum Computation and Quantum Information: A Millennium
+  Volume}, pages 53--74, 2002.
+\newblock {\tt quant-ph/0005055}.
+
+\bibitem{brown81}
+C.~Brown and P.~{Purdom, Jr.}
+\newblock An average time analysis of backtracking.
+\newblock {\em SIAM J. Comput.}, 10(3):583--593, 1981.
+
+\bibitem{cerf00}
+N.~Cerf, L.~Grover, and C.~Williams.
+\newblock Nested quantum search and structured problems.
+\newblock {\em Phys. Rev. A}, 61(3):032303, 2000.
+\newblock {\tt quant-ph/9806078}.
+
+\bibitem{chandra97}
+A.~Chandra, P.~Raghavan, W.~Ruzzo, R.~Smolensky, and P.~Tiwari.
+\newblock The electrical resistance of a graph captures its commute and cover
+  times.
+\newblock {\em Computational Complexity}, 6(4):312--340, 1996/1997.
+
+\bibitem{childs03}
+A.~Childs, R.~Cleve, E.~Deotto, E.~Farhi, S.~Gutmann, and D.~Spielman.
+\newblock Exponential algorithmic speedup by a quantum walk.
+\newblock In {\em Proc. 35\textsuperscript{th} Annual ACM Symp. Theory of
+  Computing}, pages 59--68, 2003.
+\newblock {\tt quant-ph/0209131}.
+
+\bibitem{cleve98a}
+R.~Cleve, A.~Ekert, C.~Macchiavello, and M.~Mosca.
+\newblock Quantum algorithms revisited.
+\newblock {\em Proc. R. Soc. Lond. A}, 454(1969):339--354, 1998.
+\newblock {\tt quant-ph/9708016}.
+
+\bibitem{cocco01}
+S.~Cocco and R.~Monasson.
+\newblock Statistical physics analysis of the computational complexity of
+  solving random satisfiability problems using backtrack algorithms.
+\newblock {\em Eur. J. Phys. B}, 22:505--531, 2001.
+\newblock {\tt cond-mat/0012191}.
+
+\bibitem{cocco01a}
+S.~Cocco and R.~Monasson.
+\newblock Trajectories in phase diagrams, growth processes, and computational
+  complexity: how search algorithms solve the 3-satisfiability problem.
+\newblock {\em Phys. Rev. Lett.}, 86(8), 2001.
+\newblock {\tt cond-mat/0009410}.
+
+\bibitem{cocco02}
+S.~Cocco and R.~Monasson.
+\newblock Exponentially hard problems are sometimes polynomial, a large
+  deviation analysis of search algorithms for the random satisfiability
+  problem, and its application to stop-and-restart solutions.
+\newblock {\em Phys. Rev. E}, 66(037101), 2002.
+\newblock {\tt cond-mat/0203012}.
+
+\bibitem{cocco05}
+S.~Cocco and R.~Monasson.
+\newblock Restarts and exponential acceleration of the
+  {Davis-Putnam-Loveland-Logemann} algorithm: A large deviation analysis of the
+  generalized unit clause heuristic for random {3-SAT}.
+\newblock {\em Annals of Mathematics and Artificial Intelligence},
+  43(1--4):153--172, 2005.
+\newblock {\tt cond-mat/0206242}.
+
+\bibitem{dantsin05}
+E.~Dantsin, V.~Kreinovich, and A.~Wolpert.
+\newblock On quantum versions of record-breaking algorithms for {SAT}.
+\newblock {\em ACM SIGACT News}, 36(4):103--108, 2005.
+
+\bibitem{davis62}
+M.~Davis, G.~Logemann, and D.~Loveland.
+\newblock A machine program for theorem proving.
+\newblock {\em C. ACM}, 5(7):394--397, 1962.
+
+\bibitem{davis60}
+M.~Davis and H.~Putnam.
+\newblock A computing procedure for quantification theory.
+\newblock {\em J. ACM}, 7(3):201--215, 1960.
+
+\bibitem{een03}
+N.~{E\'en} and N.~{S\"orensson}.
+\newblock An extensible {SAT}-solver.
+\newblock In {\em Proc. Theory and Applications of Satisfiability Testing
+  2003}, pages 502--518, 2003.
+
+\bibitem{farhi01}
+E.~Farhi, J.~Goldstone, S.~Gutmann, J.~Lapan, A.~Lundgren, and D.~Preda.
+\newblock A quantum adiabatic evolution algorithm applied to random instances
+  of an {NP}-complete problem.
+\newblock {\em Science}, 292(5516):472--475, 2001.
+\newblock {\tt quant-ph/0104129}.
+
+\bibitem{farhi00}
+E.~Farhi, J.~Goldstone, S.~Gutmann, and M.~Sipser.
+\newblock Quantum computation by adiabatic evolution.
+\newblock Technical Report MIT-CTP-2936, MIT, 2000.
+\newblock {\tt quant-ph/0001106}.
+
+\bibitem{farhi98}
+E.~Farhi and S.~Gutmann.
+\newblock Quantum computation and decision trees.
+\newblock {\em Phys. Rev. A}, 58(2):915--928, 1998.
+\newblock {\tt quant-ph/9706062}.
+
+\bibitem{freuder06}
+E.~Freuder and A.~Mackworth.
+\newblock Constraint satisfaction: an emerging paradigm.
+\newblock In {\em Handbook of Constraint Programming}. Elsevier, 2006.
+
+\bibitem{furer08}
+M.~F{\"u}rer.
+\newblock Solving {NP}-complete problems with quantum search.
+\newblock In {\em Proc. LATIN'08}, pages 784--792, 2008.
+
+\bibitem{gomes04}
+C.~Gomes, C.~Fern{\'a}ndez, B.~Selman, and C.~Bessiere.
+\newblock Statistical regimes across constrainedness regions.
+\newblock In {\em Principles and Practice of Constraint Programming -- CP
+  2004}, pages 32--46, 2004.
+
+\bibitem{gomes08}
+C.~Gomes, H.~Krautz, A.~Sabharwal, and B.~Selman.
+\newblock Satisfiability solvers.
+\newblock In {\em Handbook of Knowledge Representation}, volume~3 of {\em
+  Foundations of Artificial Intelligence}, pages 89--134. Elsevier, 2008.
+
+\bibitem{gomes06}
+C.~Gomes and T.~Walsh.
+\newblock Randomness and structure.
+\newblock In {\em Handbook of Constraint Programming}. Elsevier, 2006.
+
+\bibitem{grover97}
+L.~Grover.
+\newblock Quantum mechanics helps in searching for a needle in a haystack.
+\newblock {\em Phys. Rev. Lett.}, 79(2):325--328, 1997.
+\newblock {\tt quant-ph/9706033}.
+
+\bibitem{hogg94}
+T.~Hogg and C.~Williams.
+\newblock The hardest constraint problems: A double phase transition.
+\newblock {\em Artificial Intelligence}, 69:359--377, 1994.
+
+\bibitem{jia04}
+H.~Jia and C.~Moore.
+\newblock How much backtracking does it take to color random graphs? rigorous
+  results on heavy tails.
+\newblock In {\em Principles and Practice of Constraint Programming -- {CP}
+  2004}, pages 742--746, 2004.
+\newblock {\tt cond-mat/0412489}.
+
+\bibitem{kitaev95}
+A.~Kitaev.
+\newblock Quantum measurements and the abelian stabilizer problem, 1995.
+\newblock {\tt quant-ph/9511026}.
+
+\bibitem{knuth75}
+D.~Knuth.
+\newblock Estimating the efficiency of backtrack programs.
+\newblock {\em Mathematics of Computation}, 29(129), 1975.
+
+\bibitem{krovi15}
+H.~Krovi, F.~Magniez, M.~Ozols, and J.~Roland.
+\newblock Quantum walks can find a marked element on any graph.
+\newblock {\em Algorithmica}, pages 1--57, 2015.
+\newblock {\tt arXiv:1002.2419}.
+
+\bibitem{lee11}
+T.~Lee, R.~Mittal, B.~Reichardt, R.~{\v{S}}palek, and M.~Szegedy.
+\newblock Quantum query complexity of state conversion.
+\newblock In {\em Proc. 52\textsuperscript{nd} Annual Symp. Foundations of
+  Computer Science}, pages 344--353, 2011.
+\newblock {\tt arXiv:1011.3020}.
+
+\bibitem{lynce03}
+I.~Lynce and J.~P. Marques-Silva.
+\newblock An overview of backtrack search satisfiability algorithms.
+\newblock {\em Annals of Mathematics and Artificial Intelligence}, 37:307--326,
+  2003.
+
+\bibitem{magniez12}
+F.~Magniez, A.~Nayak, P.~Richter, and M.~Santha.
+\newblock On the hitting times of quantum versus random walks.
+\newblock {\em Algorithmica}, 63(1--2):91--116, 2012.
+\newblock {\tt arXiv:0808.0084}.
+
+\bibitem{magniez11}
+F.~Magniez, A.~Nayak, J.~Roland, and M.~Santha.
+\newblock Search via quantum walk.
+\newblock {\em SIAM J. Comput.}, 40(1):142--164, 2011.
+\newblock {\tt quant-ph/0608026}.
+
+\bibitem{montanaro10}
+A.~Montanaro.
+\newblock Quantum search with advice.
+\newblock In {\em Proc. 5\textsuperscript{th} Conference on the Theory of
+  Quantum Computation, Communication, and Cryptography (TQC'10)}, 2010.
+\newblock {\tt arXiv:0908.3066}.
+
+\bibitem{purdom97}
+P.~Purdom.
+\newblock Backtracking and random constraint satisfaction.
+\newblock {\em Annals of Mathematics and Artificial Intelligence}, 20:393--410,
+  1997.
+
+\bibitem{rish97}
+I.~Rish and D.~Frost.
+\newblock Statistical analysis of backtracking on inconsistent {CSPs}.
+\newblock In {\em Principles and Practice of Constraint Programming-CP97},
+  pages 150--162, 1997.
+
+\bibitem{schoning99}
+U.~Sch{\"o}ning.
+\newblock A probabilistic algorithm for k-{SAT} and constraint satisfaction
+  problems.
+\newblock In {\em Proc. 40\textsuperscript{th} Annual Symp. Foundations of
+  Computer Science}, pages 410--414, 1999.
+
+\bibitem{selman96}
+B.~Selman, D.~Mitchell, and H.~Levesque.
+\newblock Generating hard satisfiability problems.
+\newblock {\em Artificial Intelligence}, 81(1--2):17--29, 1996.
+
+\bibitem{shenvi03}
+N.~Shenvi, J.~Kempe, and K.~Whaley.
+\newblock Quantum random-walk search algorithm.
+\newblock {\em Phys. Rev. A}, 67(5):052307, 2003.
+\newblock {\tt quant-ph/0210064}.
+
+\bibitem{stockmeyer85}
+L.~Stockmeyer.
+\newblock On approximation algorithms for {\#}{P}.
+\newblock {\em SIAM J. Comput.}, 14(4):849--861, 1985.
+
+\bibitem{szegedy04}
+M.~Szegedy.
+\newblock Quantum speed-up of {M}arkov chain based algorithms.
+\newblock In {\em Proc. 45\textsuperscript{th} Annual Symp. Foundations of
+  Computer Science}, pages 32--41, 2004.
+\newblock {\tt quant-ph/0401053}.
+
+\bibitem{tulsi08}
+A.~Tulsi.
+\newblock Faster quantum walk algorithm for the two dimensional spatial search.
+\newblock {\em Phys. Rev. A}, 78:012310, 2008.
+\newblock {\tt arXiv:0801.0497}.
+
+\bibitem{wang13}
+G.~Wang.
+\newblock Quantum algorithms for approximating the effective resistances in
+  electrical networks, 2013.
+\newblock {\tt arXiv:1311.1851}.
+
+\bibitem{williams13}
+R.~Williams.
+\newblock Improving exhaustive search implies superpolynomial lower bounds.
+\newblock {\em SIAM J. Comput.}, 42(3):1218--1244, 2013.
+
+\end{thebibliography}
