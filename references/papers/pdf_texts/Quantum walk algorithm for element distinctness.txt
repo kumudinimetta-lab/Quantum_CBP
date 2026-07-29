@@ -1,0 +1,1810 @@
+
+--- PAGE 1 ---
+arXiv:quant-ph/0311001v4  8 Mar 2005
+Quantum walk algorithm for element distinctness
+Andris Ambainis∗
+Abstract
+We use quantum walks to construct a new quantum algorithm for element distinctness and its gener-
+alization. For element distinctness (the problem of ﬁnding two equal items among N given items), we
+get an O(N 2/3) query quantum algorithm. This improves the previous O(N 3/4) quantum algorithm of
+Buhrman et al. [11] and matches the lower bound by [1]. We also give an O(N k/(k+1)) query quantum
+algorithm for the generalization of element distinctness in which we have to ﬁnd k equal items among
+N items.
+1
+Introduction
+Element distinctness is the following problem.
+Element Distinctness. Given numbers x1, . . . , xN ∈[M], are they all distinct?
+It has been extensively studied both in classical and quantum computing. Classically, the best way to
+solve element distinctness is by sorting which requires Ω(N) queries. In quantum setting, Buhrman et al.
+[11] have constructed a quantum algorithm that uses O(N 3/4) queries. Aaronson and Shi [1] have shown
+that any quantum algorithm requires at least Ω(N 2/3) quantum queries.
+In this paper, we give a new quantum algorithm that solves element distinctness with O(N 2/3) queries
+to x1, . . . , xN. This matches the lower bound of [1, 4].
+Our algorithm uses a combination of several ideas: quantum search on graphs [2] and quantum walks
+[26]. While each of those ideas has been used before, the present combination is new.
+We ﬁrst reduce element distinctness to searching a certain graph with vertices S ⊆{1, . . . , N} as
+vertices. The goal of the search is to ﬁnd a marked vertex. Both examining the current vertex and moving
+to a neighboring vertex cost one time step. (This contrasts with the usual quantum search [23], where only
+examining the current vertex costs one time step.)
+We then search this graph by quantum random walk. We start in a uniform superposition over all vertices
+of a graph and perform a quantum random walk with one transition rule for unmarked vertices and another
+transition rule for marked vertices. The result is that the amplitude gathers in the marked vertices and, after
+O(N 2/3) steps, the probability of measuring the marked state is a constant.
+∗Department of Combinatorics and Optimization, Faculty of Mathematics, University of Waterloo, 200 University Avenue
+West, Waterloo, ON N2L 2T2, Canada, e-mail: ambainis@math.uwaterloo.ca. This research done at University of Cali-
+fornia, Berkeley and Institute for Advanced Study, Princeton. Supported by DARPA and Air Force Laboratory, Air Force Materiel
+Command, USAF, under agreement number F30602-01-2-0524 (at UC Berkeley) and NSF Grant DMS-0111298 (at IAS).
+1
+
+--- PAGE 2 ---
+We also give several extensions of our algorithm. If we have to ﬁnd whether x1, . . ., xN contain k
+numbers that are equal: xi1 = . . . = xik, we get a quantum algorithm with O(N k/(k+1)) queries for any
+constant1 k.
+If the quantum algorithm is restricted to storing r numbers, r ≤N 2/3, then we have an algorithm which
+solves element distinctness with O(N/√r) queries which is quadratically better than the classical O(N 2/r)
+query algorithm. Previously, such quantum algorithm was known only for r ≤
+√
+N [11]. For the problem
+of ﬁnding k equal numbers, we get an algorithm that uses O(
+Nk/2
+r(k−1)/2) queries and stores r numbers, for
+r ≤N (k−1)/k.
+For the analysis of our algorithm, we develop a generalization of Grover’s algorithm (Lemma 3) which
+might be of independent interest.
+1.1
+Related work
+Classical element distinctness. Element distinctness has been extensively studied classically. It can be
+solved with O(N) queries and O(N log N) time by querying all the elements and sorting them. Then, any
+two equal elements must be next one to another in the sorted order and can be found by going through the
+sorted list.
+In the usual query model (where one query gives one value of xi), it is easy to see that Ω(N) queries are
+also necessary. Classical lower bounds have also been shown for more general models (e.g. [22]).
+The algorithm described above requires Ω(N) space to store all of x1, . . . , xN. If we are restricted to
+space S < N, the running time increases. The straightforward algorithm needs O(N2
+S ) queries. Yao [32]
+has shown that, for the model of comparison-based branching programs, this is essentially optimal. Namely,
+any space-S algorithm needs time T = Ω(N2−o(1)
+S
+). For more general models, lower bounds on algorithms
+with restricted space S is an object of ongoing research [8].
+Related problems in quantum computing. In collision problem [14], we are given a 2-1 function f
+and have to ﬁnd x, y such that f(x) = f(y). This can be achieved in O(N 1/3) quantum steps instead of
+Θ(N 1/2) steps classically. Ω(N 1/3) is also a quantum lower bound [1, 27].
+If element distinctness can be solved with M queries, then collision problem can be solved with O(
+√
+M)
+queries [1]. Thus, a quantum algorithm for element distinctness implies a quantum algorithm for collision
+but not the other way around.
+Quantum search on graphs. The idea of quantum search on graphs was proposed by Aaronson and
+Ambainis [2] for ﬁnding a marked item on a d-dimensional grid (problem ﬁrst considered by Benioff [9])
+and other graphs with good expansion properties. Our work has a similar ﬂavor but uses completely different
+methods to search the graph (quantum walk instead of ‘’divide-and-conquer”).
+Quantum walks. There has been considerable amount of research on quantum walks (surveyed in [26])
+and their applications (surveyed in [5]). Applications of walks [5] mostly fall into two classes. The ﬁrst
+class is exponentially faster hitting times [18, 16, 25]. The second class is quantum walk search algorithms
+[30, 19, 7].
+Our algorithm is most closely related to the second class. In this direction, Shenvi et al. [30] have con-
+structed a counterpart of Grover’s search [23] based on quantum walk on hypercube. Childs and Goldstone
+[19, 20] and Ambainis et al. [7] have used quantum walk on to produce search algorithms on d-dimensional
+1The big-O constant depends on k. For non-constant k, we can show that the number of queries is O(k2N k/(k+1)). The proof
+of that is mostly technical and is omitted in this version.
+2
+
+--- PAGE 3 ---
+lattices (d ≥2) which is faster than the naive application of Grover’s search. This direction is quite closely
+related to our work. The algorithms by [30, 19, 7] and current paper solve different problems but all have
+similar structure.
+Recent developments. After the work described in this paper, the results and ideas from this paper
+have been used to construct several other quantum algorithms. Magniez et al. [28] have used our element
+distinctness algorithm to give an O(n1.3) query quantum algorithm for ﬁnding triangles in a graph. Ambainis
+et al. [7] have used ideas from the current paper to construct a faster algorithm for search on 2-dimensional
+grid. Childs and Eisenberg [17] have given a different analysis of our algorithm.
+Szegedy [31] has generalized our results on quantum walk for element distinctness to an arbitrary graph
+with a large eigenvalue gap and cast them into the language of Markov chains. An advantage of his approach
+is that it can simultaneously handle any number of solutions (unlike in the present paper which has separate
+algorithms for single solution case (algorithm 2) and multiple-solution case (algorithm 3)). Furthermore,
+Szegedy [31] have shown that, for a class of Markov chains, quantum walk algorithms are quadratically
+faster than the corresponding classical algorithm.
+Buhrman and Spalek [12] have used Szegedy’s result to construct an O(n5/3) quantum algorithm for
+verifying if a product of two n × n matrices A and B is equal to a third matrix C.
+2
+Preliminaries
+Let [N] denote {1, . . . , N}. We consider
+Element Distinctness. Given numbers x1, . . . , xN ∈[M], are there i, j ∈[N], i ̸= j such that xi = xj?
+Element k-distinctness. Given numbers x1, . . . , xN ∈[M], are there k distinct indices i1, . . . , ik ∈[N]
+such that xi1 = xi2 = . . . = xik?
+Element distinctness is a particular case of k-distinctness for k = 2.
+Our model is the quantum query model (for surveys on query model, see [6, 15]). In this model,
+our goal is to compute a function f(x1, . . . , xN). For example, k-distinctness is viewed as the function
+f(x1, . . . , xN) which is 1 if there are k distinct i1, . . . , ik ∈[N] such that xi1 = xi2 = . . . = xik and 0
+otherwise.
+The input variables xi can be accessed by queries to an oracle X and the complexity of f is the number
+of queries needed to compute f. A quantum computation with T queries is just a sequence of unitary
+transformations
+U0 →O →U1 →O →. . . →UT−1 →O →UT .
+Uj’s can be arbitrary unitary transformations that do not depend on the input bits x1, . . . , xN. O are
+query (oracle) transformations. To deﬁne O, we represent basis states as |i, a, z⟩where i consists of ⌈log N⌉
+bits, a consists of ⌈log M⌉quantum bits and z consists of all other bits. Then, O maps |i, a, z⟩to |i, (a +
+xi) mod M, z⟩.
+In our algorithm, we use queries in two situations. The ﬁrst situation is when a = |0⟩. Then, the state
+before the query is some superposition P
+i,z αi,z|i, 0, z⟩and the state after the query is the same superpo-
+sition with the information about xi: P
+i,z αi,z|i, xi, z⟩. The second situation is when the state before the
+query is P
+i,z αi,z|i, −xi mod M, z⟩with the information about information about xi from a previous query.
+Then, applying the query transformation makes the state P
+i,z αi,z|i, 0, z⟩, erasing the information about xi.
+This can be used to erase the information about xi from P
+i,z αi,z|i, xi, z⟩. We ﬁrst perform a unitary that
+3
+
+--- PAGE 4 ---
+maps |xi⟩→| −xi mod M⟩, obtaining the state P
+i,z αi,z|i, −xi mod M, z⟩and then apply the query
+transformation.
+The computation starts with a state |0⟩. Then, we apply U0, O, . . ., O, UT and measure the ﬁnal state.
+The result of the computation is the rightmost bit of the state obtained by the measurement.
+The quantum computation computes f with bounded error if, for every x = (x1, . . . , xN), the probabil-
+ity that the rightmost bit of UT OxUT−1 . . . OxU0|0⟩equals f(x1, . . . , xN) is at least 1 −ǫ for some ﬁxed
+ǫ < 1/2.
+To simplify the exposition, we occasionally describe a quantum computation as a classical algorithm
+with several quantum subroutines of the form UtOxUt−1 . . . OxU0|0⟩. Any such classical algorithm with
+quantum subroutines can be transformed into an equivalent sequence UT OxUT−1 . . . OxU0|0⟩with the num-
+ber of queries being equal to the number of queries in the classical algorithm plus the sum of numbers of
+queries in all quantum subroutines.
+Comparison oracle. In a different version of query model, we are only allowed comparison queries. In
+a comparison query, we give two indices i, j to the oracle. The oracle answers whether xi < xj or xi ≥xj.
+In the quantum model, we can query the comparison oracle with a superposition P
+i,j ai,j|i⟩|j⟩. In section
+6, we show that our algorithms can be adapted to this model with a logarithmic increase in the number of
+queries.
+3
+Results and algorithms
+Our main results are
+Theorem 1 Element k-distinctness can be solved by a quantum algorithm with O(N k/(k+1)) queries. In
+particular, element distinctness can be solved by a quantum algorithm with O(N 2/3) queries.
+Theorem 2 If memory of a quantum algorithm is restricted to O(r log M) qubits, then element distinctness
+can be solved with O(max( N
+√r, r)) queries and element k-distinctness can be solved with O(max(
+Nk/2
+r(k−1)/2, r))
+queries.
+Theorem 1 follows from Theorem 2 by setting r = ⌊N 2/3⌋for element distinctness and r = ⌊N k/(k+1)⌋
+for k-distinctness.
+Next, we present two algorithms. Algorithm 2 solves element distinctness if we have a promise that
+x1, . . . , xN are either all distinct or there is exactly one pair i, j, i ̸= j, xi = xj (and k-distinctness if
+we have a promise that there is at most one set of k indices i1, . . . , ik such that xi1 = xi2 = . . . = xik).
+Algorithm 3 solves the general case, using Algorithm 2 as a subroutine. The proofs of correctness of
+algorithm 2 and algorithm 3 are given in sections 4 and 5.
+3.1
+Main ideas
+We start with an informal description of main ideas. For simplicity, we restrict to element distinctness and
+postpone the more general k-distinctness till the end of this subsection.
+Let r = N 2/3. We deﬁne a graph G with
+ N
+r
+ +
+  N
+r+1
+ vertices. The vertices vS correspond to sets
+S ⊆[N] of size r and r + 1. Two vertices vS and vT are connected by an edge if T = S ∪{i} for some
+i ∈[N]. A vertex is marked if S contains i, j, xi = xj.
+4
+
+--- PAGE 5 ---
+Element distinctness reduces to ﬁnding a marked vertex in this graph. If we ﬁnd a marked vertex vS,
+then we know that xi = xj for some i, j ∈S, i.e. x1, . . . , xN are not all distinct.
+The naive way to ﬁnd a marked vertex would be to use Grover’s quantum search algorithm [23, 13]. If
+ǫ fraction of vertices are marked, then quantum search ﬁnds a marked vertex by examining O( 1
+√ǫ) vertices.
+Assume that there exist i, j ∈[N] such that i ̸= j, xi = xj. For a random S, |S| = N 2/3, the probability of
+vS being marked is
+Pr[i ∈S; j ∈S] = Pr[i ∈S]Pr[j ∈S|i ∈S] = N 2/3
+N
+N 2/3 −1
+N −1
+= (1 −o(1))
+1
+N 2/3 .
+Thus, a quantum algorithm can ﬁnd a marked vertex by examining O( 1
+√ǫ) = O(N 1/3) vertices. However,
+to ﬁnd out if a vertex is marked, the algorithm needs to query N 2/3 items xi, i ∈S. This makes the total
+query complexity O(N 1/3N 2/3) = O(N), giving no speedup compared to the classical algorithm which
+queries all items.
+We improve on this naive algorithm by re-using the information from previous queries. Assume that we
+just checked if vS is marked by querying all xi, i ∈S. If the next vertex vT is such that T contains only m
+elements i /∈S, then we only need to query m elements xi, i ∈T −S instead of r = N 2/3 elements xi,
+i ∈T.
+To formalize this, we use the following model. At each moment, we are at one vertex of G (superposition
+of vertices in quantum case). In one time step, we can examine if the current vertex vS is marked and move
+to an adjacent vertex vT . If, in this model, we can ﬁnd a marked vertex in M steps, then we can solve
+element distinctness in M + r steps. We ﬁrst use r queries to query all xi, i ∈S for the starting vertex vS.
+Each next step involves moving to an adjacent vertex vT . This may involve querying one xi for i ∈T −S.
+M moves involve M queries. Checking if the current vertex vS is marked requires no queries because we
+already know all xi, i ∈S. Thus, the total number of queries is at most M + r.
+In the next sections, we will show how to search this graph by quantum walk in O(N 2/3) steps for
+element distinctness and O(N k/(k+1)) steps for k-distinctness.
+3.2
+The algorithm
+Let x1, . . . , xN ∈[M]. Let r be the number of items that we are allowed to store in our memory. We
+consider two Hilbert spaces H and H′. H has dimension
+ N
+r
+Mr(N −r) and the basis states of H are
+|S, x, y⟩with S ⊆[N], |S| = r, x ∈[M]r, y ∈[N] −S. H′ has dimension
+  N
+r+1
+Mr+1(r + 1). The basis
+states of H′ are |S, x, y⟩with S ⊆[N], |S| = r + 1, x ∈[M]r+1, y ∈S.
+In the states used by our algorithm, x will always be equal to (xi1, . . . , xik) where i1, . . . , ik are elements
+of S in increasing order.
+We start by deﬁning a quantum walk on H and H′ (algorithm 1). Each step of the quantum walk starts
+in a superposition of states in H. The ﬁrst three steps map the state from H to H′ and the last three steps
+map it back to H.
+If there at most one set of k values i1, . . . , ik such that xi1 = xi2 = . . . = xik, we apply Algorithm 2
+(t1 and t2 are c1 ∗√r and c2 ∗(N
+r )k/2 for constants c1 and c2 which can be calculated from the analysis
+in section 4). This algorithm alternates quantum walk with a transformation that changes the phase if the
+current state contains k equal elements.
+5
+
+--- PAGE 6 ---
+1. Apply the transformation mapping |S⟩|y⟩to
+|S⟩
+
+
+
+−1 +
+2
+N −r
+
+|y⟩+
+2
+N −r
+X
+y′ /∈S,y′̸=y
+|y′⟩
+
+.
+on the y register of the state in H. (This transformation is a variant of “diffusion transformation” in
+[23].)
+2. Map the state from H to H′ by adding y to S and changing x to a vector of length k+1 by introducing
+0 in the location corresponding to y:
+3. Query for f(y) and insert it into location of x corresponding to y.
+4. Apply the transformation |S⟩|y⟩
+|S⟩
+
+
+
+−1 +
+2
+r + 1
+
+|y⟩+
+2
+r + 1
+X
+y′∈S,y′̸=y
+|y′⟩
+
+.
+on the y register.
+5. Erase the element of x corresponding to new y by using it as the input to query for f(y).
+6. Map the state back to H by removing the 0 component corresponding to y from x and removing y
+from S.
+Algorithm 1: One step of quantum walk
+If there can be more than one set of k equal elements, element k-distinctness is solved by algorithm 3
+which samples subsets of xi and runs algorithm 2 on each subset.
+4
+Analysis of single-collision algorithm
+4.1
+Overview
+The number of queries for algorithm 2 is r for creating the initial state and O((N/r)k/2√r) = O(
+Nk/2
+r(k−1)/2 )
+for the rest of the algorithm. Thus, the overall number of queries is O(max(r,
+Nk/2
+r(k−1)/2 )). The correctness of
+algorithm 2 follows from
+Theorem 3 Let the input x1, . . ., xN be such that xi1 = . . . = xik for exactly one set of k distinct values
+i1, . . . , ik. With a constant probability, measuring the ﬁnal state of algorithm 2 gives S such that i1, . . . , ik ∈
+S.
+Proof: Let |S, y⟩be a shortcut for the basis state |S, x, y⟩. (Since the |x⟩register always contains the state
+⊗i∈S|xi⟩, the state of |x⟩is uniquely determined by S and y.)
+6
+
+--- PAGE 7 ---
+1. Generate the uniform superposition
+1
+q
+(N
+r)(N−r)
+P
+|S|=r,y /∈S |S⟩|y⟩.
+2. Query all xi for i ∈S. This transforms the state to
+1
+q N
+r
+(N −r)
+X
+|S|=r,y /∈S
+|S⟩|y⟩
+O
+i∈S
+|xi⟩.
+3. t1 = O((N/r)k/2) times repeat:
+(a) Apply phase ﬂip (the transformation |S⟩|y⟩|x⟩→−|S⟩|y⟩|x⟩) for S such that xi1 = xi2 =
+. . . = xik for k distinct i1, . . . , ik ∈S.
+(b) Perform t2 = O(√r) steps of the quantum walk (algorithm 1).
+4. Measure the ﬁnal state.
+Algorithm 2: Single-solution algorithm
+We classify the basis states |S, y⟩(|S| = r, y /∈S) into 2k + 1 types. A state |S, y⟩is of type (j, 0) if
+|S ∩{i1, . . . , ik}| = j and y /∈{i1, . . . , ik} and of type (j, 1) if |S ∩{i1, . . . , ik}| = j and y ∈{i1, . . . , ik}.
+For j ∈{0, . . . , k −1}, there are both type (j, 0) and type (j, 1) states. For j = k, there are only (k, 0) type
+states. ((k, 1) type is impossible because, if, |S ∩{i1, . . . , ik}| = k, then y /∈S implies y /∈{i1, . . . , ik}.)
+Let |ψj,l⟩be the uniform superposition of basis states |S, y⟩of type (j, l). Let ˜H be the (2k + 1)-
+dimensional space spanned by states |ψj,l⟩.
+For the space H′, its basis states |S, y⟩(|S| = r +1, y ∈S) can be similarly classiﬁed into 2k +1 types.
+We denote those types (j, l) with j = |S ∩{i1, . . . , ik}|, l = 1 if y ∈{i1, . . . , ik} and l = 0 otherwise.
+(Notice that, since y ∈S for the space H′, we have type (k, 1) but no type (0, 1).) Let |ϕj,l⟩be the uniform
+superposition of basis states |S, y⟩of type (j, l) for space H′. Let ˜
+H′ be the (2k + 1)-dimensional space
+1. Let T = [N].
+2. While |T| > r repeat:
+(a) Run Algorithm 2 on xi, i ∈T. Measure the ﬁnal state, obtaining a set S. If there are k equal
+elements xi, i ∈S, stop, answer “not k-distinct”.
+(b) For each i ∈T, remove i from T with probability
+1
+2k+1.
+3. Query all xi, i ∈T classically. If k equal elements are found, answer “k-distinct”, otherwise, answer
+“not k-distinct”.
+Algorithm 3: Multiple-solution algorithm
+7
+
+--- PAGE 8 ---
+spanned by |ϕj,l⟩. Notice that the transformation |S, y⟩→|S ∪{y}, y⟩maps
+|ψi,0⟩→|ϕi,0⟩, |ψi,1⟩→|ϕi+1,1⟩.
+We claim
+Lemma 1 In algorithm 1, steps 1-3 map ˜H to ˜
+H′ and steps 4-6 map ˜
+H′ to ˜H.
+Proof: In section 4.2.
+Thus, algorithm 1 maps ˜H to itself. Also, in algorithm 2, step 3b maps |ψk,0⟩→−|ψk,0⟩and leaves
+|ψj,l⟩for j < k unchanged (because |ψj,l⟩, j < k are superpositions of states |S, y⟩which are unchanged
+by step 3b and |ψk,0⟩is a superposition of states |S, y⟩which are mapped to -|S, y⟩by step 3b). Thus,
+every step of algorithm 2 maps ˜H to itself. Also, the starting state of algorithm 2 can be expressed as a
+combination of |ψj,l⟩. Therefore, it sufﬁces to analyze algorithms 1 and 2 on subspace ˜H.
+In this subspace, we will be interested in two particular states. Let |ψstart⟩be the uniform superposition
+of all |S, y⟩, |S| = r, y /∈S. Let |ψgood⟩= |ψk,0⟩be the uniform superposition of all |S, y⟩with i ∈S
+and j ∈S. |ψstart⟩is the algorithm’s starting state. |ψgood⟩is the state we would like to obtain (because
+measuring |ψgood⟩gives a random set S such that {i1, . . . , ik} ⊆S).
+We start by analyzing a single step of quantum walk.
+Lemma 2 Let S be the unitary transformation induced on ˜H by one step of the quantum walk (algorithm
+1). S has 2k + 1 different eigenvalues in ˜H. One of them is 1, with |ψstart⟩being the eigenvector. The other
+eigenvalues are e±θ1i, . . ., e±θki with θj = (2√j + o(1)) 1
+√r.
+Proof: In section 4.2.
+We set t2 = ⌈
+π
+3
+√
+k
+√r⌉. Since one step of quantum walk ﬁxes ˜H, t2 steps ﬁx ˜H as well. Moreover,
+|ψstart⟩will still be an eigenvector with eigenvalue 1. The other 2k eigenvalues become e±i( 2π√
+j
+3
+√
+k +o(1)).
+Thus, every of those eigenvalues is a constant independent of N and r.
+Let step U1 be step 3a of algorithm 2 and U2 = St2 be step 3b. Then, the entire algorithm consists of
+applying (U2U1)t1 to |ψstart⟩. We will apply
+Lemma 3 Let H be a ﬁnite dimensional Hilbert space and |ψ1⟩, . . ., |ψm⟩be an orthonormal basis for H.
+Let |ψgood⟩, |ψstart⟩be two states in H which are superpositions of |ψ1⟩, . . ., |ψm⟩with real amplitudes and
+⟨ψgood|ψstart⟩= α. Let U1, U2 be unitary transformations on H with the following properties:
+1. U1 is the transformation that ﬂips the phase on |ψgood⟩(U1|ψgood⟩= −|ψgood⟩) and leaves any state
+orthogonal to |ψgood⟩unchanged.
+2. U2 is a transformation which is described by a real-valued m ∗m matrix in the basis |ψ1⟩, . . ., |ψm⟩.
+Moreover, U2|ψstart⟩= |ψstart⟩and, if |ψ⟩is an eigenvector of U2 perpendicular to |ψstart⟩, then
+U2|ψ⟩= eiθ|ψ⟩for θ ∈[ǫ, 2π −ǫ].
+Then, there exists t = O( 1
+α) such that ⟨ψgood|(U2U1)t|ψstart⟩= Ω(1). (The constant under Ω(1) is inde-
+pendent of α but can depend on ǫ.)
+8
+
+--- PAGE 9 ---
+Proof: In section 4.3.
+By Lemma 3, we can set t1 = O( 1
+α) so that the inner product of (U2U1)t1|ψstart⟩and |ψgood⟩is
+a constant.
+Since |ψgood⟩is a superposition of |S, y⟩over S satisfying {i1, . . . , ik} ⊆S, measuring
+(U2U1)t1|ψstart⟩gives a set S satisfying {i1, . . . , ik} ⊆S with a constant probability.
+It remains to calculate α. Let α′ be the fraction of S satisfying {i1, . . . , ik} ⊆S. Since |ψstart⟩is the
+uniform superposition of all |S, y⟩and |ψgood⟩is the uniform superposition of |S, y⟩with {i1, . . . , ik} ⊆S
+we have α =
+√
+α′.
+α′ = Pr[{i1, . . . , ik} ⊆S] = Pr[i1 ∈S]
+k
+Y
+j=2
+Pr[ij ∈S|{i1, . . . , ij−1} ⊆S] =
+r
+N
+k−1
+Y
+j=1
+r −j
+N −j = (1 −o(1)) rk
+N k .
+Therefore, α = Ω( rk/2
+Nk/2 ) and t1 = O((N/r)k/2).
+Lemma 3 might also be interesting by itself. It generalizes one of analyses of Grover’s algorithm [3].
+Informally, the lemma says that, in Grover-like sequence of transformations (U2U1)t, we can signiﬁcantly
+relax the constraints on U2 and the algorithm will still give similar result. It is quite likely that such situations
+might appear in analysis of other algorithms.
+For the quantum walk resulting from element distinctness, Childs and Eisenberg [17] have shown that
+⟨ψgood|(U2U1)t|ψstart⟩(and algorithm’s success probability) is 1 −o(1) instead of Ω(1), given by lemma
+3.
+4.2
+Proofs of Lemmas 1 and 2
+Proof: [of Lemma 1] To show that ˜H is mapped to ˜
+H′, it sufﬁces to show that each of basis vectors
+|ψj,l⟩is mapped to a vector in ˜
+H′. Consider vectors |ψj,0⟩and |ψj,1⟩for j ∈{0, 1, . . . , k −1}. Fix S,
+|S ∩{i1, . . . , ik}| = j. We divide y ∈[N] −S into two sets S0 and S1. Let
+S0 = {y : y ∈[N] −S, y /∈{i1, . . . , ik}},
+S1 = {y : y ∈[N] −S, y ∈{i1, . . . , ik}}.
+Since |S ∩{i1, . . . , ik}| = j, S1 contains k −j elements. Since S0 ∪S1 = [N] −S contains N −
+r elements, S0 contains N −r −k + j elements. Deﬁne |ψS,0⟩=
+1
+√
+k−j
+P
+y∈S0 |S, y⟩and |ψS,1⟩=
+1
+√
+N−r−k+j
+P
+y∈S1 |S, y⟩. Then, we have
+|ψj,0⟩=
+1
+q N
+r
+
+X
+S:|S|=r
+|ψS,0⟩
+(1)
+and, similarly for |ψj,1⟩and |ψS,1⟩.
+Consider the step 1 of algorithm 1, applied to the state |ψS,0⟩. Let |ψ′
+S,0⟩be the resulting state. Since the
+|S⟩register is unchanged, |ψ′
+S,0⟩is some superposition of states |S, y⟩. Moreover, both the state |ψS,0⟩and
+the transformation applied to this state in step 1 are invariant under permutation of states |S, y⟩, y ∈S0 or
+9
+
+--- PAGE 10 ---
+states |S, y⟩, y ∈S1. Therefore, the resulting state must be invariant under such permutations as well. This
+means that every |S, y⟩, y ∈S0 and every |S, y⟩, y ∈S1 has the same amplitude in |ψ′
+S,0⟩. This is equivalent
+to |ψ′
+S,0⟩= a|ψS,0⟩+ b|ψS,1⟩for some a, b. Because of equation (1), this means that step 1 maps |ψj,0⟩
+to a|ψj,0⟩+ b|ψj,1⟩. Steps 2 and 3 then map |ψj,0⟩to |ϕj,0⟩and |ψj,1⟩to |ϕj+1,1⟩. Thus, |ψj,0⟩is mapped
+to a superposition of two basis states of ˜
+H′: |ϕj,0⟩and |ϕj+1,1⟩. Similarly, |ψj,1⟩is mapped to a (different)
+superposition of those two states.
+For j = k, we only have one state |ψk,0⟩. A similar argument shows that this state is unchanged by step
+1 and then mapped to |ϕk,0⟩which belongs to ˜H′.
+Proof: [of Lemma 2] We ﬁx a basis for ˜H consisting of |ψj,0⟩, |ψj,1⟩, j ∈{0, . . . , j −1} and |ψk,0⟩and a
+basis for ˜
+H′ consisting of |ϕ0,0⟩and |ϕj,1⟩, |ϕj,0⟩, j ∈{1, . . . , m}. Let Dǫ be the matrix
+Dǫ =
+ 
+1 −2ǫ
+2
+√
+ǫ −ǫ2
+2
+√
+ǫ −ǫ2
+−1 + 2ǫ
+!
+.
+Claim 1 Let U1 be the unitary transformation mapping ˜H to ˜
+H′ induced by steps 1-3 of quantum walk.
+Then, U1 is described by a block diagonal matrix
+U1 =
+
+
+
+
+
+
+
+
+
+D
+k
+N−r
+. . .
+0
+0
+0
+D k−1
+N−r
+. . .
+0
+0
+. . .
+. . .
+. . .
+. . .
+. . .
+0
+0
+. . .
+D
+1
+N−r
+0
+0
+0
+. . .
+0
+1
+
+
+
+
+
+
+
+
+
+.
+Proof: Let Hj be the 2-dimensional subspace of ˜H spanned by |ψj,0⟩and |ψj,1⟩.
+Let H′
+j be the 2-
+dimensional subspace of ˜H′ spanned by |ϕj,0⟩and |ϕj+1,1⟩.
+From the proof of Lemma 1, we know that the subspace Hj is mapped to the subspace H′
+j. Thus,
+we have a block diagonal matrices with 2*2 blocks mapping Hj to H′
+j and 1*1 identity matrix mapping
+|ψk,0⟩to |ϕk,0⟩. It remains to show that the transformation from Hj to H′
+j is D k−j
+N−r . Let S be such that
+|S ∩{i1, . . . , ik}| = j. We divide y ∈[N] −S into two sets S0 and S1. Let
+S0 = {y : y ∈[N] −S, y /∈{i1, . . . , ik}},
+S1 = {y : y ∈[N] −S, y ∈{i1, . . . , ik}}.
+Since |S ∩{i1, . . . , ik}| = j, S1 contains s1 = k −j elements. Since S0 ∪S1 = [N] −S contains
+N −r elements, S0 contains s0 = N −r −k + j elements. Deﬁne |ψS,0⟩=
+1
+√
+k−j
+P
+y∈S0 |S, y⟩and
+|ψS,1⟩=
+1
+√
+N−r−k+j
+P
+y∈S1 |S, y⟩. Then, we have
+|ψj,0⟩=
+1
+q r
+j
+ N−r
+k−j
+
+X
+S:|S|=r,
+|S∩{i1,...,ik}|=j
+|ψS,0⟩
+(2)
+10
+
+--- PAGE 11 ---
+and, similarly for |ψj,1⟩and |ψS,1⟩. Fix a particular S for which |{i1, . . . , ik} ∩S| = j. Then, step 1 of
+algorithm 1 maps |ψS,0⟩to
+1
+√m1
+X
+y /∈S
+
+
+
+−1 +
+2
+N −r
+
+|y⟩+
+X
+y′̸=y,y′ /∈S
+2
+N −r|y′⟩
+
+
+=
+1
+√m1
+
+−1 +
+2
+N −r + (m1 −1)
+2
+N −r
+ X
+y∈S0
+|y⟩+ (m1)
+1
+√m1
+2
+N −r
+X
+y∈S1
+|y⟩
+=
+
+−1 + 2m1
+N −r
+
+|ψS,0⟩+ 2√m1
+N −r |ψS,1⟩=
+
+1 −2m0
+N −r
+
+|ψS,0⟩+ 2√m1
+N −r |ψS,1⟩.
+By a similar calculation (without the last step), |ψS,1⟩is mapped to
+
+−1 + 2m0
+N −r
+
+|ψS,1⟩+ 2√m1
+N −r |ψS,0⟩.
+Thus, step 1 produces the transformation D k−j
+N−r on |ψS,0⟩and |ψS,1⟩. Since |ψj,0⟩and |ψj,1⟩are uniform
+superpositions of |ψS,0⟩and |ψS,1⟩over all S, step 1 also produces the same transformation D k−j
+N−r on |ψj,0⟩
+and |ψj,1⟩. Steps 2 and 3 just map |ψj,0⟩to |ϕj,0⟩and |ψj,1⟩to |ϕj+1,1⟩.
+Similarly, steps 4-6 give the transformation U2 described by block-diagonal matrix
+U2 =
+
+
+
+
+
+
+
+
+
+1
+0
+0
+. . .
+0
+0
+D′
+1
+r+1
+0
+. . .
+0
+0
+0
+D′
+2
+r+1
+. . .
+0
+. . .
+. . .
+. . .
+. . .
+. . .
+0
+0
+0
+. . .
+D′
+k
+r+1
+
+
+
+
+
+
+
+
+
+.
+from ˜
+H′ to ˜H. Here, D′
+ǫ denotes the matrix
+D′
+ǫ =
+ 
+−1 + 2ǫ
+2
+√
+ǫ −ǫ2
+2
+√
+ǫ −ǫ2
+1 −2ǫ
+!
+.
+A step of quantum walk is S = U2U1. Let V be the diagonal matrix with odd entries on the diagonal
+being 1 and even entries being -1. Since V 2 = I, we have S = U2V 2U1 = U ′
+2U ′
+1 for U ′
+2 = U2V and
+U ′
+1 = V U1. Let
+Eǫ =
+ 
+1 −2ǫ
+−2
+√
+ǫ −ǫ2
+2
+√
+ǫ −ǫ2
+1 −2ǫ
+!
+,
+E′
+ǫ =
+ 
+1 −2ǫ
+2
+√
+ǫ −ǫ2
+−2
+√
+ǫ −ǫ2
+1 −2ǫ
+!
+,
+Then, U ′
+1 and U ′
+2 are equal to U1 and U2, with every Dǫ or D′
+ǫ replaced by corresponding Eǫ or E′
+ǫ. We
+will ﬁrst diagonalize U ′
+1 and U ′
+2 separately and then argue that eigenvalues of U ′
+2U ′
+1 are almost the same as
+eigenvalues of U ′
+2.
+11
+
+--- PAGE 12 ---
+Since U ′
+2 is block diagonal, it sufﬁces to diagonalize each block. 1*1 identity block has eigenvalue 1. For
+a matrix Eǫ, its characteristic polynomial is λ2 −(2−4ǫ)λ+1 = 0 and its roots are 2ǫ±
+√
+1 −4ǫ2i. For ǫ =
+o(1), this is equal to e±(2+o(1))i√ǫ. Thus, the eigenvalues of U ′
+2 are 1, and e±2
+√
+j
+√r+1i for j ∈{1, 2, . . . , k}.
+Similarly, the eigenvalues of U ′
+1 are 1, and e±2
+√
+j
+√N−r i for j ∈{1, 2, . . . , k}.
+To complete the proof, we use the following bound on the eigenvalues of the product of two matrices
+which follows from Hoffman-Wielandt theorem in matrix analysis [24].
+Theorem 4 Let A and B be unitary matrices. Assume that A has eigenvalues 1 + δ1, . . ., 1 + δm, B has
+eigenvalues µ1, . . ., µm and AB has eigenvalues µ′
+1, . . ., µ′
+m. Then,
+|µi −µ′
+i| ≤
+m
+X
+i=1
+|δi|.
+Proof: In section 4.4.
+Let A = U ′
+1 and B = U ′
+2. Since |eǫi −1| ≤|ǫ|, each of |δi| is of order O(
+1
+√N−r). Therefore, their sum
+is of order O(
+1
+√N−r) as well. Thus, for each eigenvalue of U ′
+2, there is a corresponding eigenvalue of U ′
+1U ′
+2
+that differs by at most by O(
+1
+√N−r). The lemma now follows from
+1
+√N−r = o(
+1
+√r+1).
+4.3
+Proof of Lemma 3
+We assume that α is less than some small constant (for example, α < 0.1). Otherwise, we can just take
+t = 0 and get ⟨ψgood|(U2U1)t|ψstart⟩= ⟨ψgood|ψstart⟩≥0.1.
+Consider the eigenvalues of U2. Since U2 is described by a real m ∗m matrix (in the basis |ψ1⟩, . . .,
+|ψm⟩), its characteristic polynomial has real coefﬁcients. Therefore, the eigenvalues are 1, -1, e±iθ1, . . .,
+e±iθl. For simplicity, assume that there is no -1 eigenvalue.
+Let |wj,+⟩, |wj,−⟩be the eigenvectors of U2 with eigenvalues eiθj, e−iθj. Let |wj,+⟩= Pl
+j′=1 cj,j′|ψj′⟩.
+Then, we can assume that |wj,−⟩= Pl
+j′=1 c∗
+j,j′|ψj′⟩.
+(Since U2 is a real matrix, taking U2|wj,+⟩=
+eiθj|wj,+⟩and replacing every number with its complex conjugate gives U2|w⟩= e−iθj|w⟩for |w⟩=
+Pl
+j=1 c∗
+j,j′|ψj′⟩.)
+We write |ψgood⟩in a basis consisting of eigenvectors of U2:
+|ψgood⟩= α|ψstart⟩+
+l
+X
+j=1
+(aj,+|wj,+⟩+ aj,−|wj,−⟩).
+(3)
+W. l. o. g., assume that α and all aj,+, aj,−are positive reals. (Otherwise, multiply |wj,+⟩and |wj,−⟩by
+appropriate complex factors to make aj,+ or aj,−real.)
+We also have aj,+ = aj,−. (To see that, let |ψgood⟩= Pl
+j′=1 bj′|ψj′⟩. Then, bj′ are real (because vector
+|ψgood⟩and matrix U are both real). We have ⟨ψgood|wj,+⟩= aj,+ = Pl
+j′=1 bj′c∗
+j,j′ and ⟨ψgood|wj,−⟩=
+aj,−= Pl
+j′=1 bj′(c∗
+j,j′)∗= (Pl
+j′=1 bj′c∗
+j,j′)∗= a∗
+j,+. Since aj,+ is real, this means aj,+ = aj,−.) Therefore,
+we denote aj,+ = aj,−as simply aj.
+12
+
+--- PAGE 13 ---
+Consider the vector
+|vβ⟩= α
+
+1 + i cot β
+2
+
+|ψstart⟩+
+l
+X
+j=1
+aj
+
+1 + i cot −θj + β
+2
+
+|wj,+⟩+
+l
+X
+j=1
+aj
+
+1 + i cot θj + β
+2
+
+|wj,−⟩.
+(4)
+We have |vβ⟩= |ψgood⟩+ i|v′
+β⟩where
+|v′
+β⟩= α cot β
+2 |ψstart⟩+
+l
+X
+j=1
+aj cot −θj + β
+2
+|wj,+⟩+
+l
+X
+j=1
+aj cot θj + β
+2
+|wj,−⟩.
+Claim 2 If |v′
+β⟩is orthogonal to |ψgood⟩, then |vβ⟩is an eigenvector of U2U1 with an eigenvalue of eiβ and
+|v−β⟩is an eigenvector of U2U1 with an eigenvalue of e−iβ.
+Proof: Since |v′
+β⟩is orthogonal to |ψgood⟩, we have U1|v′
+β⟩= |v′
+β⟩and U1|vβ⟩= −|ψgood⟩+ i|v′
+β⟩.
+Therefore,
+U2U1|vβ⟩= α
+
+−1 + i cot β
+2
+
+|ψstart⟩+
+l
+X
+j=1
+ajeiθj
+
+−1 + i cot −θj + β
+2
+
+|wj,+⟩+
+l
+X
+j=1
+aje−iθj
+
+−1 + i cot θj + β
+2
+
+|wj,−⟩.
+Furthermore,
+1 + i cot x = sin x + i cos x
+sin x
+= ei( π
+2 −x)
+sin x ,
+−1 + i cot x = −sin x + i cos x
+sin x
+= ei( π
+2 +x)
+sin x ,
+Therefore,
+
+−1 + i cot β
+2
+
+= eiβ
+
+1 + i cot β
+2
+
+,
+eiθj
+
+−1 + i cot −θj + β
+2
+
+= ei( π
+2 +
+θj
+2 + β
+2 )
+sin −θj+β
+2
+= eiβ
+
+1 + i cot −θj + β
+2
+
+and similarly for the coefﬁcient of |wj,−⟩. This means that U2U1|vβ⟩= eiβ|vβ⟩.
+For |v−β⟩, we write out the inner products ⟨ψgood|v′
+β⟩and ⟨ψgood|v′
+−β⟩. Then, we see that ⟨ψgood|v′
+−β⟩=
+−⟨ψgood|v′
+β⟩. Therefore, if |ψgood⟩and |v′
+β⟩are orthogonal, so are |ψgood⟩and |v′
+−β⟩. By the argument
+above, this implies that |v−β⟩is an eigenvector of U2U1 with an eigenvalue e−iβ.
+Claim 3 There exists β = Ω(α) such that |v′
+β⟩is orthogonal to |ψgood⟩.
+13
+
+--- PAGE 14 ---
+Proof: Let f(β) = ⟨ψgood|v′
+β⟩. We have f(β) = f1(β) + f2(β) where f1(β) = α2 cot β
+2 and
+f2(β) =
+l
+X
+j=1
+a2
+j
+
+cot −θj + β
+2
++ cot θj + β
+2
+
+.
+We estimate each of f1 and f2 separately. First, we have
+cot β
+2 =
+1
+tan β
+2
+=
+1
+β
+2 + O(β2)
+= 2
+β + O(1).
+Second,
+cot −θj + β
+2
++ cot θj + β
+2
+= −
+sin β
+sin θj+β
+2
+sin θj−β
+2
+= −
+β
+sin2 θj
+2
++ O(β2).
+Therefore, f2(β) = −Aβ + O(β2) where A = Pl
+j=1
+a2
+j
+sin2 θj
+2
+. We have A = O(1). (Since θj ∈[ǫ, π −ǫ],
+A ≤
+1
+sin2 ǫ
+Pl
+j=1 a2
+j. Since ∥s∥2 = α2 + 2 Pl
+j=1 a2
+j, we have Pl
+j=1 a2
+j ≤1
+2 and A ≤
+1
+2 sin2 ǫ.)
+Putting all together, we have that f(β) is equal to 2α2
+β −Aβ plus lower order terms. Therefore, f(β) = 0
+for β = (1 + o(1))
+√
+2α
+√
+A = Θ(α).
+Let |u1⟩=
+|vβ⟩
+∥vβ∥and |u2⟩=
+|v−β⟩
+∥v−β∥. We will show that |ψstart⟩is almost a linear combination of |u1⟩
+and |u2⟩. Deﬁne |ψend⟩= |vend⟩
+∥vend∥where
+|vend⟩=
+l
+X
+j=1
+aj
+
+1 + i cot −θj
+2
+
+|wj,+⟩+
+l
+X
+j=1
+aj
+
+1 + i cot θj
+2
+
+|wj,−⟩.
+(5)
+Claim 4
+|u1⟩= cstarti|ψstart⟩+ cend|ψend⟩+ |u′
+1⟩,
+|u2⟩= −cstarti|ψstart⟩+ cend|ψend⟩+ |u′
+2⟩
+for some cstart, cend, ∥u′
+1∥= O(β) and ∥u′
+2∥= O(β).
+Proof: By regrouping terms in equation (4), we have
+|vβ⟩= αi cot β
+2 |ψstart⟩+ |vend⟩+ |v′′
+β⟩
+(6)
+where
+|v′′
+β⟩= α|ψstart⟩+
+l
+X
+j=1
+aji
+
+cot −θj + β
+2
+−cot −θj
+2
+
+|wj,+⟩
++
+l
+X
+j=1
+aji
+
+cot θj + β
+2
+−cot θj
+2
+
+|wj,−⟩.
+14
+
+--- PAGE 15 ---
+We claim that ∥v′′
+β∥= O(β)∥vβ∥. We prove this by showing that the absolute value of each of coefﬁcients
+in |v′′
+β⟩is O(β) times the absolute value of corresponding coefﬁcient in |vβ⟩. The coefﬁcient of |ψstart⟩is α
+in |v′′
+β⟩and α(1+i cot β
+2 ) in |vβ⟩. For small β, cot β
+2 is of order Ω( 1
+β). Therefore, α = O(β)|α(1+i cot β
+2 )|.
+For the coefﬁcient of |wj,+⟩, we have
+cot −θj + β
+2
+−cot −θj
+2
+= cos −θj+β
+2
+sin −θj
+2
+−sin −θj+β
+2
+cos −θj
+2
+sin −θj+β
+2
+sin −θj
+2
+=
+sin β
+2
+sin −θj+β
+2
+sin −θj
+2
+.
+For small β, this is approximately
+β
+2 sin2 −θj
+2
+. Since θj ∈[ǫ, π−ǫ], we have | sin −θj
+2 | ≥sin ǫ
+2 and
+β
+2 sin2 −θj
+2
+≤
+β
+2 sin2 ǫ
+2 = O(β). Therefore, the absolute value of coefﬁcient of |wj,+⟩in |v′′
+β⟩is O(β) ∗aj. On the other
+hand, the coefﬁcient of |wj,+⟩in |vβ⟩is aj(1+i cot −θj+β
+2
+) which is of absolute value at least aj. Similarly,
+we can bound the absolute value of coefﬁcient of |wj,−⟩.
+By dividing equation (6) by ∥vβ∥, we get
+|u1⟩= cstarti|ψstart⟩+ cend|ψend⟩+ |u′
+1⟩
+for cstart =
+α cot β
+2
+∥vβ∥, cend = ∥vend∥
+∥vβ∥and |u′
+1⟩=
+1
+∥vβ∥|v′′
+β⟩. Since ∥v′′
+β∥= O(β)∥vβ∥, we have ∥u′
+1∥= O(β).
+The proof for u2 is similar.
+Since |u1⟩and |u2⟩are eigenvectors of U2U1 with different eigenvalues, they must be orthogonal. There-
+fore,
+⟨u1|u2⟩= −c2
+start + c2
+end + O(β) = 0.
+Also,
+∥u1∥2 = c2
+start + c2
+end + O(β2) = 1.
+These two equalities together imply that cstart =
+1
+√
+2 + O(β) and cend =
+1
+√
+2 + O(β). Therefore,
+|u1⟩=
+1
+√
+2i|ψstart⟩+ 1
+√
+2|ψend⟩+ |u′′
+1⟩,
+|u2⟩= −1
+√
+2i|ψstart⟩+ 1
+√
+2|ψend⟩+ |u′′
+2⟩,
+with ∥u′′
+1∥= O(β) and ∥u′′
+2∥= O(β). This means that
+|ψstart⟩= −i
+√
+2|u1⟩+
+i
+√
+2|u2⟩+ |w′⟩,
+∥w′∥= O(β).
+Let t = ⌊π
+2β ⌋.
+Then, (U2U1)t|u1⟩is almost i|u1⟩(plus a term of order O(β)) and
+(U2U1)t|u2⟩is almost −i|u2⟩. Therefore,
+(U2U1)t|ψstart⟩= |ψend⟩+ |v′⟩
+where ∥v′∥= O(β). This means that the inner product ⟨ψgood|(U2U1)t|ψstart⟩is ⟨ψgood|ψend⟩plus a term
+which is O(β). To complete the proof, it sufﬁces to show
+15
+
+--- PAGE 16 ---
+Claim 5 ⟨ψgood|ψend⟩= Ω(1).
+Proof: Since |ψend⟩=
+|vend⟩
+∥vend∥, we have ⟨ψgood|ψend⟩=
+⟨ψgood|vend⟩
+∥vend∥
+. By deﬁnition of |vend⟩(equation
+(5)), ⟨ψgood|vend⟩= 2 Pl
+j=1 a2
+j. By equation (3), ∥ψgood∥2 = α2 + 2 Pl
+j=1 a2
+j. Since ∥ψgood∥2 = 1, we
+have⟨ψgood|vend⟩= 1 −α2. Since α < 0.1 (see beginning of the proof), we have ⟨ψgood|ψend⟩≥
+0.99
+∥vend∥.
+We have ∥vend∥2 = a2
+0 + 2 Pl
+j=1 a2
+j(1+ cot2 θj
+2 ). Since θk ∈[ǫ, π −ǫ], ∥vend∥2 ≤a2
+0 + 2 Pl
+j=1 a2
+j(1+
+cot2 ǫ) ≤(1 + cot2 ǫ) and ⟨ψgood|ψend⟩≥
+0.99
+√
+1+cot2 ǫ which is a constant if ǫ is ﬁxed.
+4.4
+Derivation of Theorem 4
+In this section, we derive Theorem 4 (which was used in the proof of Lemma 2) from Hoffman-Wielandt
+inequality.
+Deﬁnition 1 For a matrix C = (cij), we deﬁne its l2-norm as ∥C∥=
+qP
+i,j c2
+ij.
+Theorem 5 [24, pp. 292] If U is unitary, then ∥UC∥= ∥C∥for any C.
+Theorem 6 [24, Theorem 6.3.5] Let C and D be m ∗m matrices. Let µ1, . . ., µm and µ′
+1, . . . , µ′
+m be
+eigenvalues of C and D, respectively. Then,
+m
+X
+i=1
+(µi −µ′
+i)2 ≤∥A −B∥2.
+To derive theorem 4 from theorem 6, let C = B and D = AB. Then, C −D = (I −A)B. Since
+B is unitary, ∥C −D∥= ∥I −A∥(Theorem 5). Let U be a unitary matrix that diagonalizes A. Then,
+U(I −A)U −1 = I −UAU −1 and ∥I −A∥= ∥I −UAU −1∥. Since UAU −1 is a diagonal matrix with 1+δi
+on the diagonal, I −UAU −1 is a diagonal matrix with δi on the diagonal and ∥I −UAU −1∥2 = Pm
+i=1 |δi|2
+By applying Theorem 6 to I and UAU −1, we get
+m
+X
+i=1
+(µi −µ′
+i)2 ≤
+m
+X
+i=1
+|δi|2.
+In particular, for every i, we have (µi −µ′
+i)2 ≤(Pm
+i=1 |δi|)2 and
+|µi −µ′
+i| ≤
+v
+u
+u
+t
+m
+X
+i=1
+|δi|2 ≤
+m
+X
+i=1
+|δi|.
+5
+Analysis of multiple-collision algorithm
+We claim
+Theorem 7
+(a) Algorithm 2 uses O(r +
+Nk/2
+r(k−1)/2 ) queries.
+16
+
+--- PAGE 17 ---
+(b) Let p be the success probability of algorithm 2, if there is exactly one k-collision. For any x1, . . . , xN
+containing at least one k-collision, algorithm 3 ﬁnds a k-collision with probability at least p/2.
+Proof:
+Part (a). The last step of algorithm 3 uses at most r queries and is performed at most once. Therefore,
+it sufﬁces to show that algorithm 3 uses O(r +
+Nk/2
+r(k−1)/2) queries in its second step (the while loop).
+Let Ti be the set T during the ith repetition of the loop in algorithm 3. Then |T1| = N, E|T2| =
+(1 −
+1
+2k+1)N and E|Ti+1| = (1 −
+1
+2k+1)iN. If Algorithm 3 invokes Algorithm 2 on M elements, it uses
+memory size r′ = r∗M
+N . Therefore, the number of queries used by Algorithm 2 is at most
+c
+ 
+Mk/2
+(r′)(k−1)/2 + r′
+!
+≤c
+ 
+N (k−1)/2
+r(k−1)/2
+√
+M + r
+N M
+!
+for some big-O constant c. The overall number of queries in the loop is at most
+c
+∞
+X
+i=1
+E
+ 
+N (k−1)/2
+r(k−1)/2 ∗
+q
+|Ti| + r
+N |Ti|
+!
+.
+(7)
+Since x and √x functions are concave, equation (7) is at most
+c
+∞
+X
+i=1
+ 
+N (k−1)/2
+r(k−1)/2 ∗
+q
+E|Ti| + r
+N E|Ti|
+!
+= cN (k−1)/2
+r(k−1)/2
+∞
+X
+i=1
+q
+E|Ti| + c r
+N
+∞
+X
+i=1
+E|Ti|.
+Since E|Ti+1| = (1 −
+1
+2k+1)iN, this is equal to
+cN (k−1)/2
+r(k−1)/2
+√
+N
+∞
+X
+i=0
+
+1 −
+1
+2k + 1
+i/2
++ c r
+N N
+∞
+X
+i=1
+
+1 −
+1
+2k + 1
+i
+.
+Each of two sums is over a decreasing geometric progression. If k is constant, these sums are constant and
+the number of queries is of order
+N (k−1)/2
+r(k−1)/2
+√
+N + r
+N N =
+N k/2
+r(k−1)/2 + r.
+Part (b). If x1, . . . , xN contain exactly one k-collision, then running algorithm 2 on all of x1, . . . , xN ﬁnds
+the k-collision with probability at least p. If x1, . . . , xN contain more than one k-collision, we can have
+three cases:
+1. For some i, Ti contains more than one k-collision but Ti+1 contains exactly one k-collision.
+2. For some i, Ti contains more than one k-collision but Ti+1 contains no k-collisions.
+3. All Ti contain more than one k-collision (till |Ti| becomes smaller than N 2/3 and the loop is stopped).
+In the ﬁrst case, performing algorithm 2 on xj, j ∈Ti+1 ﬁnds the k-collision with probability at least p.
+In the second case, we have no guarantees about the probability at all. In the third case, the last step of
+algorithm 3 ﬁnds one of k-collisions with probability 1.
+We will show that the probability of the second case is always less than the probability of the ﬁrst case.
+This implies that, with probability at least 1/2, either ﬁrst or third case occurs. Therefore, the probability of
+algorithm 3 ﬁnding a k-collision is at least p/2. To complete the proof, we show
+17
+
+--- PAGE 18 ---
+Lemma 4 Let T be a set containing a k-collision. Let Nonei be the event that xj, j ∈Ti contains no k
+equal elements and Uniquei be the event that xj, j ∈Ti contains a unique set of k equal elements. Then,
+Pr[Uniquei+1|Ti = T] > Pr[Nonei+1|Ti = T].
+The probability of the ﬁrst case is just the sum of probabilities
+Pr[Uniquei+1 ∧Ti = T] = Pr[T]Pr[Uniquei+1|Ti = T]
+over all i and T such that |T| > N k/(k+1) and T contains more than one k-collision. The probability of the
+second case is a similar sum of probabilities
+Pr[Nonei+1 ∧Ti = T] = Pr[T]Pr[Nonei+1|Ti = T].
+Therefore, Pr[Uniquei+1|Ti = T] > Pr[Nonei+1|Ti = T] implies that the probability of the second case
+is less than the probability of the ﬁrst case. It remains to prove the lemma.
+Proof: [of Lemma 4] Let x be such that xj = x for at least k numbers xj, j ∈Ti. Let J be the set of all
+j ∈Ti such that xj = x. Let m = |J|. Notice that m ≥k (by deﬁnition of x and J). Let Pl be the event
+that l of numbers in J belong to Ti+1. Then,
+Pr[Pl] =
+ 
+m
+l
+! 
+1 −
+1
+2k + 1
+l 
+1
+2k + 1
+m−l
+,
+Pr[Pl]
+Pr[Pl+1] =
+ m
+l
+
+  m
+l+1
+ ·
+1
+2k + 1 ·
+1
+1 −
+1
+2k+1
+= l + 1
+m −l · 1
+2k .
+For l ≤k −1, we have l + 1 ≤k and m −l ≥k −l ≥1. Therefore, l+1
+m−l
+1
+2k ≤k 1
+2k = 1
+2 for l ≤k −1.
+This implies Pr[Pl] ≤
+1
+2k−l Pr[Pk] and
+k−1
+X
+l=0
+Pr[Pl] ≤
+ k−1
+X
+l=0
+1
+2k−l
+!
+Pr[Pk] ≤Pr[Pk].
+Let p be the probability of no k equal elements from xj, Ti −J being in Ti+1. Event Nonei+1 occurs if two
+conditions are satisﬁed:
+• at most k −1 elements from J are in set Ti+1 and
+• no k equal elements from xj, j ∈Ti −J are in Ti+1.
+The two conditions are independent and the probability of the second condition. Therefore, Pr[Nonei+1|Ti =
+T] = p Pk−1
+l=0 Pr[Pl] < pPr[Pk].
+Consider the case when exactly k elements from J are in set Ti+1 and no k equal elements from xj, j ∈
+Ti −J are in Ti+1. This happens with probability pPr[Pk]. Therefore, Pr[Uniquei+1|Ti = T] ≥pPr[Pk]
+and Pr[Uniquei+1|Ti = T] ≥Pr[Nonei+1|Ti = T].
+18
+
+--- PAGE 19 ---
+6
+Running time and other issues
+6.1
+Running time
+What is the running time of our algorithm if non-query transformations are taken into account?
+Overview. All that we do between queries is Grover’s diffusion operator which can be implemented in
+O(log N) quantum time and some data structure operations on set S (for example, insertions and deletions).
+We now show how to store S in a classical data structure which supports the necessary operations in
+O(log2 N) time. If the quantum model is sufﬁciently powerful, it should be possible to transform O(log2 N)
+step classical computation into O(logc N) step quantum computation. Then, our algorithm would run in
+O(N 2/3 logc N) steps.
+Data structure. We use two copies of a skip list [29]. Assume that we would like to store (i, xi) for
+i ∈S. In a skip list, each i ∈S has a randomly assigned level li from 0 to d = log N. For j < d, i ∈S is
+assigned to level j with probability 1/2j+1. For level d, i ∈S is assigned to level d with probability 1/2d.
+For each i ∈S, we create a node storing (i, xi) and j + 1 links to other nodes, where j is the level of
+i. There is one link for each of levels 0, 1, . . . , j. In the ﬁrst skip list, the level j link points to the node for
+i0 ∈S where i0 is the smallest element of S with level j or higher satisfying i0 > i.
+To ﬁnd a node i, we ﬁrst traverse links for level d, until we ﬁnd a node id such that id ≤i but the link to
+the next node at level d points to a node i′ > i. We then traverse links for level d −1 until a node id−1 such
+that id−1 ≤i but the (d −1)st level link points to a node i′ > i. We then continue similarly, on levels d −2,
+. . ., 1, 0. If levels are assigned at random, this works in expected time O(log N). It is also possible to add
+or remove an element from S in expected time O(log N).
+The second skip list is similar, except that we order pairs (i, xi) by xi instead of i. That is, the level j
+link points to the vertex corresponding to node ij of level at least j with the smallest xij satisfying xij > xi.
+Operations. Creating skip lists and the insertion and the deletion of the elements is done by straightfor-
+ward translation of the corresponding classical algorithms into quantum algorithms. Performing diffusion
+transform (steps 1 and 4 of algorithm 1) is slightly more complicated. Diffusion transform can be imple-
+mented with O(log N) quantum gates [23] but, in our case, we have the extra requirement that it must be
+performed only on |y⟩, y ∈S (or y /∈S), not all |y⟩, y ∈[N] as in [23]. To do that, we need to implement a
+1-1 mapping f between between S and {1, . . . , |S|} (or between [N] −S and {1, . . . , N −|S|}). Once we
+have such mapping, we can carry out the transformation |y⟩→|f(y)⟩by |y⟩|0⟩→|y⟩|f(y)⟩→|0⟩|f(y)⟩
+where the ﬁrst step is a calculation of f(y) from y and the second step is the reverse of a calculation of y
+from f(y). The transformation |y⟩→|f(y)⟩maps the set |y⟩, y ∈S to the set |y⟩, y ∈{1, . . . , |S|}. Then,
+we can implement diffusion over this set efﬁciently as in [23] and apply the transformation |f(y)⟩→|y⟩,
+mapping {1, . . . , |S|} back to S.
+To implement f, we augment the ﬁrst skip list so that, along with a level j link to a vertex ij, a vertex
+i stores the number of vertices i′ of level less than j with the property that i < i′ < id. Those numbers are
+updated, whenever a vertex is inserted or deleted.
+To compute the function f(y), we ﬁrst traverse the links at level d and count the number of nodes i′ with
+i′ < i, where i is the current node (by adding the numbers of intermediate nodes stored together with the
+links). We continue, until traversing the next link would make the number of nodes i′ more than y. We then
+continue similarly on level d −1, then level d −2, etc.
+Two possible problems. Making a data structure part of quantum algorithm creates two subtle issues.
+19
+
+--- PAGE 20 ---
+First, there is the uniqueness problem. In many classical data structures, the same set S can be stored in
+many equivalent ways, depending on the order in which elements were added/deleted. In the quantum case,
+this would mean that the basis state |S⟩is replaced by many states |S1⟩, |S2⟩, . . . which in addition to S
+store some information about the previous sets. This can have very bad result. In the original quantum
+algorithm, we might have α|S⟩interfering with −α|S⟩, resulting in 0 amplitude for |S⟩. If α|S⟩−α|S⟩
+becomes α|S1⟩−α|S2⟩, there is no interference between |S1⟩and |S2⟩and the result of the algorithm can
+be different.
+To avoid this problem, we need a data structure where the same set S ⊆[N] is always stored in the same
+way, independent of how S was created.
+Second, if we use a classical subroutine, it must terminate in a ﬁxed time t. Only then, we can replace
+it by an O(poly(t)) time quantum algorithm. The subroutines that take time t on average (but might take
+longer time sometimes) are not acceptable.
+Solution to the ﬁrst problem. Skip lists have the uniqueness property, assuming that the levels of i ∈S
+are independent of the way how the skip list storing S was created. To achieve that, we take d hash functions
+h1, h2, . . . , hd mapping [N] to {0, 1}. i ∈[N] is level j (where j ≤log d−1) if h1(i) = . . . = hj−1(i) = 1
+but hj(i) = 0. i ∈[N] is level d if h1(i) = . . . = hd(i) = 0. Each hash function is picked from a k-wise
+independent family of hash functions, for k = ⌈4 log2 d + 1⌉. In the quantum case, this is implemented
+by augmenting the quantum state by an extra register holding |h1, . . . , hd⟩. The register is initialized to a
+superposition in which every basis state |h1, . . . , hd⟩has an equal amplitude. The register is then used to
+perform transformations dependent on h1, . . . , hd on other registers.
+Solution to the second problem. We show that, for any S, the probability that lookup, insertion or
+deletion of some element takes more than O(log2 N) steps is very small. We then modify the algorithms
+for lookup, insertion or deletion so that they abort after c log2 N steps and show that this has no signiﬁcant
+effect on the entire quantum search algorithm.
+To show that O(log2 N) steps sufﬁce for the lookup, it sufﬁces to show that at most O(log N) steps are
+needed on each of log N +1 levels. We ﬁrst show that for level 0. Let i1, i2, . . . be the elements of S ordered
+so that i1 ≤i2 ≤i3 . . . (for the ﬁrst skip list) or xi1 ≤xi2 ≤xi3 . . . (for the second skip list). Then, the
+number of steps spent on level 0, while searching for ij, is of the same order as the maximum c such that
+ij−c, . . ., ij are all at level 0. That is equivalent to h1(ij−c) = h1(ij−c+1) = . . . = h1(ij) = 0. Since h1 is
+k-independent, the probability that c ≥k is 2−k < N −4.
+For level i (0 < i < d), ﬁrst ﬁx the hash functions h1, . . . , hi. Let i1, i2, . . . be the elements of S for
+which h1, . . ., hi−1 are all 1, ordered so that i1 ≤i2 ≤. . . (or xi1 ≤xi2 ≤. . .). By the same argument,
+the probability that the algorithm spends at least k −1 steps on level i is at most N −4. For level d, we ﬁx
+hash functions h1, . . . , hd−1 and notice that i is on level d whenever hd(i) = 1. The rest of the argument
+is as before, with h1(ij−c) = h1(ij−c+1) = . . . = h1(ij) = 1 instead of h1(ij−c) = h1(ij−c+1) = . . . =
+h1(ij) = 0.
+Since there are log N +1 levels and r elements of S, the probability that the algorithm spends more than
+k −1 steps on one level for some element of S is at most O(|S| log N
+N4
+) = O( 1
+N3 ).
+We now modify the procedures for lookup, deletion and insertion so that, after c log2 N the procedure
+stops and outputs “FAIL”. Then, the updates are always completed in c log2 N steps, but, with a small
+probability, they might not be completed correctly.
+20
+
+--- PAGE 21 ---
+We claim that this does not affect the algorithm signiﬁcantly. Let
+|ψi⟩=
+X
+S,y,h1,...,hd
+αi
+S,y|ψS,h1,...,hd⟩|y⟩
+be the state of the quantum algorithm after i steps (each step being the quantum translation of one data
+structure operation), using quantum translations of the perfect data structure operations (which do not fail
+but may take more than c log2 N steps). Here, h1, . . . , hd stand for indices of the hash functions h1, . . . , hd,
+among all functions in the k-wise independent family of hash functions. |ψS,h1,...,hd⟩stand for the basis state
+corresponding to our data structure storing (i, xi) for i ∈S, using the hash functions h1, . . . , hd. (Notice
+that the amplitude αi
+S,y is independent of h1, . . . , hd, since h1, . . . , hd all are equally likely.)
+Let |ψ′
+i⟩be a the state of the quantum algorithm, using quantum translations of the data structure opera-
+tions which may fail. We claim
+Claim 6 ∥ψi −ψ′
+i∥= O(
+i
+N3/2 ).
+Proof: By induction. It sufﬁces to show that ∥ψi −ψ′
+i∥≤∥ψi−1 −ψ′
+i−1∥+ O(
+1
+N3/2 ).
+To show that, we introduce an intermediate state |ψ′′
+i ⟩which is obtained by applying the perfect trans-
+formations in the ﬁrst i −1 steps and the transformation which may fail in the last step. Then,
+∥ψi −ψ′
+i∥≤∥ψi −ψ′′
+i ∥+ ∥ψ′′
+i −ψ′
+i∥.
+The second term, ∥ψ′′
+i −ψ′
+i∥is the same as ∥ψi−1 −ψ′
+i−1∥since the states |ψ′′
+i ⟩, |ψ′
+i⟩are obtained by
+applying the same unitary transformation (quantum translation of a data structure transformation which
+may fail) to states |ψi−1⟩, |ψ′
+i−1⟩. To bound the ﬁrst term, ∥ψi −ψ′′
+i ∥, notice that these states are obtained
+by applying two different unitaries (quantum translations of perfect and imperfect data structure operations)
+to the same state |ψi−1⟩. The two unitaries only differ for (S, h1, . . . , hd) for which the data structure
+operation does not ﬁnish in c log2 N steps. For any ﬁxed S, the probability of this happening is O( 1
+N3 ).
+Hence, ∥ψi −ψ′′
+i ∥2 = O( 1
+N3) and ∥ψi −ψ′′
+i ∥2 = O(
+1
+N3/2 )
+Since the element distinctness algorithm involves a constant number of data structure operations per
+query, the total number of data structure operations is O(N) and the distance between the ideal ﬁnal state
+(when all operations are performed correctly) and the actual ﬁnal state is of the order O(
+N
+N3/2 ) = O(
+1
+N1/2 ).
+This also means that the probability distributions obtained by measuring the two states differ by at most
+O(
+1
+N1/2 ), in variational distance [10]. Therefore, the imperfectness of the data structure operations does not
+have a signiﬁcant effect.
+6.2
+Comparison model
+Our algorithm can be adapted to the model of comparison queries similarly to the algorithm of [11]. Instead
+of having the register ⊗j∈S|xj⟩, we have a register |j1, j2, . . . , jr⟩where |jl⟩is the index of the lth smallest
+element in the set S. Given such register and y ∈[N], we can add y to |j1, . . . , jr⟩by binary search which
+takes O(log
+√
+N 2/3) = O(log N) queries. We can also remove a given x ∈[N] in O(log N) queries by
+reversing this process. This gives an algorithm with O(N 2/3 log N) queries and O(N 2/3 logc N) running
+time (using the skip list implementation described above).
+21
+
+--- PAGE 22 ---
+7
+Open problems
+1. Time-space tradeoffs. Our optimal O(N 2/3)-query algorithm requires space to store O(N 2/3) items.
+How many queries do we need if algorithm’s memory is restricted to r items? Our algorithm needs
+O( N
+√r) queries and this is the best known. Curiously, the lower bound for deterministic algorithms in
+comparison query model is Ω(N2
+r ) queries [32] which is quadratically more. This suggests that our
+algorithm might be optimal in this setting as well. However, the only lower bound is the Ω(N 2/3)
+lower bound for algorithms with unrestricted memory [1].
+2. Optimality of k-distinctness algorithm. While element distinctness is known to require Ω(N 2/3)
+queries, it is open whether our O(N k/(k+1)) query algorithm for k-distinctness is optimal.
+The best lower bound for k-distinctness is Ω(N 2/3), by a following argument. We take an instance of
+element distinctness x1, . . . , xN and transform it into k-distinctness by repeating every element k −1
+times. If x1, . . . , xN are all distinct, there is no k equal elements. If there are i, j such that xi = xj
+among original N elements, then repeating each of them k −1 times creates 2k −2 equal elements.
+Therefore, solving k-distinctness on (k−1)∗N elements requires at least the same number of queries
+as solving distinctness on N elements (which requires Ω(N 2/3) queries).
+3. Quantum walks on other graphs. A quantum walk search algorithm based on similar ideas can
+be used for Grover search on grids [7, 19]. What other graphs can quantum-walks based algorithms
+search? Is there a graph-theoretic property that determines if quantum walk algorithms work well on
+this graph?
+[7] and [31] have shown that, for a class of graphs, the performance of quantum walk depends on
+certain expressions consisting of graph’s eigenvalues. In particular, if a graph has a large eigenvalue
+gap, quantum walk search performs well [31]. A large eigenvalue graph is, however, not necessary,
+as shown by quantum search algorithms for grids [7, 31].
+Acknowledgments. Thanks to Scott Aaronson for showing that k-distinctness is at least as hard as
+distinctness (remark 2 in section 7), to Robert Beals, Greg Kuperberg and Samuel Kutin for pointing out
+the “uniqueness” problem in section 6 and to Boaz Barak, Andrew Childs, Daniel Gottesman, Julia Kempe,
+Samuel Kutin, Frederic Magniez, Oded Regev, Mario Szegedy and Tathagat Tulsi for comments and discus-
+sions.
+References
+[1] S. Aaronson, Y. Shi. Quantum lower bounds for the collision and the element distinctness problems.
+Journal of the ACM, 51:595-605, 2004.
+[2] S. Aaronson, A. Ambainis. Quantum search of spatial structures. Proceedings of FOCS’03, pp. 200-
+209.
+[3] D. Aharonov. Quantum computation - a review. Annual Review of Computational Physics(ed. Dietrich
+Stauffer), vol. VI, World Scientiﬁc, 1998.
+22
+
+--- PAGE 23 ---
+[4] A. Ambainis. Quantum lower bounds for collision and element distinctness with small range,
+quant-ph/0305179.
+[5] A. Ambainis. Quantum walks and their algorithmic applications. International Journal of Quantum
+Information, 1:507-518 (2003).
+[6] A. Ambainis. Quantum query algorithms and lower bounds. Proceedings of FOTFS’III, Trends in
+Logic, 23:15-32, Kluwer, 2004. Journal version under preparation.
+[7] A. Ambainis, J. Kempe, A. Rivosh. Coins make quantum walks faster, Proceedings of SODA’05. Also
+quant-ph/0402107.
+[8] P. Beame, M. Saks, X. Sun, E. Vee. Time-space trade-off lower bounds for randomized computation
+of decision problems. Journal of the ACM, 50: 154-195, 2003. Also FOCS’00.
+[9] P. Benioff. Space searches with a quantum robot.Quantum Computation and Quantum Information: A
+Millennium Volume, AMS Contemporary Mathematics Series, 2002. Also quant-ph/0003006.
+[10] E. Bernstein, U. Vazirani. Quantum Complexity Theory. SIAM J. Comput. 26(5): 1411-1473, 1997.
+[11] H. Buhrman, C. Durr, M. Heiligman, P. Hoyer, F. Magniez, M. Santha, and R. de Wolf. Quantum
+algorithms for element distinctness. Proceedings of Complexity’01, pp.131-137,
+[12] H. Buhrman, R. Spalek. Quantum veriﬁcation of matrix products, quant-ph/0409035.
+[13] G. Brassard, P. Høyer, M. Mosca, and A. Tapp. Quantum amplitude ampliﬁcation and estimation,
+Quantum Computation and Quantum Information: A Millennium Volume, AMS Contemporary Math-
+ematics Series, 2002.
+[14] G. Brassard, P. Høyer, and A. Tapp. Quantum cryptanalysis of hash and claw-free functions. Proceed-
+ings of LATIN’98, Lecture Notes in Computer Science, 1380:163-169, 1998.
+[15] H. Buhrman, R. de Wolf. Complexity measures and decision tree complexity: a survey. Theoretical
+Computer Science, 288:21-43, 2002.
+[16] A. Childs, R. Cleve, E. Deotto, E. Farhi, S. Gutmann, D. Spielman Exponential algorithmic speedup
+by quantum walk. Proceedings of STOC’03, pp. 59-68.
+[17] A. Childs, J. Eisenberg. Quantum algorithms for subset ﬁnding. quant-ph/0311038.
+[18] A. Childs, E. Farhi, S. Gutmann. An example of the difference between quantum and classical random
+walks. Journal of Quantum Information Processing, 1:35, 2002.
+[19] A. Childs, J. Goldstone. Spatial search by quantum walk, Phys. Rev. A, 70:022314, 2004.
+[20] A. Childs, J. Goldstone. Spatial search and the Dirac equation, Phys. Rev. A 70:042312, 2004.
+[21] E. Farhi, S. Gutmann. Quantum computation and decision trees. Physical Review A, 58:915-928, 1998.
+[22] D. Grigoriev, M. Karpinski, F. Meyer auf der Heide, and R. Smolensky. A lower bound for randomized
+algebraic decision trees. Proceedings of STOC’96, pp. 612–619.
+23
+
+--- PAGE 24 ---
+[23] L. Grover. A fast quantum mechanical algorithm for database search. Proceedings of STOC’96, pp.
+212-219.
+[24] R. Horn, C. Johnson Matrix Analysis, Cambridge University Press, 1985.
+[25] J. Kempe. Quantum random walks hit exponentially faster Proceedings of RANDOM’03, Lecture
+Notes in Computer Science, 2764:354-369, 2003.
+[26] J. Kempe. Quantum random walks - an introductory overview, Contemporary Physics, 44:307-327,
+2003.
+[27] S. Kutin. A quantum lower bound for the collision problem. quant-ph/0304162.
+[28] F. Magniez, M. Santha, M. Szegedy. An
+˜
+O(n1.3) quantum algorithm for the triangle problem. Pro-
+ceedings of SODA’05. Also quant-ph/0310134.
+[29] W. Pugh. Skip lists: A probabilistic alternative to balanced trees. Communications of the ACM,
+33(6):668–676, 1990.
+[30] N. Shenvi, J. Kempe, K. Whaley. Quantum random-walk search algorithm, Physical Review A,
+67:052307, 2003.
+[31] M. Szegedy. Quantum speed-up of Markov Chain based algorithms. Proceedings of FOCS’04, pp.
+32-41. Earlier version at quant-ph/0401053.
+[32] A. Yao. Near-optimal time-space tradeoff for element distinctness. Proceedings of FOCS’88, pp. 91-
+97.
+24

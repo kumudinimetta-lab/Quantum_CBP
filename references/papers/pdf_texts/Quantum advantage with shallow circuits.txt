@@ -1,0 +1,1324 @@
+
+--- PAGE 1 ---
+arXiv:1704.00690v1  [quant-ph]  3 Apr 2017
+Quantum advantage with shallow circuits
+Sergey Bravyi1, David Gosset1, Robert K¨onig2
+1IBM T.J. Watson Research Center
+2 Institute for Advanced Study & Zentrum Mathematik,
+Technische Universit¨at M¨unchen
+Abstract
+We prove that constant-depth quantum circuits are more powerful than their clas-
+sical counterparts. To this end we introduce a non-oracular version of the Bernstein-
+Vazirani problem which we call the 2D Hidden Linear Function problem. An instance
+of the problem is speciﬁed by a quadratic form q that maps n-bit strings to integers
+modulo four. The goal is to identify a linear boolean function which describes the ac-
+tion of q on a certain subset of n-bit strings. We prove that any classical probabilistic
+circuit composed of bounded fan-in gates that solves the 2D Hidden Linear Function
+problem with high probability must have depth logarithmic in n. In contrast, we show
+that this problem can be solved with certainty by a constant-depth quantum circuit
+composed of one- and two-qubit gates acting locally on a two-dimensional grid.
+1
+Introduction
+Parallel algorithms lay the foundation for modern high-performance computing. Many
+problems of practical importance such as Monte Carlo simulation, computing the rank,
+the determinant, and the inverse of a matrix lend themselves naturally to paralleliza-
+tion [1, 2]. Of particular interest to us are the problems that can be solved on a parallel
+machine in a constant time independent of the problem size using a polynomial number
+of processors. The class of such problems, known as NC0, captures the computational
+power of constant-depth circuits with bounded fan-in gates [3].
+The success of classical parallel algorithms motivates the study of their quantum
+counterparts. Quantum parallel algorithms running in a constant time take as input
+a classical bit string, apply a constant-depth quantum circuit composed of one- and
+two-qubit gates, and output a random bit string obtained by measuring each qubit in
+the 0, 1-basis. For brevity, we shall refer to such computations as Shallow Quantum
+Circuits (SQC).
+Although SQCs are a highly restricted form of quantum computation, there is hope
+that they may outperform classical computers in certain tasks. A pioneering work by
+Terhal and DiVincenzo [4] gave the ﬁrst evidence in this direction by showing that
+SQCs may be hard to simulate classically.
+Quite recently, Bermejo-Vega et al. [5],
+sbravyi@us.ibm.com, dngosset@us.ibm.com, robert.koenig@tum.de
+1
+
+--- PAGE 2 ---
+building on earlier studies of so-called IQP circuits [6, 7, 8], gave further evidence that
+the output distribution of SQCs may be hard to sample classically even if a constant
+statistical error is allowed; see also Ref. [9]. A more powerful model of computation
+consisting of logarithmic-depth quantum circuits assisted by polynomial-time classical
+computation is known to be capable of solving hard problems such as factoring [10].
+Parallelism and circuit depth are important considerations when designing quantum
+algorithms that can be executed in the near-future on small quantum computers that
+may lack error correction capabilities [11, 12, 13]. While the overhead for encoding and
+manipulating quantum data fault-tolerantly is asymptotically small [14, 15], it remains
+prohibitive for current technology. A quantum computation without error correction
+can only compute for a constant amount of time before the qubits decohere and the
+entropy builds up [16]. In this situation one may wish to parallelize the computation
+as much as possible to ﬁt within the coherence time.
+What can we hope to prove concerning the computational power of SQCs ? A
+rigorous proof that SQCs outperform polynomial-time classical algorithms for some
+computational task is arguably beyond our reach (as it would imply a separation be-
+tween the complexity classes BQP and BPP). In this paper we set a less ambitious goal
+and pose the following question:
+Can constant-depth quantum circuits solve a computational problem that constant-depth
+classical circuits cannot?
+Put diﬀerently, we ask whether constant-time parallel quantum algorithms are more
+powerful than their classical probabilistic counterparts. We show that the answer to
+the above question is YES, even if the quantum circuit is composed of nearest-neighbor
+gates acting on a 2D grid whereas the only restriction on the constant-depth classical
+(probabilistic) circuit is having a bounded fan-in. In particular, the gates in the classical
+circuit may be long-range (i.e., they need not be geometrically local in 2D or otherwise)
+and may have unbounded fan-out. We emphasize that our result constitutes a provable
+separation and does not rely on any conjectures or assumptions concerning complexity
+classes. Formally, our result implies that there is a search (relational) problem solved
+by SQCs but not by NC0 circuits, even if we allow the classical circuit access to random
+input bits drawn from an arbitrary distribution depending on the input size.
+The computational problem that we use to establish the above separation is a simple
+linear algebra task concerning quadratic forms over the binary ﬁeld, see Section 3 for
+formal deﬁnitions. We call it the 2D Hidden Linear Function problem. The input is
+a binary vector b ∈{0, 1}n and a binary n × n matrix A. Here the rows and columns
+of A are labeled by sites of a 2D grid with n sites, and A is sparse in the sense that
+Ai,j = 0 unless the sites i, j are nearest neighbors on the grid. The pair A, b deﬁnes a
+quadratic form q : Fn
+2 →Z4 such that
+q(x) = 2
+X
+1≤α<β≤n
+Aα,β xαxβ +
+n
+X
+α=1
+bαxα,
+where x1, . . . , xn ∈F2 are binary variables. Deﬁne the set
+Lq = {x ∈Fn
+2 : q(x ⊕y) = q(x) + q(y)
+∀y ∈Fn
+2}.
+(1)
+Here x ⊕y denotes addition of binary vectors modulo two, while q(x) + q(y) in Eq. (1)
+is evaluated modulo four. We show that the restriction of q(x) onto Lq is always a
+2
+
+--- PAGE 3 ---
+linear form, that is, there exists a vector z ∈Fn
+2 such that q(x) = 2 Pn
+α=1 zαxα for
+all x ∈Lq. The problem is to ﬁnd such a vector z (which may be non-unique). This
+problem can be viewed as an non-oracular version of the well-known Bernstein-Vazirani
+problem [17], where the goal is to learn a hidden linear function speciﬁed by an oracle.
+In our case there is no oracle and the linear function is hidden inside the quadratic
+form q which is explicitly speciﬁed by its coeﬃcients A, b.
+Our results can be summarized as follows.
+Theorem. Any classical probabilistic circuit with bounded fan-in gates that solves the
+2D Hidden Linear Function problem with success probability greater than 7/8 must have
+depth Ω(log n). In contrast the problem can be solved with certainty by a constant-depth
+quantum circuit composed of one- and two-qubit gates acting locally on a 2D grid.
+Our main technical contribution is the depth lower bound for classical circuits
+which solve the 2D Hidden Linear Function problem, see Section 4. The proof exploits
+quantum nonlocality – a form of correlation present in the measurement statistics of
+entangled quantum states that cannot be reproduced by local hidden variable mod-
+els [18, 19] even if a limited amount of communication is allowed [20]. By leveraging the
+result of Ref. [20] we prove that a class of entangled quantum states known as cluster
+states (or 2D graph states) [21, 22] exhibits a particularly strong form of nonlocality
+that cannot be reproduced by constant-depth classical circuits. At the same time, we
+show that such nonlocality is present in the input-output correlations of the 2D Hidden
+Linear Function problem. We also prove that this problem can be solved by a simple
+SQC that consists of two layers of single-qubit gates, and a unitary operator Uq such
+that Uq|x⟩= iq(x)|x⟩. The latter can be easily implemented by a constant-depth circuit
+which takes as input the coeﬃcients A, b which specify q, see Section 3 for details.
+Quantum algorithms for learning and testing properties of Boolean functions have
+a long history [17, 23, 24, 25, 26, 27]. Most of these algorithms (including ours) work
+by sampling a probability distribution related to the Fourier transform of the function
+of interest. For example, an analogue of the Bernstein-Vazirani problem for quadratic
+forms over the binary ﬁeld has been previously considered by R¨otteler [28]. That work
+describes a quantum algorithm that learns a quadratic form with n binary variables
+speciﬁed by an oracle using only O(n) queries to the oracle. We note however that
+the problem considered in Ref. [28] is not directly related to the one studied in the
+present paper. Our problem is more closely related to the Bernstein Vazirani problem
+[17] or, more generally, the Fourier Fishing problem introduced by Aaronson [25, 29].
+Fourier Fishing is a search problem where the goal is to identify a bit sting z such that
+the Fourier transform of a given Boolean function has non-negligible weight on z. We
+shall see that a string z is a solution of the 2D Hidden Linear Function problem for a
+quadratic form q iﬀthe Fourier transform of q has a non-zero weight on z, see Lemma 2
+in Section 3.
+To the best of our knowledge, quantum analogues of low-depth circuit classes NC
+and NCk were ﬁrst introduced by Moore and Nilsson [30]. This work also provided
+techniques for parallelizing quantum circuits. Hoyer and Spalek [31] showed that com-
+bining SQCs with the so-called quantum fan-out gates (CNOTs with a single control
+and multiple target qubits) gives a class of quantum circuits that is powerful enough
+to solve the factoring problem, if assisted by polynomial-time classical computation.
+An alternative characterization of this class of circuits in terms of measurement-based
+computations was later given by Browne et al. [32]. Finally, Terhal and DiVincenzo [4]
+3
+
+--- PAGE 4 ---
+showed that any quantum circuit composed of one- and two-qubit gates can be com-
+pressed to a constant-depth if the ability to post-select measurement outcomes is given.
+This implies that post-selective SQCs can solve any problem in the complexity class
+PostBQP = PP, see Ref. [33]. On the negative side, Eldar and Harrow have recently
+shown [34] that SQCs are not capable of preparing certain entangled states associated
+with good quantum codes that can be prepared by polynomial-size quantum circuits.
+Furthermore, it is known that depth-2 SQCs can be eﬃciently simulated classically in
+polynomial time [4]. Superpolynomial-time classical algorithms for simulating more
+general SQCs are discussed in Ref. [29].
+The remainder of the paper is organized as follows. We begin in Section 2 by estab-
+lishing some deﬁnitions and notation. In Section 3 we discuss computational problems
+where the goal is to ﬁnd a hidden linear boolean function. In particular, we describe
+the 2D Hidden Linear Function problem and show that it is solved deterministically
+by SQCs. In Section 4 we prove that the 2D Hidden Linear Function problem cannot
+be solved by classical circuits of low depth. We conclude in Section 5 with some open
+questions.
+2
+Preliminaries
+Here we describe the classes of circuits considered in this paper and review the deﬁnition
+of quantum graph states.
+Quantum circuits
+A quantum circuit of depth d consists of a sequence of d layers
+of one- and two-qubit gates, such that gates within a given layer act on disjoint sets of
+qubits. In other words, the unitary implemented by the circuit is a product Ud . . . U2U1
+where each Uj is a tensor product of one- and two-qubit gates which act nontrivially
+on disjoint sets of qubits. We shall use the Cliﬀord+T gate set, that is, we assume
+that all single-qubit gates are either1
+H =
+1
+√
+2
+ 1
+1
+1
+−1
+
+,
+S =
+ 1
+0
+0
+−i
+
+,
+or
+T =
+ 1
+0
+0
+eiπ/4
+
+and all two-qubit gates are controlled-Z gates CZ = |0⟩⟨0| ⊗I + |1⟩⟨1| ⊗Z. Here and
+below X, Y, Z denote the single-qubit Pauli matrices,
+X =
+ 0
+1
+1
+0
+
+,
+Y =
+ 0
+−i
+i
+0
+
+,
+Z =
+ 1
+0
+0
+−1
+
+.
+Classical circuits
+A classical circuit is speciﬁed by a directed acyclic graph in
+which each vertex is either an input (if it has in-degree 0), an output (if it has out-degree
+0), or a gate. For each gate we must also specify a boolean function {0, 1}k →{0, 1}
+which is computed by the gate, where k is the in-degree or “fan-in” of the gate. The
+output bit computed by a gate is copied to all outgoing edges of this gate. The out-
+degree or “fan-out” of a gate is the number of times the output of the gate is used in
+the remainder of the circuit. The depth d of a classical circuit is the maximum number
+of gates along a path from an input to an output.
+1Our deﬁnition of the S-gate diﬀers from the standard one (which has +i instead of −i).
+4
+
+--- PAGE 5 ---
+Let C be a classical circuit with input x ∈{0, 1}m and output z = F(x) ∈{0, 1}n.
+We will consider probabilistic circuits in which a subset of input bits may be chosen
+at random, that is x = x′r where r ∈{0, 1}ℓis a random string drawn from some
+(arbitrary) distribution ρ(r) and x′ ∈{0, 1}m−ℓ. We shall often identify a variable xj
+or zk with its index j or k respectively.
+Deﬁnition 1. A pair of variables xj, zk is said to be correlated iﬀthere exists y ∈
+{0, 1}m such that ﬂipping the jth bit of y ﬂips the kth bit of F(y).
+Note that xj, zk can be correlated only if the graph describing the circuit contains
+a path from xj to zk.
+Deﬁnition 2 (Lightcone). Let C be a classical circuit. For each input bit xj deﬁne its
+light cone LC(xj) to be the set of output variables correlated with xj. Likewise, for each
+output bit zk deﬁne its light cone LC(zk) to be the set of input variables correlated with
+zk.
+In this paper we are interested in circuits with constant depth such that all gates
+have fan-in at most K = O(1). This class of circuits is known as NC0. Any such circuit
+computes a local function in the sense that each output bit can only be correlated with
+a constant number of input bits. Indeed, if C has depth d then for all i we have
+|LC(zi)| ≤Kd.
+(2)
+Graph states
+Let G = (V, E) be a ﬁnite simple graph. Deﬁne an associated |V |-
+qubit graph state |ΦG⟩by
+|ΦG⟩=
+
+Y
+{i,j}∈E
+CZij
+
+H⊗|V ||0|V |⟩.
+(3)
+Here and below the subscript of a gate indicates the qubit(s) acted upon by this gate,
+and we use a shorthand notation |0m⟩≡|0⟩⊗m. The graph state |ΦG⟩is a stabilizer
+state with stabilizer group generated by
+gv = Xv
+
+
+Y
+w:{w,v}∈E
+Zw
+
+
+v ∈V.
+(4)
+In other words |ΦG⟩is the unique state satisfying gv|ΦG⟩= |ΦG⟩for all v ∈V .
+3
+Hidden linear function problems
+In this section we consider computational problems where the goal is to ﬁnd a hidden
+linear function.
+Our starting point is the well-known Bernstein-Vazirani problem [17]. Here one
+is given oracle access to a linear boolean function ℓ: Fn
+2 →F2 parameterized by a
+“secret” bit string z ∈{0, 1}n
+ℓ(x) = zT x
+mod 2
+x ∈{0, 1}n.
+5
+
+--- PAGE 6 ---
+Here and below zT x ≡Pn
+α=1 zαxα denotes the inner product of vectors. Bernstein
+and Vazirani showed that one can identify the linear function ℓ(i.e., ﬁnd the secret bit
+string z) using just one quantum query to an oracle Uℓwhich performs the unitary
+Uℓ|x⟩= (−1)ℓ(x)|x⟩.
+Indeed, we have
+|z⟩= H⊗nUℓH⊗n|0n⟩.
+On the other hand a classical algorithm with access to a classical oracle computing ℓ
+requires n queries to obtain z.
+In the Bernstein-Vazirani problem the oracle hides the linear function. The quan-
+tum speedup obtained is relative to the oracle and is not guaranteed to translate into
+a real-world quantum advantage. Where else (other than inside an oracle) can we hide
+a linear function?
+We will now see how to hide a linear boolean function inside a Z4-valued quadratic
+form. In particular, we consider quadratic forms q : Fn
+2 →Z4 such that
+q(x) = 2
+X
+1≤α<β≤n
+Aα,β xαxβ +
+n
+X
+α=1
+bαxα,
+(5)
+where x1, . . . , xn ∈{0, 1} are binary variables2,
+Aα,β ∈{0, 1}
+and
+bα ∈{0, 1}.
+(6)
+In the remainder of this Section all arithmetic is performed in the ring Z4 (unless stated
+otherwise). We shall label elements of Z4 by {0, 1, 2, 3}. Entrywise addition of vectors
+modulo 2 will be denoted ⊕. Deﬁne the set
+Lq = {x ∈Fn
+2 : q(x ⊕y) = q(x) + q(y)
+∀y ∈Fn
+2}.
+(7)
+Now let us see how q hides a linear boolean function.
+Lemma 1. The set Lq is a linear subspace of Fn
+2 and q(x) ∈{0, 2} for all x ∈Lq. The
+restriction of q to Lq is a linear function, that is, there exists a vector z ∈{0, 1}n such
+that q(x) = 2zT x for all x ∈Lq.
+Proof. Suppose x, x′ ∈Lq. Choose any y ∈Fn
+2. Then
+q(x ⊕x′ ⊕y) = q(x) + q(x′ ⊕y) = q(x) + q(x′) + q(y) = q(x ⊕x′) + q(y).
+This proves x⊕x′ ∈Lq, that is, Lq is a linear subspace. Note that 0 = q(0) = q(x⊕x) =
+2q(x) for any x ∈Lq, that is, q(x) ∈{0, 2}. Deﬁne a function l : Lq →F2 by
+l(x) =
+ 1
+if
+q(x) = 2,
+0
+if
+q(x) = 0.
+From Eq. (7) one infers that l(x) is linear modulo two,
+l(x ⊕y) = l(x) ⊕l(y)
+for all x, y ∈Lq.
+It follows that l(x) = zT x (mod 2) for some vector z ∈{0, 1}n. Thus q(x) = 2zT x for
+all x ∈Lq.
+2Here for simplicity we only consider bα ∈{0, 1}. Our results could alternatively be proved using a more
+general deﬁnition of quadratic forms where we allow bα ∈{0, 1, 2, 3}.
+6
+
+--- PAGE 7 ---
+The linear action of q on the subspace Lq can be parameterized by a secret bit
+string z ∈{0, 1}n.
+In contrast with the Bernstein-Vazirani problem, here z is not
+unique because the hidden linear function is only deﬁned on a subspace of Fn
+2. To see
+this, let L⊥
+q be the orthogonal complement of Lq. Then for any valid secret string z, and
+any y ∈L⊥
+q , z ⊕y is also a valid secret string (since 2(z ⊕y)T x = 2zT x + 2yT x = 2zT x
+for x ∈Lq). We deﬁne a search problem where the goal is to ﬁnd a valid secret string.
+Hidden Linear Function Problem. The input is a quadratic form q : Fn
+2 →Z4
+speciﬁed by a matrix A and a vector b as in Eqs. (5,6). A solution is a binary vector
+z ∈{0, 1}n such that q(x) = 2zT x for all x ∈Lq.
+A quantum circuit which solves the Hidden Linear Function problem is shown in
+Fig. 1. Here there are two input registers holding b and A as well as an n-qubit data
+register. The circuit involves controlled gates which implement
+CZ(A) =
+Y
+1≤i<j≤n
+CZAij
+ij
+S(b) =
+n
+O
+j=1
+Sbj
+j
+(8)
+on the data register conditioned on the ﬁrst two registers holding bit strings b, A re-
+spectively. The n-qubit unitary Uq = S(b)CZ(A) satisﬁes
+Uq|x⟩= iq(x)|x⟩,
+x ∈{0, 1}n.
+(9)
+The output z ∈{0, 1}n of the circuit is therefore drawn from the distribution
+p(z) = |⟨z|H⊗nUqH⊗n|0n⟩|2.
+(10)
+The following Lemma asserts that the circuit from Fig. 1 solves the Hidden Linear
+Function problem deterministically (i.e., its output z is a solution with probability 1).
+Lemma 2. p(z) > 0 iﬀz is a solution of the Hidden Linear Function problem, that
+is, q(x) = 2zT x for all x ∈Lq. Furthermore, p(z) is the uniform distribution on the
+set of all solutions z.
+Proof. For any linear subspace L ⊆Fn
+2 and a vector z ∈Fn
+2 deﬁne a partial Fourier
+transform
+Γ(L, z) ≡
+X
+x∈L
+(−1)zT x · iq(x).
+Then
+p(z) = 1
+4n |Γ(Fn
+2, z)|2 .
+(11)
+Choose any linear subspace K ⊆Fn
+2 such that
+Fn
+2 = Lq + K
+and
+Lq ∩K = 0.
+(12)
+From Eq. (7) one infers that
+Γ(Fn
+2, z) = Γ(Lq, z) · Γ(K, z).
+(13)
+7
+
+--- PAGE 8 ---
+H⊗n
+H⊗n
+CZ(A)
+S(b)
+|0n⟩
+|A⟩
+|b⟩
+|A⟩
+|b⟩
+Uq
+Figure 1: A quantum circuit which solves the Hidden Linear Function problem.
+Here
+CZ(A) = Q
+1≤i<j≤n CZ
+Aij
+ij
+and S(b) = Nn
+j=1 S
+bj
+j .
+Claim 1. Γ(Lq, z) = |Lq| if z is a solution of the Hidden Linear Function Problem
+and Γ(Lq, z) = 0 otherwise. The number of solutions to the Hidden Linear Function
+Problem is |L⊥
+q |.
+Proof. By Lemma 1 there exists a vector y ∈Fn
+2 such that q(x) = 2yT x for all x ∈Lq.
+Then iq(x) = (−1)yT x and thus
+Γ(Lq, z) =
+X
+x∈Lq
+(−1)xT (y⊕z) =
+ |Lq|
+if
+y ⊕z ∈L⊥
+q ,
+0
+otherwise.
+Note that the ﬁrst case, y ⊕z ∈L⊥
+q , occurs iﬀz is a solution of the Hidden Linear
+Function Problem, since y and z have the same binary inner product with any vector
+from Lq iﬀy ⊕z ∈L⊥
+q . Therefore the number of solutions is |L⊥
+q |.
+Claim 2. |Γ(K, z)|2 = 2n · |Lq|−1 for all z ∈Fn
+2.
+We provide a proof of Claim 2 in Appendix A. The statement of the lemma follows
+directly from Eqs. (11,13) and Claims 1,2.
+A simple corollary of Lemma 2 is that the Hidden Linear Function problem can
+be solved in polynomial-time using a classical computer. Indeed, for a given input
+(A, b) the circuit from Fig. 1 applies a sequence of Cliﬀord gates to the data register
+followed by measurement in the computational basis.
+A solution can be eﬃciently
+computed classically by simulating this circuit using the Gottesman-Knill Theorem
+(see for example Ref. [35]).
+Since p(z) is proportional to the absolute value squared of the Fourier transform
+of iq(x), see Eq. (10), we see that the Hidden Linear Function problem is a variant of
+the Fourier Fishing problem deﬁned in Section 6.2 of Ref. [29]. One diﬀerence is that
+instead of Boolean functions we consider Z4-valued functions.
+A second important
+diﬀerence is that we consider an explicit computational problem (as opposed to an
+oracular one).
+In general the circuit from Fig. 1 may not be expressible as a constant-depth quan-
+tum circuit. We now restrict our attention to a subset of instances where A has a
+certain 2D structure. We will see that for such instances the circuit from Fig. 1 can be
+decomposed as a constant-depth quantum circuit over the Cliﬀord+T gate set.
+8
+
+--- PAGE 9 ---
+In particular, let G = (V, E) be the N × N grid graph. If we label vertices of G by
+horizontal and vertical coordinates
+V = {(i, j) : 1 ≤i, j ≤N}
+then it has vertical edges e = {v, w} ∈E between all pairs v = (i, j), w = (i, j + 1)
+and horizontal edges between all pairs v = (i, j), w = (i + 1, j). Then |V | = N 2 and
+|E| = 2N(N −1). Let us consider quadratic forms Eq. (5) where the matrix A speciﬁes
+a subgraph of G. More precisely, we assume that A is an N 2 × N 2 matrix whose rows
+and columns are labeled by vertices of G. We require that Av,w = 0 unless the pair
+{v, w} is an edge of G. We shall parameterize such a matrix by |E| binary variables
+Ae ∈{0, 1} such that Ae = Av,w = 1 iﬀe = {v, w} ∈E. Now we can rewrite Eq. (5) as
+q(x) = 2
+X
+e={v,w}∈E
+Aexvxw +
+X
+v∈V
+bvxv,
+A ∈{0, 1}|E|
+b ∈{0, 1}|V |.
+(14)
+2D Hidden Linear Function Problem. Let G = (V, E) be the N ×N grid. The
+input is a Z4-valued quadratic form q speciﬁed by vectors A and b as in Eq. (14).
+A solution is a binary vector z ∈{0, 1}|V | such that q(x) = 2zT x for all x ∈Lq.
+We shall say that the above describes an instance of size N. The number of input bits
+in an instance of size N is then |V | + |E| = 3N 2 −2N. The number of output bits is
+n = |V | = N 2.
+The quantum algorithm from Fig. 1 solves the 2D Hidden Linear Function problem
+and can be implemented in constant depth:
+Theorem 1. For each N ≥2 there exists a quantum circuit QN of depth d = O(1)
+which deterministically solves size-N instances of the 2D Hidden Linear Function prob-
+lem.
+Proof. It suﬃces to show that the controlled-S(b) and controlled-CZ(A) gates in Fig. 1
+can be expressed as constant-depth quantum circuits composed of one- and two-qubit
+gates over the Cliﬀord+T gate set.
+The controlled-S(b) gate can be implemented by applying a layer of two-qubit
+controlled-S gates CS = |0⟩⟨0| ⊗I + |1⟩⟨1| ⊗S acting on disjoint pairs of qubits. The
+gate CS can be expressed exactly (with constant depth, of course) over the Cliﬀord+T
+gate set (see for example Ref. [36]), which shows that the controlled-S(b) gate from
+Fig. 1 can be implemented in constant depth.
+The controlled-CZ(A) gate can be written as a product of three-qubit controlled-
+controlled-Z (CCZ) gates:
+Y
+e={v,w}∈E
+I ⊗
+
+|0⟩⟨0|e ⊗I + |1⟩⟨1|e ⊗CZv,w
+
+(15)
+(here the three registers are as in Fig.1–the ﬁrst one holds b, the second one holds A
+and the third one is the data register). We can partition the edges of the 2D grid into
+four disjoint layers E = E1 ∪E2 ∪E3 ∪E4 such that no edges within a given layer share
+a vertex. Thus Eq. (15) can be written as a depth-4 circuit composed of CCZ gates.
+Each CCZ gate can then be decomposed exactly as a product of (a constant number
+of) one- and two-qubit gates from the Cliﬀord+T gate set [36].
+9
+
+--- PAGE 10 ---
+The circuit of Fig. 1 can be embedded into a two-dimensional grid of size N × N
+such that each vertex of the grid contains O(1) qubits and all two-qubit gates are
+geometrically local. Indeed, the circuit contains n = |V | target qubits (the bottom
+register initialized in the |0n⟩state) and |V | + |E| control qubits (the top and the
+center registers initialized in the |b⟩and |A⟩states). We shall place the target qubit
+labeled by a vertex v and the control qubit that holds bv at the vertex v of the grid.
+Place the control qubit that holds Ae with a horizontal (resp. vertical) edge e at the
+left (resp. bottom) endpoint of the edge e. Now each vertex contains at most four
+qubits and each two-qubit gate couples qubits located at the same vertex or a pair
+of nearest-neighbor vertices.
+Thus the 2D Hidden Linear Function problem can be
+solved by a constant-depth quantum circuit with geometrically local gates3. We now
+show that even this highly restricted class of SQCs is more powerful than classical
+constant-depth circuits.
+Theorem 2. The following holds for all suﬃciently large N. Let CN be a classical
+probabilistic circuit with fan-in at most K which solves all size-N instances of the 2D
+Hidden Linear Function problem with probability greater than 7/8. Then the depth of
+CN is at least
+1
+8
+log(N)
+log(K).
+Here the classical circuit CN takes input A, b along with a random string r drawn
+from some (arbitrary) probability distribution and its output z ∈{0, 1}N2 must be a
+solution to the given instance with probability greater than 7/8. We prove the Theorem
+in the next Section.
+4
+Nonlocality thwarts shallow classical circuits
+Constant-depth classical circuits with gates of bounded fan-in exhibit a kind of locality
+expressed by Eq. (2). On the other hand it is well known that the correlations present in
+the measurement statistics of entangled quantum states exhibit quantum nonlocality–
+that is, they cannot be reproduced by completely local functions in which every output
+bit depends only on a single associated input bit as well as a shared random string.
+In this Section we provide a proof of Theorem 2 which exploits this tension. We will
+see how quantum nonlocality–even in states generated by constant-depth quantum
+circuits– thwarts simulation by classical circuits which are (a) completely local, (b)
+geometrically local in one dimension, and ﬁnally (c) “constant-depth local” in the
+sense of Eq. (2).
+Let us begin with a famous illustration [19, 18] of quantum nonlocality. Deﬁne the
+3-qubit GHZ state
+|GHZ⟩=
+1
+√
+2 (|000⟩+ |111⟩) ,
+which satisﬁes
+P|GHZ⟩= |GHZ⟩
+P ∈{X1X2X3, −X1Y2Y3, −Y1X2Y3, −Y1Y2X3}.
+(16)
+3We note that a physical implementation of the circuit from Fig. 1 would require only n = N 2 qubits and
+use only (classically controlled) Cliﬀord gates H, S, CZ with nearest-neighbor CZ gates.
+10
+
+--- PAGE 11 ---
+Let b ∈{0, 1}3 and consider the measurement outcomes m ∈{−1, 1}3 obtained by
+measuring each qubit j of |GHZ⟩in either the X basis (if bj = 0) or the Y basis (if
+bj = 1). Eq. (16) implies that the quantum measurement statistics satisfy
+ib1+b2+b3m1m2m3 = 1
+whenever
+b1 ⊕b2 ⊕b3 = 0.
+(17)
+In contrast it is not hard to show that Eq. (17) cannot be satisﬁed by a local hidden-
+variable model in which the measurement outcomes m are completely local functions
+of the measurement settings b and also may depend on a shared random string r, that
+is, mj = mj(bj, r) for j = 1, 2, 3.
+Barrett et al. [20] described an extension of the GHZ example which we review
+(with some small modiﬁcations) in Section 4.1. It shows that the statistics of single-
+qubit measurements on the graph state corresponding to an even length cycle posess
+geometrically nonlocal correlations. In other words, certain measurement outcomes are
+correlated with measurement settings (i.e., choice of single-qubit measurement bases)
+that are far away with respect to the shortest path on the cycle. These measurement
+statistics cannot be simulated by low-depth classical circuits which are geometrically
+local in one dimension.
+Finally, in Section 4.2 we turn our attention to the 2D Hidden Linear Function
+problem. Let us now argue that the setting is not so diﬀerent from the above two
+examples. Recall that the circuit from Fig. 1 produces a uniformly random solution
+z ∈{0, 1}n to a given instance A, b. Just like in the GHZ example, here the output z is
+obtained by measuring each qubit of an entangled quantum state in one of two possible
+bases. Indeed, observe that the ﬁrst two gates in the circuit prepare the graph state
+|ΦA⟩for the graph A with adjacency matrix A, and the rest of the circuit measures
+each qubit v in either the X basis (if bv = 0) or the Y basis (if bv = 1)4.
+To prove Theorem 2 we establish that the correlations between the input A, b and
+the output z in the 2D Hidden Linear Function problem have a strong form of non-
+locality that cannot be reproduced by constant-depth probabilistic classical circuits of
+bounded fan-in. We ﬁrst suppose CN is a classical circuit which solves size-N instances
+of the 2D Hidden Linear Function problem with high probability. We restrict our at-
+tention to instances where A speciﬁes a subgraph of the grid which is an even length
+cycle. For each such instance we can infer (from the Barrett et al. example) a geo-
+metrically nonlocal feature of the correlations generated by CN. We use a probabilistic
+argument and Eq. (2) to show that at least one of these features is absent if CN has
+depth o(log(N)). Thus we obtain the desired lower bound on the depth of CN.
+4.1
+Geometric nonlocality in a 1D graph state
+Here we present a variant of an example due to Barrett et al. [20]. Let Γ be the M-
+cycle graph with M even. Suppose u, v, w are vertices such that all pairwise distances
+between them are even. We shall say that a vertex j is even (resp. odd) if it has even
+distance (resp. odd distance) from u, v, w. It will be convenient to view Γ as a triangle
+as shown in Fig. 2. We deﬁne sets L, R, B of vertices for each of the three sides as
+shown. The vertices u, v, w are not contained in any of these sets. Also deﬁne sets
+Rodd, Reven of odd and even vertices respectively on side R of the triangle, and likewise
+Lodd, Leven, Bodd, Beven.
+4To see this note that HZH = X and (HS)†Z(HS) = Y .
+11
+
+--- PAGE 12 ---
+...
+...
+...
+B
+L
+R
+u
+w
+v
+Figure 2: We consider a cycle Γ of even length M and three vertices u, v, w such that all
+pairwise distances are even. The sides L, R, B may have unequal lengths.
+Let |ΦΓ⟩be the M-qubit graph state for Γ as in Eq. (3). For b = bubvbw ∈{0, 1}3
+deﬁne
+T (b) =
+n
+z ∈{0, 1}M : ⟨z|H⊗MSbu
+u Sbv
+v Sbw
+w |ΦΓ⟩̸= 0
+o
+.
+In other words T (b) describes the set of possible measurement outcomes if the qubits
+of |ΦΓ⟩in L ∪R ∪B are measured in the X basis and the qubits u, v, w are measured
+in the X or Y basis depending on b (as before, 0 and 1 bits of b indicate measurements
+in the X and Y basis respectively).
+For any two vertices j, k ∈Γ write distΓ(j, k) for the number of edges in the shortest
+path between them in Γ. Deﬁne
+D = min {distΓ(u, v), distΓ(v, w), distΓ(u, w)} .
+Our aim in this Section is to show (following Barrett et al. [20]) that the relationship
+between input b and output z ∈T (b) is geometrically nonlocal in the following sense.
+Lemma 3. Consider a classical circuit which takes as input a bit string b = bubvbw ∈
+{0, 1}3 and a random string r ∈{0, 1}ℓ(drawn from some distribution ρ) and outputs
+z ∈{0, 1}M. Suppose
+Prob [z ∈T (b)] > 7
+8.
+(18)
+Then the lightcone of one of the input bits bi ∈{bu, bv, bw} contains an output bit zq
+such that distΓ(i, q) ≥D/2.
+The authors of Ref. [20] showed that the correlations resulting from measuring
+the graph state |ΦΓ⟩cannot be reproduced by a “communication-assisted local hidden
+variable model”. In Lemma 3 we have phrased the result in terms of circuits.
+We shall prove the lemma momentarily. First we show that the set T (b) of possible
+measurement outcomes for the 1D graph state satisﬁes an identity similar to Eq. (17).
+It will be convenient to work with ±1-valued variables deﬁned by mj = (−1)zj for
+j ∈{1, 2, . . . , M}. Deﬁne the following products:
+mL =
+Y
+j∈Lodd
+mj
+mR =
+Y
+j∈Rodd
+mj
+mB =
+Y
+j∈Bodd
+mj
+mE =
+Y
+j∈Reven∪Leven∪Beven
+mj.
+(19)
+12
+
+--- PAGE 13 ---
+Claim 3. Let b = bubvbw ∈{0, 1}3 and suppose z ∈T (b). Then mRmBmL = 1.
+Moreover, if bu ⊕bv ⊕bw = 0 then
+ibu+bv+bwmumvmwmEmbu
+R mbv
+B mbw
+L = 1.
+(20)
+Proof. For any subset I ⊆[M] deﬁne operators
+X(I) =
+Y
+j∈I
+Xj
+and
+g(I) =
+Y
+j∈I
+gj.
+Recall that gj are stabilizers of the graph state |ΦΓ⟩deﬁned in Eq. (4) such that
+gj|ΦΓ⟩= |ΦΓ⟩for all j. First note that the operator X(Rodd ∪Lodd ∪Bodd) is in the
+stabilizer group of |ΦΓ⟩. Indeed, we have
+X(Rodd ∪Lodd ∪Bodd) = g(Rodd ∪Lodd ∪Bodd).
+Accordingly, |ΦΓ⟩is in the +1 eigenspace of this operator. Therefore a measurement
+of each qubit in Rodd ∪Lodd ∪Bodd in the X basis will result in outcomes mR, mL,
+mB satisfying mRmBmL = 1 as claimed. The four cases of Eq. (20) arise in the same
+way from the following elements of the stabilizer group of |ΦΓ⟩:
+(bubvbw = 000)
+XuXvXw · X
+ Reven ∪Leven ∪Beven
+
+= g({uvw} ∪Reven ∪Leven ∪Beven)
+(bubvbw = 110)
+−YuYvXw · X
+ R ∪B ∪Leven
+
+= g({uvw} ∪R ∪B ∪Leven)
+(bubvbw = 101)
+−YuXvYw · X
+ R ∪L ∪Beven
+
+= g({uvw} ∪R ∪L ∪Beven)
+(bubvbw = 011)
+−XuYvYw · X
+ B ∪L ∪Reven
+
+= g({uvw} ∪B ∪L ∪Reven).
+Proof of Lemma 3. To reach a contradiction let us suppose that the hypotheses of the
+lemma are satisﬁed but the conclusion does not hold. That is, let C be a classical
+circuit satisfying Eq. (18) and suppose that the lightcone LC(bu) only includes output
+bits zj where distΓ(u, j) ≤D/2−1 (and likewise for bv and bw). Therefore each output
+bit zj only depends on the random string r as well as the nearest input bit bu, bv or bw
+(if zj is equidistant to two of them it depends on neither).
+Write z = F(b, r) for the function which is computed by the circuit C. Below we
+show that for each r there exists a string b ∈{0, 1}3 such that F(b, r) /∈T (b). This
+implies that when r is chosen at random from some distribution ρ we have
+1
+8
+X
+b∈{0,1}3
+Probρ [F(b, r) ∈T (b)] = 1
+8 · Eρ
+
+#
+
+b ∈{0, 1}3 : F(b, r) ∈T (b)
+	 
+≤7
+8.
+which shows that Probρ [F(b, r) ∈T (b)] ≤7/8 for some b. Thus we arrive at a contra-
+diction, which is suﬃcient to prove the Lemma.
+It remains to show that for each r there exists a b such that F(b, r) /∈T (b). So let r
+be ﬁxed and consider z = F(b, r) as a function of b. Let mj = (−1)zj and consider the
+products deﬁned in Eq. (19) (as a function of b). Suppose ﬁrst that mRmBmL = −1 for
+13
+
+--- PAGE 14 ---
+some b0 ∈{0, 1}3. Then by Claim 3, F(b0, r) /∈T (b0) and we are done. Next suppose
+that mRmBmL = 1 for all b ∈{0, 1}3. Since each output bit zj is a function only of
+the nearest input bit bu, bv, bw and we are considering products of values (−1)zj, there
+exist aﬃne boolean functions e, f, g, h : {0, 1}3 →{0, 1} such that
+mumvmwmE = (−1)e(b)
+mR = (−1)f(b)
+mB = (−1)g(b)
+mL = (−1)h(b)
+and such that f(b) does not depend on bu, g(b) does not depend on bv, h(b) does not
+depend on bw, and f(b) ⊕g(b) ⊕h(b) = 0. Note that
+ibu+bv+bwmumvmwmEmbu
+R mbv
+B mbw
+L = ibu+bv+bw(−1)e(b)+f(b)bu+g(b)bv+h(b)bw.
+(21)
+The following Claim implies that Eq. (21) is not equal to +1 for all bit strings b with
+even hamming weight. Applying Claim 3 we see that this implies that F(b, r) /∈T (b)
+for some (even hamming weight) string b, completing the proof.
+Claim 4. Suppose e, f, g, h : {0, 1}3 →{0, 1} are aﬃne boolean functions.
+Write
+x = x1x2x3 ∈{0, 1}3. Suppose f(x) does not depend on x1, g(x) does not depend on
+x2, h(x) does not depend on x3, and that f(x) ⊕g(x) ⊕h(x) is independent of x. Then
+X
+x1⊕x2⊕x3=0
+ix1+x2+x3(−1)e(x)+f(x)x1+g(x)x2+h(x)x3 ≤2.
+A proof of Claim 4 is provided in Appendix B.
+4.2
+Proof of Theorem 2
+Proof. Let C ≡CN be a classical probabilistic circuit of fan-in ≤K which solves the
+2D Hidden Linear Function problem with probability > 7/8 on all instances of size N.
+That is, C takes as input vectors A, b as in Eq. (14) as well as a random bit string r
+drawn from some (arbitrary) distribution. The output of C is a bit string z which is a
+solution to the given instance with probability > 7/8.
+We suppose that the depth d of C satisﬁes
+d < 1
+8
+log(N)
+log(K).
+(22)
+Below we prove that for all suﬃciently large N (i.e., larger than some universal con-
+stant) this leads to a contradiction.
+Suppose j ∈V is a vertex of the N × N grid G = (V, E). Let Box(j) ⊆V be a
+square box of size ⌊N 1/2⌋× ⌊N 1/2⌋centered at vertex j. Each box deﬁnes a subset of
+output variables zk contained in this box. Choose square-shaped regions U, V, W ⊆V
+as shown in Figure 3. Let Veven ⊂V denote the set of vertices on the even sublattice
+of the grid. In other words Veven contains all vertices with even horizontal and vertical
+coordinates.
+Combining Eqs. (2,22) we get
+|LC(zi)| ≤Kd < N
+1
+8
+i ∈V.
+(23)
+This shows that all output bits have “small” lightcones. Next we shall identify large
+sets of input bits which also have small lightcones.
+14
+
+--- PAGE 15 ---
+W
+V
+U
+⌊N/3⌋
+⌊N/3⌋
+⌊N/3⌋
+⌊N/3⌋
+w
+u
+v
+⌊N1/2⌋
+j
+Box(j)
+Figure 3: Left: deﬁnition of the regions U, V, W. Right: deﬁnition of Box(j) and a possible
+choice of vertices u, v, w.
+For each region R ∈{U, V, W} deﬁne sets of good and bad vertices
+Good(R) = {v ∈R ∩Veven : |LC(bv)| ≤N
+1
+4}
+(24)
+Bad(R) = {R ∩Veven} \ Good(R).
+(25)
+Claim 5. For R ∈{U, V, W} we have
+|Good(R)| = Ω(N 2).
+(26)
+Proof. Deﬁne a bipartite graph with one side of the partition labeled by input bits bv
+with v ∈R ∩Veven and the other side labeled by outputs zj with j ∈V . An edge
+between zj and bv is present iﬀbv ∈LC(zj). The total number of edges J in this graph
+satisﬁes
+|Bad(R)|N
+1
+4 ≤J ≤|V | · max
+i∈V |LC(zi)| ≤N
+17
+8 ,
+where we used |V | = N 2 and Eq. (23). Rearranging gives |Bad(R)| ≤N
+15
+8 . Since
+|R ∩Veven| = Θ(N 2) we get
+|Good(R)| = |R ∩Veven| −|Bad(R)| = Ω(N 2).
+Claim 6. For all large enough N one can choose a triple of vertices u, v, w such that
+u ∈Good(U), v ∈Good(V), w ∈Good(W) and
+Box(u) ⊆U,
+Box(v) ⊆V,
+Box(w) ⊆W,
+(27)
+LC(bu) ∩Box(v) = ∅,
+LC(bu) ∩Box(w) = ∅
+(28)
+LC(bv) ∩Box(u) = ∅,
+LC(bv) ∩Box(w) = ∅
+(29)
+LC(bw) ∩Box(u) = ∅,
+LC(bw) ∩Box(v) = ∅.
+(30)
+15
+
+--- PAGE 16 ---
+Proof. Since each vertex in the grid belongs to at most N boxes, we infer that a given
+lightcone LC(bu) with u ∈Good(U) can intersect with at most N|LC(bu)| ≤N
+5
+4 boxes.
+Here we used the fact that |LC(bu)| ≤N
+1
+4 for all u ∈Good(U) by deﬁnition. The total
+number of vertices v ∈Good(V) such that Box(v) ⊆V is Ω(N 2), which follows from
+Eq. (26) (and since the number of vertices q ∈V with Box(q) ̸⊆V is o(N 2) as any such
+vertex q must lie near the boundary of region V). Thus if u, v, w are picked uniformly
+at random from the sets Good(U), Good(V) and Good(W) respectively subject to
+Eq. (27) then
+Prob[LC(bu) ∩Box(v) ̸= ∅] ≤O
+ 
+N
+5
+4
+N 2
+!
+< 1
+6
+for large enough N. A similar bound applies to the ﬁve other combinations of vertices
+that appear in Eqs. (28,29,30). By the union bound, there exists at least one choice of
+u, v, w that satisﬁes all conditions Eqs. (27,28,29,30).
+Below we consider cycles Γ that are subgraphs of the grid G.
+Claim 7. The following holds for all suﬃciently large N. Fix some triple of vertices
+u ∈Good(U), v ∈Good(V), w ∈Good(W) satisfying Eqs. (27,28,29,30).
+Then
+there exists a cycle Γ containing u, v, w such that the lightcones LC(bu), LC(bv), LC(bw)
+contain no vertices of Γ lying outside of Box(u) ∪Box(v) ∪Box(w).
+w
+u
+v
+γ(u, v)
+γ(v, w)
+γ(u, w)
+Figure 4: Pairwise disjoint paths γ connecting the boxes Box(u), Box(v), Box(w).
+The
+number of paths connecting each pair of boxes is ⌊N1/2⌋.
+Proof. Indeed, since each box has size ⌊N 1/2⌋×⌊N 1/2⌋, one can choose ⌊N 1/2⌋pairwise
+disjoint paths γ that connect any pair of boxes Box(u), Box(v), Box(w), see Figure 4.
+Let γ(a, b) be a path connecting Box(a) and Box(b), where a ̸= b ∈{u, v, w}. Any
+triple of paths γ(u, v), γ(v, w), γ(u, w) can be completed to a cycle Γ that contains
+u, v, w by adding the missing segments of the cycle inside the boxes Box(u), Box(v),
+Box(w). Since LC(bu) has size at most N
+1
+4 (recall that u is a good vertex) and each
+vertex q ∈V belongs to at most one path γ, we infer that LC(bu) intersects with at
+16
+
+--- PAGE 17 ---
+most N
+1
+4 paths γ. Thus if we pick the path γ(u, v) uniformly at random among all
+⌊N 1/2⌋possible choices then
+Prob[LC(bu) ∩γ(u, v) ̸= ∅] ≤
+N
+1
+4
+⌊N 1/2⌋< 1
+9
+for large enough N. The same bound applies to eight remaining combinations of a
+lightcone LC(bu), LC(bv), LC(bw) and a path γ. By the union bound, there exists at
+least one triple of paths γ(u, v), γ(v, w), γ(u, w) that do not intersect with LC(bu),
+LC(bv), LC(bw). This gives the desired cycle Γ.
+Let u, v, w and Γ be chosen as described in Claim 7. Let M be the number of
+vertices in Γ. Recall that u, v, w ∈Veven and therefore all pairwise distances between
+them along Γ are even. Consider the subset of instances (A, b) of the 2D Hidden Linear
+Function problem where
+Ae =
+(
+1
+if e is an edge of Γ
+0
+otherwise.
+and
+bj = 0
+if
+j ∈V \ {u, v, w}.
+(31)
+There are 8 such instances corresponding to choices of input bits bu, bv, bw ∈{0, 1}. By
+ﬁxing inputs to the circuit C in this way and looking only at output bits zj with j ∈Γ
+we obtain a classical circuit D which takes a three-bit string bubvbw ∈{0, 1}3 and a
+random string r as input and outputs zΓ ∈{0, 1}M. For any input bit bi ∈{bu, bv, bw}
+we have
+LD(bi) ⊆LC(bi)
+(32)
+since any pair of input/output variables which are correlated in D are by deﬁnition
+also correlated in C. Our assumption that C solves the 2D Hidden Linear Function
+problem with probability greater than 7/8 implies
+Prob
+h
+⟨zΓ|H⊗MSbu
+u Sbv
+v Sbw
+w |ΦΓ⟩̸= 0
+i
+> 7
+8.
+(33)
+To see this, recall from Lemma 2 that the circuit from Fig. 1 produces a uniformly
+random solution to the 2D Hidden Linear Function problem, and that the state of
+output qubits in Γ after applying the circuit to inputs A, b as in Eq. (31) is
+H⊗MSbu
+u Sbv
+v Sbw
+w |ΦΓ⟩.
+Using Eq. (33) and applying Lemma 3 with the cycle Γ constructed above we infer
+that the lightcone LD(bi) of one of the input bits bi ∈{bu, bv, bw} contains at least one
+output bit zj such that j ∈Γ and the distance between i and j along the cycle Γ is
+Ω(N). By Eq. (32) the same is true for the lightcone LC(bi). For all suﬃciently large
+N this contradicts Claims 6,7. Indeed, by Claim 7, the vertex j ∈LC(bi) ∩Γ must lie
+in one of Box(u), Box(v) or Box(w), and since LC(bi) has no intersection with Box(k)
+(i ̸= k) by Claim 6, this implies that j ∈Box(i). But the distance from i to any vertex
+inside Box(i) is ≤N 1/2. We conclude that Eq. (22) is false for all suﬃciently large
+N.
+17
+
+--- PAGE 18 ---
+5
+Conclusions and open problems
+We have shown that shallow quantum circuits are more powerful than their classical
+counterparts. Our work raises several questions:
+Does the 2D Hidden Linear Function problem resist simulation by more powerful
+classical circuit families such as AC0 (constant-depth circuits with unbounded fan-in)?
+The constant 7/8 appearing in Theorem 2 is unlikely to be optimal–can it be replaced
+by a vanishing function of N? A recursive variant of the Bernstein-Vazirani problem
+is known to provide a superpolynomial speedup in query complexity [17]. Is there any
+use in deﬁning a recursive variant of the Hidden Linear Function problem?
+A challenging open question is to establish a separation between the power of quan-
+tum and classical circuits for sampling problems. Let Un be a (unitary implemented
+by a) n-qubit quantum circuit and consider the output probability distribution
+ρn(z) = |⟨z|Un|0n⟩|2.
+Does there exist a constant-depth family of quantum circuits {Un} which sample dis-
+tributions ρn that cannot be sampled by constant-depth classical circuits? A powerful
+tool that might be used to address this question is given in Ref. [37]. In particular,
+the author shows that any distribution over n-bit strings with linear min-entropy (i.e.,
+˜Θ(n)) which is generated by applying a constant-depth classical circuit to a uniformly
+random input string can be expressed as a convex combination of simple distributions
+(“bit-block sources”) with linear min-entropy. We do not know if the distributions
+sampled by constant-depth quantum circuits have this property.
+Acknowledgments
+SB and DG acknowledge support from the IBM Research Frontiers Institute. RK is
+supported by the Technische Universit¨at M¨unchen – Institute for Advanced Study,
+funded by the German Excellence Initiative and the European Union Seventh Frame-
+work Programme under grant agreement no. 291763.
+A
+Proof of Claim 2
+Proof. Deﬁne a function J : Fn
+2 × Fn
+2 →Z4
+J(x, y) = q(x ⊕y) −q(x) −q(y),
+x, y ∈Fn
+2.
+(34)
+Let us show that J(x, y) is a bilinear form, that is, there exists a symmetric binary
+matrix B such that
+J(x, y) = 2
+n
+X
+α,β=1
+Bα,βxαyβ
+(35)
+for all x, y. Indeed, a direct inspection of Eq. (5) shows that q(x) obeys the following
+identity5:
+q(x ⊕y ⊕z) −q(x ⊕y) −q(y ⊕z) −q(z ⊕x) + q(x) + q(y) + q(z) = 0
+(36)
+5By linearity, it suﬃces to check this identity for the special cases q(x) = 2xαxβ and q(x) = xα.
+18
+
+--- PAGE 19 ---
+for all x, y, z. The above expression can be viewed as as a discrete version of the third
+derivative of q which vanishes because q is a quadratic form. Combining Eqs. (34,36)
+one gets
+J(x ⊕y, z) = J(x, z) + J(y, z)
+(37)
+for all x, y, z. Choosing x = y gives 0 = 2J(x, z), that is, the function J(x, z) takes
+values 0, 2 and we can write J(x, y) = 2J′(x, y), where J′(x, y) takes values in Z2. By
+deﬁnition, J′(x, y) = J′(y, x) and J′(x ⊕y, z) = J′(x, z) ⊕J′(y, z) for all x, y, z. This
+is possible only if J′(x, y) is a symmetric bilinear form over the binary ﬁeld, that is,
+J′(x, y) = xT By (mod 2) for some symmetric binary matrix B. This proves Eq. (35).
+The deﬁnition of Lq and Eqs. (34,35) imply that
+Lq = ker (B)
+(38)
+which gives
+ker(B) ∩K = 0,
+(39)
+see Eq. (12). We claim that for any z ∈Fn
+2 there exists a vector w ∈K such that
+zT x = wT Bx
+for all
+x ∈K.
+(40)
+Indeed, note that (X ∩Y)⊥= X ⊥+ Y⊥for any linear subspaces X, Y ⊆Fn
+2. Let
+Im(B) ≡span{Bx : x ∈Fn
+2}. Using the identity
+ker (B)⊥= Im(BT ) = Im(B)
+and taking the dual of Eq. (39) gives
+Im(B) + K⊥= Fn
+2
+(41)
+Choose any vector z ∈Fn
+2 and write it as
+z = u ⊕v,
+where
+u ∈Im(B)
+and
+v ∈K⊥.
+This is always possible due to Eq. (41). Let u = Bu′ for some u′ ∈Fn
+2. From Eq. (12)
+we infer that u′ = w ⊕w′ for some w ∈K and w′ ∈Lq. Putting together the above
+facts we see that any vector z ∈Fn
+2 can be written as
+z = Bu′ ⊕v = B(w ⊕w′) ⊕v,
+where
+w ∈K,
+w′ ∈Lq,
+v ∈K⊥.
+Note that Bw′ = 0 due to Eq. (38). Thus zT x = wT Bx for all x ∈K, as claimed in
+Eq. (40). From Eq. (40) one gets
+(−1)zT x · iq(x) = (−1)wT Bx · iq(x) = iJ(w,x)+q(x) = iq(w⊕x)−q(w)
+for all x ∈K.
+Therefore
+Γ(K, z) =
+X
+x∈K
+(−1)zT x · iq(x) = i−q(w) ·
+X
+x∈K
+iq(w⊕x) = i−q(w) ·
+X
+x∈K
+iq(x).
+This shows that the absolute value of Γ(K, z) does not depend on z. Let C ≡|Γ(K, z)|2.
+Combining Eqs. (11,13) and Claim 1 one gets
+1 =
+X
+z∈Fn
+2
+p(z) = |L⊥
+q | · |Lq|2 · C
+4n
+= |Lq| · C
+2n
+,
+which proves the claim.
+19
+
+--- PAGE 20 ---
+B
+Proof of Claim 4
+Proof. Write
+e(x) = e0 ⊕e1x1 ⊕e2x2 ⊕e3x3
+e0, e1, e2, e3 ∈{0, 1}
+(42)
+f(x) = f0 ⊕f2x2 ⊕f3x3
+f0, f2, f3 ∈{0, 1}
+(43)
+g(x) = g0 ⊕g1x1 ⊕g3x3
+g0, g1, g3 ∈{0, 1}
+(44)
+h(x) = h0 ⊕h1x1 ⊕h2x2.
+h0, h1, h2 ∈{0, 1}
+(45)
+The fact that f(x) ⊕g(x) ⊕h(x) is a constant function implies
+f2 ⊕h2 = f3 ⊕g3 = g1 ⊕h1 = 0.
+(46)
+We have
+f(x)x1 + g(x)x2 + h(x)x3
+= f0x1 + g0x2 + h0x3 + (f2 + g1)x1x2 + (f3 + h1)x1x3 + (g3 + h2)x2x3. (47)
+For all x satisfying x1 ⊕x2 ⊕x3 = 0 we have x1x3 = x1x2 ⊕x1 and x2x3 = x1x2 ⊕x2.
+Using this fact and Eqs.(47), (46) we get
+(−1)f(x)x1+g(x)x2+h(x)x3 = (−1)(f0+f3+h1)x1+(g0+g3+h2)x2+h0x3
+whenever x1 ⊕x2 ⊕x3 = 0. Noting that the exponent on the right hand side is an
+aﬃne boolean function, and that e(x) is also an aﬃne boolean function we get
+X
+x1⊕x2⊕x3=0
+ix1+x2+x3(−1)e(x)+f(x)x1+g(x)x2+h(x)x3
+≤
+max
+w∈{0,1}4
+X
+x1⊕x2⊕x3=0
+ix1+x2+x3(−1)w0+w1x1+w2x2+w3x3 (48)
+≤2
+Since each summand in Eq. (48) is ±1, the last line is equivalent to the statement that
+the sum is strictly less than 4, which follows from the fact that the following system of
+equations over F2 has no solution:
+w0 = 0
+w1 ⊕w2 = 1
+w1 ⊕w3 = 1
+w2 ⊕w3 = 1.
+(49)
+(Note that Eq. (49) would be necessary for Eq. (48) to be equal to 4, as can be seen
+by considering x = x1x2x3 ∈{000, 110, 101, 011}.)
+References
+[1] Laszlo Csanky. Fast parallel matrix inversion algorithms. SIAM Journal on Com-
+puting, 5(4):618–623, 1976.
+[2] Allan Borodin, Joachim Von Zur Gathen, and John Hopcroft. Fast parallel matrix
+and gcd computations. Information and Control, 52(3):241–256, 1982.
+[3] Sanjeev Arora and Boaz Barak. Computational complexity: a modern approach.
+Cambridge University Press, 2009.
+20
+
+--- PAGE 21 ---
+[4] Barbara M Terhal and David P DiVincenzo.
+Adaptive quantum computation,
+constant depth quantum circuits and Arthur-Merlin games. Quant. Inf. Comp.,
+4(2):134–145, 2004.
+[5] Juan Bermejo-Vega, Dominik Hangleiter, Martin Schwarz, Robert Raussendorf,
+and Jens Eisert.
+Architectures for quantum simulation showing quantum
+supremacy. arXiv preprint arXiv:1703.00466, 2017.
+[6] Michael J Bremner, Ashley Montanaro, and Dan J Shepherd.
+Average-case
+complexity versus approximate simulation of commuting quantum computations.
+Physical Review Letters, 117(8):080501, 2016.
+[7] Michael J Bremner, Ashley Montanaro, and Dan J Shepherd. Achieving quan-
+tum supremacy with sparse and noisy commuting quantum computations. arXiv
+preprint arXiv:1610.01808, 2016.
+[8] Edward Farhi and Aram W Harrow. Quantum supremacy through the quantum
+approximate optimization algorithm. arXiv preprint arXiv:1602.07674, 2016.
+[9] Xun Gao, Sheng-Tao Wang, and Lu-Ming Duan. Quantum supremacy for simulat-
+ing a translation-invariant Ising spin model. Physical Review Letters, 118:040502,
+2017.
+[10] Richard Cleve and John Watrous. Fast parallel circuits for the quantum Fourier
+transform. In Foundations of Computer Science, 2000. Proceedings. 41st Annual
+Symposium on, pages 526–536. IEEE, 2000.
+[11] Kristan Temme, Sergey Bravyi, and Jay M Gambetta. Error mitigation for short
+depth quantum circuits. arXiv preprint arXiv:1612.02058, 2016.
+[12] Ying Li and Simon C Benjamin. Eﬃcient variational quantum simulator incorpo-
+rating active error minimisation. arXiv preprint arXiv:1611.09301, 2016.
+[13] Sergio Boixo, Sergei V Isakov, Vadim N Smelyanskiy, Ryan Babbush, Nan Ding,
+Zhang Jiang, John M Martinis, and Hartmut Neven.
+Characterizing quantum
+supremacy in near-term devices. arXiv preprint arXiv:1608.00263, 2016.
+[14] Daniel Gottesman.
+What is the overhead required for fault tolerance?
+arXiv
+preprint arXiv:1310.2984, 2013.
+[15] H´ector Bomb´ın. Gauge color codes: optimal transversal gates and gauge ﬁxing in
+topological stabilizer codes. New Journal of Physics, 17(8):083002, 2015.
+[16] Fernando Pastawski, Alastair Kay, Norbert Schuch, and Ignacio Cirac. How long
+can a quantum memory withstand depolarizing noise? Physical Review Letters,
+103(8):080501, 2009.
+[17] Ethan Bernstein and Umesh Vazirani. Quantum complexity theory. SIAM Journal
+on Computing, 26(5):1411–1473, 1997.
+[18] David Mermin. Extreme quantum entanglement in a superposition of macroscop-
+ically distinct states. Physical Review Letters, 65(15):1838, 1990.
+[19] Daniel M Greenberger, Michael A Horne, Abner Shimony, and Anton Zeilinger.
+Bell’s theorem without inequalities. American Journal of Physics, 58(12):1131–
+1143, 1990.
+21
+
+--- PAGE 22 ---
+[20] Jonathan Barrett, Carlton M Caves, Bryan Eastin, Matthew B Elliott, and Ste-
+fano Pironio. Modeling Pauli measurements on graph states with nearest-neighbor
+classical communication. Physical Review A, 75(1):012103, 2007.
+[21] Robert Raussendorf and Hans J Briegel. A one-way quantum computer. Physical
+Review Letters, 86(22):5188, 2001.
+[22] Hans J Briegel and Robert Raussendorf.
+Persistent entanglement in arrays of
+interacting particles. Physical Review Letters, 86(5):910, 2001.
+[23] David Deutsch and Richard Jozsa. Rapid solution of problems by quantum com-
+putation. In Proceedings of the Royal Society of London A: Mathematical, Physical
+and Engineering Sciences, volume 439, pages 553–558. The Royal Society, 1992.
+[24] Alp Atıcı and Rocco A Servedio. Quantum algorithms for learning and testing
+juntas. Quantum Information Processing, 6(5):323–348, 2007.
+[25] Scott Aaronson. BQP and the polynomial hierarchy. In Proceedings of the forty-
+second ACM symposium on Theory of computing, pages 141–150. ACM, 2010.
+[26] Dmitry Gavinsky, Martin Roetteler, and J´er´emie Roland. Quantum algorithm for
+the boolean hidden shift problem. In International Computing and Combinatorics
+Conference, pages 158–167. Springer, 2011.
+[27] Andrew W Cross, Graeme Smith, and John A Smolin. Quantum learning robust
+against noise. Physical Review A, 92(1):012327, 2015.
+[28] Martin R¨otteler.
+Quantum algorithms to solve the hidden shift problem for
+quadratics and for functions of large gowers norm. In International Symposium on
+Mathematical Foundations of Computer Science, pages 663–674. Springer, 2009.
+[29] Scott Aaronson and Lijie Chen. Complexity-theoretic foundations of quantum
+supremacy experiments. arXiv preprint arXiv:1612.05903, 2016.
+[30] Cristopher Moore and Martin Nilsson. Parallel quantum computation and quan-
+tum codes. SIAM Journal on Computing, 31(3):799–815, 2001.
+[31] Peter Hoyer and Robert Spalek. Quantum fan-out is powerful. Theory of comput-
+ing, 1(5):83–101, 2005.
+[32] Dan Browne, Elham Kasheﬁ, and Simon Perdrix.
+Computational depth com-
+plexity of measurement-based quantum computation. In Conference on Quantum
+Computation, Communication, and Cryptography, pages 35–46. Springer, 2010.
+[33] Scott Aaronson. Quantum computing, postselection, and probabilistic polynomial-
+time. In Proceedings of the Royal Society of London A: Mathematical, Physical
+and Engineering Sciences, volume 461, pages 3473–3482. The Royal Society, 2005.
+[34] Lior Eldar and Aram W Harrow. Local hamiltonians whose ground states are
+hard to approximate. arXiv preprint arXiv:1510.02082, 2015.
+[35] Scott Aaronson and Daniel Gottesman. Improved simulation of stabilizer circuits.
+Physical Review A, 70(5):052328, 2004.
+[36] Matthew Amy, Dmitri Maslov, Michele Mosca, and Martin Roetteler. A meet-
+in-the-middle algorithm for fast synthesis of depth-optimal quantum circuits.
+IEEE Transactions on Computer-Aided Design of Integrated Circuits and Sys-
+tems, 32(6):818–830, 2013.
+22
+
+--- PAGE 23 ---
+[37] Emanuele Viola. Extractors for circuit sources. SIAM Journal on Computing,
+43(2):655–672, 2014.
+23

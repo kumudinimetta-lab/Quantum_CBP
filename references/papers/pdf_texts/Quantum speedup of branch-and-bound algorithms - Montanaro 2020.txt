@@ -1,0 +1,1483 @@
+
+--- PAGE 1 ---
+Quantum speedup of branch-and-bound algorithms
+Ashley Montanaro1
+1School of Mathematics, University of Bristol, Bristol, UK.∗
+Branch-and-bound is a widely used technique for solving combinatorial optimisation problems where one has
+access to two procedures: a branching procedure that splits a set of potential solutions into subsets, and a cost
+procedure that determines a lower bound on the cost of any solution in a given subset. Here we describe a quan-
+tum algorithm that can accelerate classical branch-and-bound algorithms near-quadratically in a very general
+setting. We show that the quantum algorithm can ﬁnd exact ground states for most instances of the Sherrington-
+Kirkpatrick model in time O(20.226n), which is substantially more efﬁcient than Grover’s algorithm.
+Quantum computers can solve certain problems, such as
+simulation of quantum-mechanical systems [20] and integer
+factorisation [41], exponentially faster than the best classical
+algorithms known.
+As well as these special-purpose algo-
+rithms, there are general-purpose quantum algorithms which
+can outperform their classical counterparts more modestly for
+a wide range of problems within the domains of constraint sat-
+isfaction and optimisation [32]. A famous example is Grover’s
+algorithm for unstructured search [21], which can be applied
+to ﬁnd the minimal value in a set of size N with O(
+√
+N) eval-
+uations of values in the set [17]. This algorithm achieves a
+quadratic speedup over exhaustive classical search. However,
+for many problems encountered in practice, there are more
+efﬁcient classical algorithms than exhaustive search, which
+take advantage of the structure of the problem.
+This can
+apply to NP-complete problems, which are expected not to
+have polynomial-time algorithms, yet which can sometimes
+be solved surprisingly efﬁciently in practice.
+One of the most successful general approaches to solving
+constrained optimisation problems is known as branch-and-
+bound. This approach can be applied to problems where the
+goal is to ﬁnd a minimal-cost valid solution, in a setting where
+one has access to two functions: a bounding function cost
+that, for a given subset of the set of possible solutions, returns
+a lower bound on the cost of any valid solution in that sub-
+set; and a branching rule branch to be applied if a subset
+of possible solutions cannot yet be ruled out, which will di-
+vide that subset into two or more “live” subsets to be explored
+in later iterations. Then the branch-and-bound approach ex-
+plores subsets of potential solutions, ruling out those where
+the cost of any valid solution is too high (e.g. higher than the
+lowest cost of a valid solution found so far). The goal is to use
+this additional information to avoid exploring every possible
+solution. Clearly, this approach can equivalently be applied to
+problems where the goal is to maximise the value of a valid
+solution.
+Although the number of subsets produced by the branching
+steps can grow exponentially, implying an exponential run-
+ning time, algorithms based on this technique can sometimes
+ﬁnd exact solutions to instances of hard optimisation problems
+substantially beyond the reach of unstructured search. For ex-
+ample, integer linear programming problems can be solved
+∗ashley.montanaro@bristol.ac.uk
+using a branch-and-bound approach where the cost function
+is based on relaxing to linear programming problems (see Ap-
+pendix A for more details).
+Here we describe a general quantum approach to accelerate
+classical branch-and-bound algorithms almost quadratically.
+The quantum branch-and-bound algorithm can be applied to
+speed up any classical algorithm that ﬁts into the branch-and-
+bound paradigm (formally deﬁned below). These include al-
+gorithms for integer linear programming; nonlinear program-
+ming; the travelling salesman problem; and more [30].
+The quantum algorithm is based on quantum subroutines
+that speed up a related class of classical algorithms: back-
+tracking algorithms [2, 33]. Backtracking is an approach that
+solves constraint satisfaction problems given the ability to de-
+termine whether a partial solution to the problem could be ex-
+tended to a full solution. Backtracking algorithms can be in-
+terpreted as the special case of branch-and-bound algorithms
+where the cost function either returns 0 (for a valid solution
+to the problem) or ∞(for an invalid potential solution, or a
+partial solution that cannot be extended to a full solution), so
+the algorithm described here can be seen as generalising the
+results of [2, 33].
+This result contrasts with other quantum approaches to
+solve hard optimisation problems, such as the adiabatic al-
+gorithm [19] and the quantum approximate optimisation algo-
+rithm [18], in that the branch-and-bound algorithm guarantees
+to ﬁnd the minimal-cost solution with arbitrarily high proba-
+bility; however, for certain problems its running time can be
+long (e.g. exponential in the input size).
+One area where branch-and-bound algorithms have been
+successfully applied classically is ﬁnding ground states of
+spin models [22, 28, 35, 36]. For example, branch-and-bound
+has been used to ﬁnd the largest exact ground states known
+of instances of the Bernasconi model [8], corresponding to
+binary sequences with minimal autocorrelation. The fastest
+known branch-and-bound algorithms for this model have run-
+time estimated numerically as approximately O(20.79n) [35];
+the quantum branch-and-bound algorithm would improve this
+scaling to approximately O(20.4n).
+Another spin model addressed using branch-and-bound is
+the well-studied Sherrington-Kirkpatrick (S-K) model [40],
+which is the family of classical Hamiltonians H(x)
+=
+P
+1≤i<j≤n aijxixj where x ∈{±1}n and aij are distributed
+according to the normal distribution N(0, 1).
+Finding the
+lowest-energy state for such a Hamiltonian can be achieved
+arXiv:1906.10375v1  [cs.DS]  25 Jun 2019
+
+--- PAGE 2 ---
+2
+in time O(2n/2 poly(n)) using Grover’s algorithm. Recently,
+Callison et al. [12] have described an intriguing quantum al-
+gorithm that uses quantum walks to solve the S-K model, and
+gave evidence based on numerical experiments for small n
+that the runtime of the algorithm should be approximately
+O(20.41n). Here we apply the quantum branch-and-bound al-
+gorithm to speed up a simple classical branch-and-bound al-
+gorithm [22] for the S-K model, and show rigorously that the
+runtime of the quantum algorithm is O(20.226n) on most in-
+stances of size n, which is substantially more efﬁcient than
+Grover search. Numerical evidence suggests that the runtime
+in practice could be as low as O(20.186n).
+Branch-and-cut methods have also been used to ﬁnd ground
+states of spin glasses [36]; these could be accelerated using the
+same quantum approach.
+Model for branch-and-bound algorithms. For a problem
+to be accessible to branch-and-bound, we must have access to
+cost and branch procedures. Each takes as input a sub-
+set S of potential solutions to an optimisation problem, per-
+haps chosen from a restricted family of subsets. cost(S)
+returns a lower bound on the cost of any solution within S.
+branch(S) either returns that S only contains one element,
+or splits S into two or more disjoint sets S1, . . . , Sk. For sim-
+plicity, here we assume that k is a ﬁxed constant. For the be-
+haviour of cost to be reasonable, we must have cost(S) ≥
+cost(S′) whenever S ⊆S′. We assume that for all sub-
+sets S, either cost(S) ∈[0, cmax] for some known cmax, or
+cost(S) = ∞, where the latter corresponds to S containing
+no valid solutions. We can assume essentially without loss of
+generality that cost is integer-valued; real-valued cost func-
+tions can be handled by truncating their output to precision δ,
+and multiplying all costs by 1/δ. In this situation cmax effec-
+tively acts as a precision parameter.
+An abstraction of the problem of ﬁnding a minimal-cost so-
+lution to a problem given access to the cost and branch
+procedures is the following model of search within trees [24],
+illustrated in Figure 1. The search space is described by a
+rooted tree where each node v is either labelled with an integer
+c(v) between 0 and cmax or with ∞, and satisﬁes the promise
+that if w is a child of v, then c(w) ≥c(v). We are given query
+access to two oracles, each of which takes as input a node v.
+One oracle returns c(v) and the other returns the children of v,
+if there are any. The goal is to ﬁnd a leaf node v such that c(v)
+is minimised, while making the minimal number of queries.
+In this abstraction, a node in the tree represents a subset of
+possible solutions (with a leaf representing a single possible
+solution), and its label represents a lower bound on the cost of
+any solution in that subset. A label of ∞represents that there
+is no valid solution in that subset. Revealing the children of a
+node corresponds to splitting a set of potential solutions into
+subsets. Note that the backtracking approach for solving con-
+straint satisfaction problems corresponds to exploring a tree
+of this form where each node is labelled either with 0 or ∞.
+The best classical strategy for solving the search problem
+in such a tree is to maintain a list of “live” nodes (those whose
+children have not yet been explored), and always to choose to
+explore the live node with the lowest cost [24]. This strategy is
+1
+1
+3
+∞
+2
+3
+5
+7
+∞
+6
+4
+6
+8
+FIG. 1. An example tree corresponding to a branch-and-bound al-
+gorithm. Nodes are labelled with their cost bounds, which are non-
+decreasing on any path from the root to a leaf. The green node is the
+optimal solution; yellow nodes are removed if the tree is truncated at
+the optimal cost.
+known as best-ﬁrst search. Although it is optimal in terms of
+query complexity, it may require a very large amount of space
+to store the list of live nodes, so in practice other strategies
+may be preferred (such as depth-ﬁrst search); strategies which
+achieve near-optimal query complexity in limited space are
+known [24].
+We will consider particular subtrees of the overall tree, ob-
+tained by truncating it at a particular cost c, i.e. deleting all
+nodes whose labels are greater than c. This is equivalent to
+changing the cost function to a cost’ function such that
+cost’(x) = ∞if cost(x) > c. This transformation clearly
+preserves the tree structure and the monotonicity of the cost
+function. We also have that truncating the tree at a cost cmin
+equal to the minimal cost of a valid solution preserves the
+presence of a minimal-cost valid solution in the tree.
+As observed by Karp and Zhang [25], this kind of trunca-
+tion controls the complexity of a class of classical search al-
+gorithms: Any algorithm which outputs all the minimal-cost
+leaves must explore the entire tree truncated at cost cmin. Oth-
+erwise, it could not be sure that it had found all the minimal-
+cost leaves. In particular, if all solutions have distinct costs,
+any algorithm which outputs the minimal-cost solution must
+explore the whole tree truncated at that cost.
+Statement of results. We can now state our main result.
+Let T be the tree corresponding to a branch-and-bound algo-
+rithm A. Let d be the depth of T , let cmin be the minimal cost
+of a valid solution, and let Tmin be the size of the truncated
+tree with cost bound cmin. (If there is no solution, cmin = ∞,
+and Tmin is the size of the whole tree T .) Fix a constant ϵ > 0.
+Then there is a quantum algorithm which uses
+eO
+p
+Tmind3/2 log cmax
+
+calls to cost and branch, and except with failure proba-
+bility at most ϵ, returns a solution with minimal cost, if one
+exists, and otherwise returns “no solution”. The eO notation
+hides polylogarithmic factors in d, 1/ϵ and log cmax.
+Assuming that Tmin ≫poly(d), Tmin ≫log cmax, this
+is roughly a quadratic speedup over any possible classical
+branch-and-bound search algorithm which ﬁnds all minimal-
+cost solutions in the tree corresponding to A, whose complex-
+ity (as discussed above) is lower-bounded by Tmin. In the
+
+--- PAGE 3 ---
+3
+usual case where there is a unique minimal-cost solution, the
+speedup is approximately quadratic over any possible classi-
+cal branch-and-bound algorithm (i.e. one that uses only the
+cost and branch procedures).
+Quantum branch-and-bound algorithm. In order to state
+the quantum branch-and-bound algorithm, we will need two
+quantum-algorithmic ingredients. Both relate to determining
+properties of trees, in a model where only the root node is
+known in advance, and the structure of the tree can only be re-
+vealed via “oracle” queries to nodes. A query to a node reveals
+the neighbours of the node and whether the node is marked.
+This model disallows the straightforward use of methods such
+as Grover’s algorithm to search in the tree.
+The ﬁrst ingredient is quantum tree search.
+It follows
+from [6, 7, 33] that there is a quantum algorithm which, given
+ϵ and oracle access to a tree with depth at most d, T nodes and
+maximal degree k = O(1), makes
+O
+√
+Td3/2 log d log(1/ϵ)
+
+(1)
+queries and performs O(1) other elementary operations per
+query, and except with failure probability at most ϵ:
+• If the tree contains at least one marked node, the algo-
+rithm returns the label of a marked node;
+• If the tree does not contain any marked nodes, the algo-
+rithm returns “not found”.
+Jarret and Wan have described an algorithm [23] which
+solves the same tree search problem with complexity bounded
+by O(
+√
+Td log4(md) log(m/ϵ)), where m is the number of
+marked nodes. This is an improvement on (1) by up to a fac-
+tor of almost d when m is small. However, if m is very large
+(e.g. exponential in n), this complexity bound can be larger
+than (1). Here, we will need to apply quantum tree search in
+a setting where we have no upper bound on m, which could
+be as large as T, which in turn can be exponentially large in
+n. So we will state complexity bounds based on (1), though in
+some cases (e.g. when T is small) the algorithm of Jarret and
+Wan may be more efﬁcient.
+When we use the quantum tree search algorithm we will
+have access to an upper bound on the size of the tree. Al-
+though, as stated above, having access to such an upper bound
+is not necessary, it can be seen by inspecting the proof of
+correctness in [33] that the algorithm is simpliﬁed somewhat
+given this additional information. However, this does not af-
+fect its asymptotic complexity.
+The second ingredient we will need is quantum tree size
+estimation [2]. The quantum tree size estimation algorithm,
+given query access to a tree with depth at most d, T nodes and
+maximal degree k = O(1), and parameters T0, ϵ, δ, makes
+O
+√T0d
+δ3/2 log2(1/ϵ)
+
+queries and performs O(log T0) other elementary operations
+per query, and except with failure probability at most ϵ:
+1. Set T ←1, cold ←0, ϵ′ ←ϵ/(Kd log2 cmax) for some
+sufﬁciently large constant K.
+2. While T ≤Tmax:
+(a) If T > Tmax/2, cnew ←cmax. Otherwise, set
+cnew ←0 and for i = 1 to log2 cmax:
+i. If Countcnew+cmax/2i(T, ϵ′, 1/2) does not re-
+turn “contains more than T
+nodes”, set
+cnew ←cnew + cmax/2i.
+(b) Run Searchcnew(ϵ′). If it returns the label of a solu-
+tion, use binary search on c between cold and cnew
+within Searchc(ϵ′) to ﬁnd the minimal c such that a
+solution with cost c exists, and return that solution.
+(c) Set T ←2T, cold ←cnew.
+3. Return “no solution”
+Algorithm 2. Quantum branch-and-bound algorithm with failure pa-
+rameter ϵ.
+• If T ≤T0/(1 + δ), the algorithm outputs eT ≤T0 such
+that | eT −T| ≤δT;
+• If T > (1+δ)T0, the algorithm outputs “contains more
+than T0 nodes”.
+The restriction to k = O(1) in these algorithms is not sig-
+niﬁcant, as any node with degree k can be replaced with a
+binary tree of depth O(log k). Hence, if each node had de-
+gree at most k, the tree size T would increase by a constant
+factor and the depth d would increase by an O(log k) factor,
+corresponding to the complexity bounds increasing by a factor
+polylogarithmic in d.
+Let Countc(T0, ϵ, δ) denote the quantum tree size estima-
+tion algorithm applied to count the number of nodes in the
+truncated tree corresponding to the backtracking algorithm
+with cost bound c, where d and k are ﬁxed; and similarly let
+Searchc(ϵ) denote the quantum tree search algorithm applied
+to search in the truncated tree with cost bound c, where a node
+is marked if it corresponds to a valid solution to the original
+problem (i.e. was a leaf with ﬁnite cost in the original tree).
+Assume that we have an upper bound cmax such that all valid
+solutions have cost strictly less than cmax, and an upper bound
+Tmax ≤kd on the size of the tree; further assume for simplic-
+ity that cmax is a power of 2.
+Then the quantum branch-and-bound algorithm is stated
+formally as Algorithm 2. The intuitive idea behind it is as
+follows: we want to ﬁnd a cost c ≥cmin such that the size Tc
+of the tree truncated at cost c is not much greater than Tmin.
+Given such a c, we can ﬁnd a minimal-cost solution within the
+tree using Searchc, with a complexity of O(√Tmin poly(d))
+queries. And to ﬁnd such a c efﬁciently, we can perform a
+binary search on c using Countc, to ﬁnd the maximal c such
+that the tree size is smaller than some upper bound, which
+is not much greater than Tmin. There is the technicality that
+Countc(T, ϵ, δ) may not return the correct answer for some
+choices of c and T.
+However, this turns out not to affect
+the correctness or performance of the binary search, because
+
+--- PAGE 4 ---
+4
+Countc(T, ϵ, δ) does always return the correct answer when
+the size of the tree truncated at c is sufﬁciently small with re-
+spect to T. The formal proof of correctness and runtime of the
+algorithm is deferred to Appendix B.
+Sherrington-Kirkpatrick spin glass.
+The Sherrington-
+Kirkpatrick (S-K) model [40] is the family of classical Hamil-
+tonians H(x) = P
+1≤i<j≤n aijxixj where x ∈{±1}n
+and aij are distributed according to the normal distribution
+N(0, 1). Let A = (aij) denote the corresponding square ma-
+trix where aij = 0 for i ≥j. Given a Hamiltonian H de-
+scribed by the matrix A, our computational task is to deter-
+mine Emin(H) := minx H(x).
+Determination of the limiting form of the expected ground
+state energy Emin := EH[Emin(H)] as n →∞has been a
+question of extensive interest within the theory of spin glasses.
+A precise limiting expression is known for this quantity, which
+evaluates to Emin = (−0.763167 · · · + o(1))n3/2. This for-
+mula was conjectured by Parisi [37] and later proven correct
+by Talagrand [42]. Although an explicit expression, evaluat-
+ing it numerically is non-trivial; however, the constant factor
+is now known to many digits of precision [15, 39].
+Finding the ground state energy of general Ising model
+Hamiltonians (of the form of H with arbitrary coefﬁcients aij)
+is NP-hard, which holds even given locality restrictions on the
+pairs i, j such that aij ̸= 0 [5]. The S-K model is a natural
+family of Ising model Hamiltonians, and has been a target for
+a number of different algorithmic approaches, both heuristic
+(e.g. [9, 38]) and exact [22, 27, 28]. Although it was recently
+proven that ground state energies of the S-K model can be ap-
+proximated efﬁciently [31], there is no known efﬁcient (i.e.
+polynomial-time in n) method to compute them exactly.
+There is a straightforward exact approach to computing
+Emin(H) which ﬁts into the branch-and-bound paradigm and
+was proposed in [22]. Variables x1, . . . , xn ∈{±1} are as-
+signed values sequentially. To determine a lower bound on the
+cost of any assignment beginning with a partial assignment
+x1, . . . , xℓ, we observe that
+H(x1, . . . , xℓ, zℓ+1, . . . , zn) =
+X
+1≤i<j≤ℓ
+aijxixj +
+ℓ
+X
+i=1
+n
+X
+j=ℓ+1
+aijxizj +
+X
+ℓ+1≤i<j≤n
+aijzizj
+and hence
+min
+z
+H(x1, . . . , xℓ, zℓ+1, . . . , zn)
+=
+X
+1≤i<j≤ℓ
+aijxixj + min
+z
+
+
+ℓ
+X
+i=1
+n
+X
+j=ℓ+1
+aijxizj +
+X
+ℓ+1≤i<j≤n
+aijzizj
+
+
+≥
+X
+1≤i<j≤ℓ
+aijxixj −
+n
+X
+j=ℓ+1
+
+ℓ
+X
+i=1
+aijxi
+ + min
+z
+X
+ℓ+1≤i<j≤n
+aijzizj
+=: BoundA(x).
+The ﬁrst and second components of BoundA(x) can be com-
+puted from x in time O(n2). The third component is equal
+to minx H′(x), where H′ is formed from H by deleting the
+ﬁrst ℓrows and columns of the matrix A = (aij). Thus, if
+we have already solved the n −1 minimisation problems ob-
+tained by restricting A to the corresponding submatrices, we
+can compute BoundA(x) efﬁciently. As the runtime of the
+overall algorithm is exponential in n, this additional cost does
+not signiﬁcantly affect its overall complexity.
+This algorithm ﬁts into the formal model for branch-and-
+bound discussed above in a straightforward way: the branch-
+and-bound tree is a binary tree, where nodes at depth ℓcorre-
+spond to ℓ-bit strings, for 0 ≤ℓ≤n, and the cost function
+is BoundA. So the quantum branch-and-bound algorithm can
+immediately be applied to accelerate it quadratically. Note
+that cost should be non-negative and integer-valued; this
+can be achieved by truncating the real values aij after p bi-
+nary digits to produce a new Hamiltonian eH, rescaling by 2p,
+and performing an overall energy shift. It is sufﬁcient to take
+p = O(log n) to achieve Emin( eH) = Emin(H) + o(1). This
+corresponds to a cost bound for the integer-valued problem
+cmax = poly(n).
+Let TA denote the size of the branch-and-bound tree cor-
+responding to the Hamiltonian H with matrix A, using cost
+function BoundA, truncated optimally at cost Emin(H). In
+Appendix C we prove that for sufﬁciently large n, PrA[TA ≥
+20.451n] ≤0.01. So for the vast majority of instances of size
+n, the runtime of the classical branch-and-bound algorithm is
+O(20.451n) steps, which is already faster than Grover’s algo-
+rithm. The runtime of the quantum branch-and-bound algo-
+rithm on these instances is O(20.226n) steps, observing that
+the depth d of the branch-and-bound tree is equal to n, and
+log cmax = O(log n), so these only contribute lower-order
+terms to the complexity. The constant 0.01 could be made
+arbitrarily small.
+This rigorous result is only an upper bound on the tree size
+of the classical algorithm (and by extension the runtime of the
+quantum algorithm), which may not be tight. To investigate
+this, a depth-ﬁrst variant of the classical algorithm was imple-
+mented and run on instances of the S-K model for n ≤50.
+Extrapolation of the tree sizes obtained suggests that the true
+scaling of TA for random A is O(20.371n), which would cor-
+respond to a quantum runtime of O(20.186n). See Appendix
+E for further details.
+Conclusions and further work.
+We have described a
+quantum algorithm which can accelerate classical branch-and-
+bound algorithms in a very general setting. We ﬁnish by dis-
+cussing potential routes to improving the results of this work.
+First, in some cases the square-root dependence of the runtime
+on Tmin cannot be improved; even in the special case where
+the cost function either evaluates to 0 or ∞, there are depth-
+d trees for which the quantum algorithm requires Ω(√Tmind)
+queries to determine whether there is a leaf of cost 0 [1]. How-
+ever, it might be possible to improve the depth dependence by
+a factor of up to d, e.g. by extending ideas of [23].
+Ambainis and Kokainis [2] have given a quantum algorithm
+which, given a deterministic classical algorithm that explores
+a search tree to ﬁnd a marked node and uses Q queries to do
+so, can ﬁnd a marked node using eO(√Qd3/2) queries. This
+improves on the quantum tree search algorithm used here in
+
+--- PAGE 5 ---
+5
+that its complexity depends on Q, rather than the size T of the
+whole tree. It seems unclear whether this algorithm could be
+applied to accelerate Algorithm 2 directly, for at least two rea-
+sons. First, the algorithm as designed also uses the Count sub-
+routine, whose runtime depends on the entire tree size. Sec-
+ond, in practice any classical or quantum branch-and-bound
+algorithm is likely to explore the whole tree of potential solu-
+tions, in order to ensure that it has not omitted any solutions
+with lower cost than the current best solution.
+Finally, in order to determine whether the quantum branch-
+and-bound algorithm will genuinely outperform the best clas-
+sical methods for problems of practical interest, once all over-
+heads are taken into account, a more detailed analysis of the
+algorithm’s runtime should be undertaken, extending previous
+analysis for backtracking [13].
+Acknowledgements.
+I acknowledge support from the
+QuantERA ERA-NET Cofund in Quantum Technologies
+implemented within the European Union’s Horizon 2020
+Programme (QuantAlgo project),
+EPSRC Early Career
+Fellowship EP/L021005/1 and EPSRC/InnovateUK grant
+EP/R020426/1.
+This project has received funding from
+the European Research Council (ERC) under the European
+Union’s Horizon 2020 research and innovation programme
+(grant agreement No. 817581).
+I would like to thank Viv
+Kendon for insight into the results of [12], and Stephen Pid-
+dock for helpful discussions throughout.
+[1] S. Aaronson and A. Ambainis.
+Quantum search of
+spatial regions.
+Theory of Computing, 1:47–79, 2005.
+quant-ph/0303041.
+[2] A. Ambainis and M. Kokainis.
+Quantum algorithm for tree
+size estimation, with applications to backtracking and 2-player
+games. In Proc. 49th Annual ACM Symp. Theory of Computing,
+pages 989–1002, 2017.
+[3] J. van Apeldoorn and A. Gily´en. Improvements in quantum
+SDP-solving with applications, 2018. arXiv:1804.05058.
+[4] J. van Apeldoorn, A. Gily´en, S. Gribling, and R. de Wolf. Quan-
+tum sdp-solvers: Better upper and lower bounds. In Proc. 58th
+Annual Symp. Foundations of Computer Science, pages 403–
+414, 2017. arXiv:1705.01843.
+[5] F. Barahona. On the computational complexity of Ising spin
+glass models. J. Phys. A: Math. Gen., 15(10):3241, 1982.
+[6] A. Belovs.
+Quantum walks and electric networks, 2013.
+arXiv:1302.3143.
+[7] A. Belovs, A. Childs, S. Jeffery, R. Kothari, and F. Magniez.
+Time-efﬁcient quantum walks for 3-distinctness. In Proc. 40th
+International Conference on Automata, Languages and Pro-
+gramming (ICALP’13), pages 105–122, 2013.
+[8] J. Bernasconi. Low autocorrelation binary sequences: statistical
+mechanics and conﬁguration space analysis. J. Phys. France,
+48:559–567, 1987.
+[9] S.
+Boettcher.
+Extremal
+optimization
+for
+Sherrington-
+Kirkpatrick spin glasses. Eur. Phys. J. B, 46(4):501–505, 2005.
+[10] F. Brand˜ao, A. Kalev, T. Li, C. Y.-Y. Lin, K. Svore, and X. Wu.
+Quantum SDP solvers: Large speed-ups, optimality, and appli-
+cations to quantum learning. In Proc. 46th International Confer-
+ence on Automata, Languages and Programming (ICALP’19),
+page to appear, 2019. arXiv:1710.02581.
+[11] F. Brand˜ao and K. Svore. Quantum speed-ups for semideﬁnite
+programming. In Proc. 58th Annual Symp. Foundations of Com-
+puter Science, pages 415–426, 2017. arXiv:1609.05537.
+[12] A. Callison, N. Chancellor, F. Mintert, and V. Kendon. Find-
+ing spin-glass ground states using quantum walks, 2019.
+arXiv:1903.05003.
+[13] E. Campbell, A. Khurana, and A. Montanaro.
+Applying
+quantum algorithms to constraint satisfaction problems, 2018.
+arXiv:1810.05582.
+[14] D. Chen, R. Batson, and Y. Dang. Applied Integer Program-
+ming: Modeling and Solution. Wiley, 2010.
+[15] A. Crisanti and T. Rizzo. Analysis of the ∞-replica symmetry
+breaking solution of the Sherrington-Kirkpatrick model. Phys.
+Rev. E, 65:046137, 2002. cond-mat/0111037.
+[16] D. Dubhashi and A. Panconesi. Concentration of measure for
+the analysis of randomized algorithms. Cambridge University
+Press, 2009.
+[17] C. D¨urr and P. Høyer. A quantum algorithm for ﬁnding the
+minimum, 1996. quant-ph/9607014.
+[18] E. Farhi, J. Goldstone, and S. Gutmann. A quantum approxi-
+mate optimization algorithm, 2014. arXiv:1411.4028.
+[19] E. Farhi, J. Goldstone, S. Gutmann, and M. Sipser. Quantum
+computation by adiabatic evolution.
+Technical Report MIT-
+CTP-2936, MIT, 2000. quant-ph/0001106.
+[20] I. Georgescu, S. Ashhab, and F. Nori. Quantum simulation. Rev.
+Mod. Phys., 86:153, 2014. arXiv:1308.6253.
+[21] L. Grover. Quantum mechanics helps in searching for a nee-
+dle in a haystack.
+Phys. Rev. Lett., 79(2):325–328, 1997.
+quant-ph/9706033.
+[22] A. Hartwig, F. Daske, and S. Kobe. A recursive branch-and-
+bound algorithm for the exact ground state of Ising spin-glass
+models. Computer Physics Communications, 32(2):133–188,
+1980.
+[23] M. Jarret and K. Wan.
+Improved quantum backtracking al-
+gorithms using effective resistance estimates.
+Phys. Rev. A,
+97:022337, 2018. arXiv:1711.05295.
+[24] R. Karp, M. Saks, and A. Wigderson. On a search problem
+related to branch-and-bound procedures. In Proc. 27th Annual
+Symp. Foundations of Computer Science, pages 19–28, 1986.
+[25] R. Karp and Y. Zhang.
+Randomized parallel algorithms for
+backtrack search and branch-and-bound computation. Journal
+of the ACM, 40(3):765–789, 1993.
+[26] I. Kerenidis and A. Prakash. A quantum interior point method
+for LPs and SDPs, 2018. arXiv:1808.09266.
+[27] S. Kobe.
+Ground-state energy and frustration of the
+Sherrington-Kirkpatrick model and related models, 2003.
+cond-mat/0311657.
+[28] S. Kobe and A. Hartwig. Exact ground state of amorphous Ising
+systems. Computer Physics Communications, 16:1–4, 1978.
+[29] S. Lalley.
+Concentration inequalities, 2013.
+https:
+//galton.uchicago.edu/˜lalley/Courses/386/
+Concentration.pdf.
+[30] E. Lawler and D. Wood. Branch-and-bound methods: A survey.
+Operations Research, 14(4):699–719, 1966.
+[31] A. Montanari.
+Optimization of the Sherrington-Kirkpatrick
+Hamiltonian, 2018. arXiv:1812.10897.
+[32] A. Montanaro. Quantum algorithms: an overview. npj Quantum
+Information, 2:15023, 2016. arXiv:1511.04206.
+[33] A. Montanaro.
+Quantum-walk speedup of backtracking
+
+--- PAGE 6 ---
+6
+algorithms.
+Theory of Computing,
+14(15):1–24,
+2018.
+arXiv:1509.02374.
+[34] D. Moylett, N. Linden, and A. Montanaro. Quantum speedup
+of the traveling-salesman problem for bounded-degree graphs.
+Phys. Rev. A, 95(032323), 2017. arXiv:1612.06203.
+[35] T. Packebusch and S. Mertens.
+Low autocorrelation binary
+sequences.
+J. Phys. A: Math. Gen., 49(16):165001, 2016.
+1512.02475.
+[36] M. Palassini, F. Liers, M. Juenger, and A. Young. Low energy
+excitations in spin glasses from exact ground states. Phys. Rev.
+B, 68:064413, 2003. cond-mat/0212551.
+[37] G. Parisi. A sequence of approximated solutions to the S-K
+model for spin glasses. J. Phys. A: Math. Gen., 13(4):L115–
+L121, 1980.
+[38] M. Pelikan, H. Katzgraber, and S. Kobe. Finding ground states
+of Sherrington-Kirkpatrick spin glasses with hierarchical BOA
+and genetic algorithms. In Proc. GECCO’08: Proceedings of
+the 10th annual conference on Genetic and evolutionary com-
+putation, pages 447–454, 2008. arXiv:0801.2997.
+[39] M. Schmidt. Replica Symmetry Breaking at Low Temperatures.
+PhD thesis, Universit¨at W¨urzburg, 2008.
+[40] D. Sherrington and S. Kirkpatrick. Solvable model of a spin-
+glass. Phys. Rev. Lett., 35:1792, 1975.
+[41] P. W. Shor. Polynomial-time algorithms for prime factoriza-
+tion and discrete logarithms on a quantum computer. SIAM J.
+Comput., 26:1484–1509, 1997. quant-ph/9508027.
+[42] M. Talagrand.
+The Parisi formula.
+Annals of Mathematics,
+163:221–263, 2006.
+Appendix A: Example: Integer Linear Programming
+To gain some intuition for how the results presented here
+could be applied, in this appendix we describe one simple and
+well-known application of branch-and-bound techniques: in-
+teger linear programming. An integer linear program (ILP) is
+a problem of the form:
+minimise cT x
+subject to Ax ≥b,
+x ≥0,
+x ∈Zn
+where b and c are vectors, A is a matrix, and inequalities
+are interpreted componentwise. Integer linear programming
+problems have many applications, including production plan-
+ning, scheduling, capital budgeting and depot location [14].
+We can solve ILPs using branch-and-bound as follows. We
+begin by ﬁnding a lower bound on the optimal solution to the
+ILP, by relaxing it to a standard linear program (LP) and solv-
+ing the LP; that is, removing the constraint x ∈Zn. This
+corresponds to the cost function. If the solution s is integer-
+valued, we are done, as it corresponds to a valid solution to the
+ILP. Otherwise, consider an index i such that the found solu-
+tion value si is not an integer. To implement branching, we
+consider the two LPs formed by introducing the constraints
+xi ≤⌊si⌋, xi ≥⌈si⌉. At least one of these must have the
+same optimal solution as the original ILP. We then repeat with
+these new LPs. An appealing aspect of this method is that
+the solution to the relaxation simultaneously tells us a lower
+bound on the cost, and a good variable to branch on.
+The sequences of additional constraints specify subsets of
+potential solutions to the overall ILP. The branch and cost
+functions take this sequence as input and solve the resulting
+LP, to make a decision about which variable to branch on
+next, and compute a lower bound on cost, respectively. The
+complexity of the LP-solving step is polynomial in the input
+size, so the primary contribution to the overall runtime will in
+general be the exponential scaling in terms of the number of
+branching steps. A standard classical method could be used
+(e.g. the simplex algorithm), or one of the recently developed
+quantum algorithms for linear programming [3, 4, 10, 11, 26].
+A particularly simple and elegant special case of this ap-
+proach is the knapsack problem. Here we are given a list of
+n items, each with weights wi and values vi, and an overall
+weight upper bound W. We seek to ﬁnd a subset S of the
+items that maximises P
+i∈S vi, given that P
+i∈S wi ≤W. We
+can write this as an integer linear program as follows:
+maximise
+n
+X
+i=1
+vixi
+subject to
+n
+X
+i=1
+wixi ≤W,
+xi ∈{0, 1} for all i.
+Each variable xi corresponds to whether the i’th item is in-
+cluded in the knapsack.
+Then the LP relaxation is simply
+to replace the constraint xi ∈{0, 1} with the constraint
+0 ≤xi ≤1 for all i. This is equivalent to allowing fractional
+amounts of each item to be included.
+The branch-and-bound approach to solving ILPs can imme-
+diately also be applied to the generalisation to Mixed Integer
+Linear Programming, where only certain variables are con-
+strained. Now we only branch on those variables which are
+forced to be integers. One can also apply it to “branch and
+cut” algorithms. In this approach, when the LP relaxation re-
+turns a non-integer-valued solution, one may also add a new
+constraint (hyperplane) which separates that solution from all
+integer-valued feasible solutions.
+Appendix B: Analysis of Algorithm 2
+In this appendix we prove the correctness and the claimed
+runtime bound of Algorithm 2.
+Theorem 1. Let cmin be the minimal cost of a valid solution,
+and let Tmin be the size of the truncated tree with cost bound
+cmin. (If there is no solution, cmin = ∞, and Tmin is the size
+of the whole tree.) Algorithm 2 uses
+O
+p
+Tmind log cmax log
+d log cmax
+ϵ
+
+×
+
+log
+d log cmax
+ϵ
+
++ d log d
+ 
+
+--- PAGE 7 ---
+7
+oracle calls, and except with failure probability at most ϵ, re-
+turns a solution with minimal cost, if one exists, and otherwise
+“no solution”.
+Proof. We ﬁrst show that the algorithm succeeds with proba-
+bility at least 1 −ϵ. The loop executes at most O(d) times,
+so each of Count and Search is used at most O(d log cmax)
+times.
+By a union bound, it is sufﬁcient to pick ϵ′
+=
+O(ϵ/(d log cmax)) to ensure that all the uses of Count and
+Search succeed, except with total probability at most ϵ. So
+we henceforth assume that Count and Search do always suc-
+ceed.
+If this is the case, we ﬁrst observe that the algorithm al-
+ways correctly outputs a minimal-cost solution, if one exists,
+or otherwise “no solution”. This is because at the ﬁnal itera-
+tion (when T > Tmax/2), if no solution has previously been
+found then Search will explore the entire tree and ﬁnd a solu-
+tion if one exists. To see that it outputs a minimal-cost solu-
+tion, note that the binary search on c using Search is over the
+range [cold, cnew], and cold is no larger than the largest value of
+cnew previously computed, so any solution with cost smaller
+than cold would have been found in a previous iteration.
+It remains to prove the runtime bound.
+Let Tc de-
+note the size of the truncated tree with cost bound c (so
+Tmin
+=
+Tcmin).
+The ﬁrst binary search (in part 2a)
+executes Countc O(log cmax) times, each iteration using
+O(
+√
+Td log2(1/ϵ′)) queries; and the second binary search ex-
+ecutes Searchcnew O(log cmax) times, where each iteration uses
+O(
+p
+Tcnewd3/2 log d log(1/ϵ′)) queries. At each iteration of
+the loop, after the binary search using Countc, Tcnew ≤3T/2
+by correctness of the quantum tree size estimation algorithm.
+Further, at the ﬁrst iteration when T ≥3Tmin/2 (if such an it-
+eration occurs), for all c ≤cmin, Countc does not return “con-
+tains more than T nodes”. This implies that cnew ≥cmin, be-
+cause as the binary search terminated at cost cnew, Countcnew+1
+must have returned “contains more than T nodes”. Note that
+this holds even though Countc can return an arbitrary outcome
+when Tc ∈(2T/3, 3T/2].
+Therefore, at this iteration the tree truncated at cost cnew
+contains a minimal-cost solution, which will be found by the
+binary search on c using Searchc, and the algorithm will ter-
+minate. On the other hand, if there is no iteration such that
+T ≥3Tmin/2, we must have Tmin > 2Tmax/3. Combining
+these two claims, we have T ≤3Tmin throughout the algo-
+rithm. The loop over exponentially increasing values of T
+does not affect the overall complexity bound, so the overall
+complexity is
+O
+p
+Tmind log cmax log
+d log cmax
+ϵ
+
+×
+
+log
+d log cmax
+ϵ
+
++ d log d
+ 
+queries, as claimed.
+We remark that it seems that, in general, Algorithm 2 could
+not be replaced with simply using the Search subroutine with
+exponentially increasing values of the cost parameter (an ap-
+proach taken in [34] for the special case of accelerating back-
+tracking algorithms for the travelling salesman problem). This
+is because increasing the cost at which the tree is truncated by
+a constant factor could increase the size of the truncated tree
+substantially beyond Tmin.
+Appendix C: Truncated tree size bound for
+Sherrington-Kirkpatrick model
+In this appendix, let TA denote the size of the tree corre-
+sponding to the classical branch-and-bound algorithm applied
+to ﬁnd the ground-state energy of an Ising Hamiltonian H cor-
+responding to an n×n matrix A, using the bounding function
+BoundA described in the main text, where the tree is truncated
+at the optimal value cmin.
+We will prove the following result:
+Theorem 2. Let A be an n × n matrix corresponding to a
+Sherrington-Kirkpatrick model instance on n spins. For all
+sufﬁciently large n,
+Pr
+A [TA ≥20.451n] ≤0.01.
+The dominant term in the quantum complexity is the square
+root of the classical complexity, which is determined by
+TA, so Theorem 2 implies that the quantum branch-and-
+bound algorithm has an O(20.226n) running time on 99% of
+Sherrington-Kirkpatrick model instances.
+In order to prove Theorem 2, we will need two technical
+lemmas, proven in Appendix D.
+Lemma 3. Let x1, . . . , xN ∼N(0, 1). Let f : RN →R
+be continuous and 1-Lipschitz in each coordinate separately,
+i.e. |f(x1, . . . , xN) −f(x1, . . . , xi−1, x′
+i, xi+1, . . . , xN)| ≤
+|xi −x′
+i| for all i ∈[N]. Then
+Pr[f(x) ≥Ex[f(x)] + t] ≤e−t2/(2N),
+Pr[f(x) ≤Ex[f(x)] −t] ≤e−t2/(2N).
+Lemma 3 was shown in [29] but with an incorrect con-
+stant.
+We will also need a bound on the expectation
+EA[minz∈{±1}n zT Az]. A precise value for this is known as
+n →∞, but we will need a bound that holds for arbitrary n:
+Lemma 4. Let A be an n × n matrix corresponding to a
+Sherrington-Kirkpatrick model instance on n spins. For all
+n, EA[minz∈{±1}n zT Az] ≥−0.601√n −0.833n3/2.
+We are now able to prove Theorem 2. The basic strategy is
+to upper-bound the expected value of TA, using that (by lin-
+earity of expectation) this can be expressed as a sum over all
+bit-strings x ∈{±1}ℓ, 0 ≤ℓ≤n, of the probability that
+the node corresponding to x is contained within the truncated
+branch-and-bound tree. These bit-strings x are precisely those
+such that BoundA(x) ≤minz∈{±1}n zT Az, and a tail bound
+can be used to upper-bound the probability that this event oc-
+curs.
+
+--- PAGE 8 ---
+8
+There are two technical difﬁculties which need to be han-
+dled. First, this approach does not give a good upper bound
+in the case where minz∈{±1}n zT Az is high, which can oc-
+cur with non-negligible probability, leading to EA[TA] be-
+coming large. We therefore handle this case separately and
+show that it occurs with low probability. Next, to ﬁnd a tail
+bound on BoundA(x), we need to compute expressions of the
+form EA[minz∈{±1}n−ℓzT Az]; although a limiting form for
+this is known [37, 39, 42], we will additionally need relatively
+tight bounds in the case ℓ≈n. We therefore split into cases
+ℓ≤0.9n (where (n −ℓ) →∞and we can use the precise
+limiting result) and ℓ> 0.9n (where we use Lemma 4).
+Proof of Theorem 2. Write µ = EA[minz∈{±1}n zT Az], and let γ > 0 be an arbitrary value to be determined. We will upper-
+bound the probability that TA ≥B for some B as follows, where we use the notation [Y ] for the indicator random variable
+which evaluates to 1 if Y is true, and 0 if Y is false:
+Pr
+A [TA ≥B] = Pr
+A [TA ≥B ∧min
+z
+zT Az ≤µ + γn3/2] + Pr
+A [TA ≥B ∧min
+z
+zT Az > µ + γn3/2]
+≤Pr
+A
+h
+TA[min
+z
+zT Az ≤µ + γn3/2] ≥B
+i
++ Pr
+A [min
+z
+zT Az > µ + γn3/2]
+≤1
+B EA
+h
+TA[min
+z
+zT Az ≤µ + γn3/2]
+i
++ Pr
+A [min
+z
+zT Az > µ + γn3/2]
+= 1
+B
+n
+X
+ℓ=0
+X
+x∈{±1}ℓ
+EA
+h
+[BoundA(x) ≤min
+z
+zT Az][min
+z
+zT Az ≤µ + γn3/2]
+i
++ Pr
+A [min
+z
+zT Az > µ + γn3/2]
+≤1
+B
+n
+X
+ℓ=0
+X
+x∈{±1}ℓ
+Pr
+A
+h
+BoundA(x) ≤µ + γn3/2i
++ Pr
+A [min
+z
+zT Az > µ + γn3/2]
+≤n + 1
+B
+max
+ℓ,x∈{±1}ℓ2ℓPr
+A
+h
+BoundA(x) ≤µ + γn3/2i
++ Pr
+A [min
+z
+zT Az > µ + γn3/2]
+where the second inequality is Markov’s inequality and we use linearity of expectation in the second equality.
+To upper-bound the last term, we use Lemma 3. We ﬁrst observe that f(A) = minz zT Az is 1-Lipschitz in each variable, as
+if we modify A to produce A′ by changing apq to a′
+pq for some pair p < q,
+min
+z∈{±1}n
+X
+i<j
+a′
+ijzizj =
+min
+z∈{±1}n
+
+(a′
+pq −apq)zpzq +
+X
+i<j
+aijzizj
+
+≥−|a′
+pq −apq| +
+min
+z∈{±1}n
+X
+i<j
+aijzizj,
+(C1)
+and by a similar argument minz∈{±1}n P
+i<j a′
+ijzizj ≤|a′
+pq −apq| + minz∈{±1}n P
+i<j aijzizj. So Lemma 3 implies that
+Pr
+A [min
+z
+zT Az > µ + γn3/2] ≤e−(γn3/2)2/(2(
+n
+2)) ≤e−γ2n.
+For this to be upper-bounded by a small constant (e.g. 0.005) we can take γ = O(1/√n).
+We next upper-bound the ﬁrst term by bounding PrA
+
+BoundA(x) ≤µ + γn3/2
+. We only need to consider ℓ≥0.4n in the
+maximisation, because when ℓ≤0.4n, trivially upper-bounding this probability by 1 already gives a sufﬁciently strong bound.
+Recall that
+BoundA(x) =
+X
+1≤i<j≤ℓ
+aijxixj −
+n
+X
+j=ℓ+1
+
+ℓ
+X
+i=1
+aijxi
+ + min
+z
+X
+ℓ+1≤i<j≤n
+aijzizj.
+The function fx(A) = BoundA(x) is 1-Lipschitz in each variable by a similar argument to (C1). Thus, for any η ≥0,
+Pr
+A
+h
+BoundA(x) ≤EA[BoundA(x)] −ηn3/2i
+≤e−η2n.
+(C2)
+
+--- PAGE 9 ---
+9
+First assume that 0.4n ≤ℓ≤0.9n, so (n −ℓ) →∞as n →∞. For any x ∈{±1}ℓ, we have
+EA[BoundA(x)] =
+X
+1≤i<j≤ℓ
+EA[aij]xixj −
+n
+X
+j=ℓ+1
+EA
+"
+ℓ
+X
+i=1
+aijxi
+
+#
++ EA
+
+min
+z
+X
+ℓ+1≤i<j≤n
+aijzizj
+
+
+(C3)
+= −(n −ℓ)EA
+"
+ℓ
+X
+i=1
+aij
+
+#
++ EA
+
+min
+z
+X
+ℓ+1≤i<j≤n
+aijzizj
+
+
+(C4)
+= −(n −ℓ)
+r
+2
+π
+√
+ℓ−(0.763 · · · + o(1))(n −ℓ)3/2,
+(C5)
+where we use linearity of expectation to obtain the ﬁrst expression, that Pℓ
+i=1 aij ∼
+√
+ℓN(0, 1), and the known limiting result
+EA
+h
+minz
+P
+ℓ+1≤i<j≤n aijzizj
+i
+= (−0.763167 · · · + o(1))(n −ℓ)3/2 [37, 39, 42].
+Writing α = ℓ/n, we have that
+EA[BoundA(x)] = (−(1 −α)√α
+r
+2
+π −(0.763 · · · + o(1))(1 −α)3/2)n3/2 =: g1(α)n3/2.
+On the other hand, for ℓ≥0.9n, we follow a similar argument but apply the nonasymptotic result of Lemma 4 to bound
+EA
+h
+minz
+P
+ℓ+1≤i<j≤n aijzizj
+i
+, which implies that
+EA[BoundA(x)] ≥−(n −ℓ)
+r
+2
+π
+√
+ℓ−0.601
+√
+n −ℓ−0.833(n −ℓ)3/2
+(C6)
+≥−(n −ℓ)
+r
+2
+π
+√
+ℓ−1.434(n −ℓ)3/2
+(C7)
+= (−(1 −α)√α
+r
+2
+π −1.434(1 −α)3/2)n3/2 =: g2(α)n3/2.
+(C8)
+In either case, we have
+Pr
+A
+h
+BoundA(x) ≤µ + γn3/2i
+= Pr
+A
+h
+BoundA(x) −EA[BoundA(x)] ≤µ + γn3/2 −EA[BoundA(x)]
+i
+.
+By (C2), using µ = (−0.763167 · · ·+o(1))n3/2 and observing (see Figure 3) that EA[BoundA(x)] > µ+γn3/2 for sufﬁciently
+large n, so the right-hand side is negative as required, we have
+Pr
+A
+h
+BoundA(x) ≤µ + γn3/2i
+≤
+(
+e−(g1(α)+(0.763···+o(1))−γ)2n
+if 0.4 ≤α ≤0.9
+e−(g2(α)+(0.763···+o(1))−γ)2n
+if α ≥0.9
+.
+So
+max
+ℓ≥0.4n,x∈{±1}ℓ2ℓPr
+A
+h
+BoundA(x) ≤µ + γn3/2i
+≤max{
+max
+α∈[0.4,0.9] 2αne−(g1(α)+0.763···+o(1))2n,
+max
+α∈[0.9,1] 2αne−(g2(α)+0.763···+o(1))2n}
+= max{
+max
+α∈[0.4,0.9] 2n(α−(g1(α)+0.763···+o(1))2/ ln 2),
+max
+α∈[0.9,1] 2n(α−(g2(α)+0.763···+o(1))2/ ln 2)}
+observing that γ = o(1). It remains to determine upper bounds on the functions
+α −(g1(α) + 0.763 · · · + o(1))2
+ln 2
+= α −
+(−(1 −α)√α
+q
+2
+π + 0.763 . . . (1 −(1 −α)3/2))2
+ln 2
++ o(1) =: h1(α) + o(1),
+(C9)
+α−(g2(α) + 0.763 · · · + o(1))2
+ln 2
+= α−
+(−(1 −α)√α
+q
+2
+π + 0.763 · · · −1.434(1 −α)3/2)2
+ln 2
++o(1) =: h2(α)+o(1). (C10)
+
+--- PAGE 10 ---
+10
+This can easily be achieved numerically, giving (see Figure 4) the result that h1(α) < 0.45003 for 0 ≤α ≤1 and h2(α) <
+0.45003 for α ≥0.9. Hence
+Pr
+A [TA ≥B] ≤(n + 1)2(0.45003+o(1))n
+B
++ 0.005,
+and to upper-bound the ﬁrst term by 0.005, for sufﬁciently large n one can take B = 20.451n. This completes the proof.
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+-1.2
+-1
+-0.8
+-0.6
+-0.4
+-0.2
+0
+-0.763
+g1( )
+g2( )
+Figure 3. The functions g1(α), g2(α) deﬁned in (C5), (C8). g1(α) ≥
+−0.763 for all α ≥0.4, while g2(α) ≥−0.763 for all α ≥0.9.
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+0
+0.1
+0.2
+0.3
+0.4
+0.451
+h1( )
+h2( )
+Figure 4.
+The functions h1(α), h2(α) deﬁned in (C9), (C10).
+h1(α) < 0.45003 for all α, while h2(α) < 0.45003 for all α ≥0.9.
+Appendix D: Proofs of technical lemmas
+In this appendix we prove Lemmas 3 and 4.
+We say
+that f(x1, . . . , xN) satisﬁes the bounded differences condi-
+tion with constants di, i ∈[N], if |f(x) −f(x′)| ≤di when-
+ever x and x′ differ only in the i’th coordinate.
+Lemma 5 (McDiarmid’s inequality or method of bounded
+differences [16, Corollary 5.2]). If f(x1, . . . , xN) satisﬁes
+the bounded differences condition with constants di, and
+x1, . . . , xN are independent random variables, then
+Pr[f(x) ≥Ex[f(x)] + t] ≤e−2t2/d,
+Pr[f(x) ≤Ex[f(x)] −t] ≤e−2t2/d,
+where d = PN
+i=1 d2
+i .
+Lemma 3 (restated). Let x1, . . . , xN
+∼
+N(0, 1).
+Let
+f
+:
+RN
+→
+R
+be
+continuous
+and
+1-Lipschitz
+in
+each
+coordinate
+separately,
+i.e.
+|f(x1, . . . , xN) −
+f(x1, . . . , xi−1, x′
+i, xi+1, . . . , xN)| ≤|xi −x′
+i| for all i ∈
+[N]. Then
+Pr[f(x) ≥Ex[f(x)] + t] ≤e−t2/(2N),
+Pr[f(x) ≤Ex[f(x)] −t] ≤e−t2/(2N).
+Proof. For i ∈[N], j ∈[M], let yj
+i be a Rademacher ran-
+dom variable, taking values ±1 with equal probability. Then
+deﬁne the sequence x(y) by x(y)i =
+1
+√
+M
+PM
+j=1 yj
+i .
+Let
+g : {±1}MN →R be deﬁned by setting g(y) = f(x(y)).
+Then changing one entry of y can change x(y)i by at most
+2/
+√
+M, so we can apply Lemma 5 with di = 2/
+√
+M to ob-
+tain
+Pr[f(x(y)) ≥Ey[f(x(y))] + t] ≤e−t2/(2N),
+Pr[f(x(y)) ≤Ey[f(x(y))] −t] ≤e−t2/(2N).
+As M →∞, the distribution of x(y)i approaches a standard
+normal distribution for all i. The lemma follows.
+Lemma 4 (restated). Let A be an n×n matrix corresponding
+to a Sherrington-Kirkpatrick model instance on n spins. For
+all n, EA[minz∈{±1}n zT Az] ≥−0.601√n −0.833n3/2.
+Proof of Lemma 4. We start with
+EA
+
+min
+z∈{±1}n zT Az
+
+= −
+Z 0
+−∞
+Pr
+
+min
+z∈{±1}n zT Az ≤t
+
+dt,
+valid as minz∈{±1}n zT Az is non-positive. Next, for any t ≤
+0 we have
+Pr
+
+min
+z∈{±1}n zT Az ≤t
+
+≤2n Pr
+
+X
+i<j
+aij ≤t
+
+
+
+--- PAGE 11 ---
+11
+using a union bound over z and symmetry of the distribution
+of aij. By a tail bound on the normal distribution, we have
+Pr
+
+X
+i<j
+aij ≤t
+
+≤e−t2/(2(
+n
+2)) ≤e−t2/n2
+for all t ≤0. So
+EA
+
+min
+z∈{±1}n zT Az
+
+≥−
+Z 0
+−∞
+min{1, 2ne−t2/n2}dt
+= −
+Z −n3/2√
+ln 2
+−∞
+2ne−t2/n2dt −
+Z 0
+−n3/2√
+ln 2
+1dt
+= −n2n−1/2
+Z −
+√
+2n ln 2
+−∞
+e−t2/2dt −
+√
+ln 2n3/2
+≥−
+√n
+2
+√
+ln 2
+−
+√
+ln 2n3/2
+= −0.600561 . . . √n −0.832555 . . . n3/2,
+where we use the bound
+R ∞
+a e−x2/2dx ≤
+1
+ae−a2/2 for any
+a > 0 in the second inequality.
+Appendix E: Classical numerical branch-and-bound results
+We implemented the classical branch-and-bound algorithm
+described in the main text, with cost function BoundA, us-
+ing a simple depth-ﬁrst search procedure within the branch-
+and-bound tree which backtracks on nodes corresponding to
+partial solutions with an energy bound worse than the lowest
+energy seen thus far. For an S-K model instance described by
+a matrix A, this gives an upper bound on the size TA of an op-
+timally truncated branch-and-bound tree (equivalently, on the
+runtime of the best-ﬁrst search algorithm applied to ﬁnd the
+ground state energy, with cost function BoundA).
+This algorithm enabled instances on more than 50 spins to
+be solved within minutes on a standard laptop computer. We
+then carried out a least-squares ﬁt on the log of the number
+of nodes explored, omitting small n, to estimate the scaling
+of the algorithm with n. Note that, due to ﬁnite-size effects,
+this may not be accurate for large n; however, it gives an in-
+dication of tree size scaling. The median normalised ground
+state energy found for the larger values of n (e.g. ≈−0.71 for
+n = 50) seems to approach the limiting value −0.763167 . . .
+relatively slowly. These results are consistent with heuristic
+ﬁnite-size results reported in [9] and were validated using ex-
+haustive search for small n.
+10
+20
+30
+40
+50
+n
+26
+29
+212
+215
+218
+221
+224
+Median tree size
+Median tree size
+Linear fit
+Figure 5. Median tree size explored by classical branch-and-bound
+algorithm with depth-ﬁrst strategy. 99 random instances generated
+for each n. Fit is line y = 20.371n+5.380.
+10
+20
+30
+40
+50
+n
+1.2
+1.0
+0.8
+0.6
+0.4
+0.2
+Normalised ground state energy
+Median
+Max
+Min
+Figure 6. Normalised ground state energy Eminn−3/2 of instances
+of the S-K model. 99 random instances generated for each n.

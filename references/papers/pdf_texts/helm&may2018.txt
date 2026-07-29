@@ -1,0 +1,1229 @@
+--- PAGE 1 ---
+Subset Sum Quantumly in 1.17n
+Alexander Helm1
+Horst Görtz Institute for IT-Security
+Ruhr University Bochum, Germany
+alexander.helm@rub.de
+Alexander May
+Horst Görtz Institute for IT-Security
+Ruhr University Bochum, Germany
+alex.may@rub.de
+Abstract
+We study the quantum complexity of solving the subset sum problem, where the elements
+a1, . . . , an are randomly chosen from Z2ℓ(n) and t = P
+i ai ∈Z2ℓ(n) is a sum of n/2 elements.
+In 2013, Bernstein, Jeﬀery, Lange and Meurer constructed a quantum subset sum algorithm with
+heuristic time complexity 20.241n, by enhancing the classical subset sum algorithm of Howgrave-
+Graham and Joux with a quantum random walk technique. We improve on this by deﬁning a
+quantum random walk for the classical subset sum algorithm of Becker, Coron and Joux. The
+new algorithm only needs heuristic running time and memory 20.226n, for almost all random
+subset sum instances.
+2012 ACM Subject Classiﬁcation Theory of computation →Quantum complexity theory
+Keywords and phrases Subset sum, Quantum walk, Representation technique
+Digital Object Identiﬁer 10.4230/LIPIcs.TQC.2018.5
+Acknowledgements We are grateful to Stacey Jeﬀery for many insightful discussions.
+1
+Introduction
+The subset sum (aka knapsack) problem is one of the most famous NP-hard problems. Due
+to its simpleness, it inspired many cryptographers to build cryptographic systems based
+on its hardness. In the 80s, many attempts for building secure subset sum based schemes
+failed [20], often because these schemes were built on subset sum instances (a1, . . . , an, t)
+that turned out to be solvable eﬃciently.
+Let a1, . . . , an be randomly chosen from Z2ℓ(n), I ⊂{1, . . . , n} and t ≡P
+i∈I ai mod 2ℓ(n).
+The quotient n/ℓ(n) is usually called the density of a subset sum instance. In the low
+density case where ℓ(n) ≫n, I is with high probability (over the randomness of the instance)
+a unique solution of the subset sum problem. Since unique solutions are often desirable
+for cryptographic constructions, most initial construction used low-density subset sums.
+However, Brickell [8] and Lagarias, Odlyzko [17] showed that low-density subset sums with
+ℓ(n) > 1.55n can be transformed into a lattice shortest vector problem that can be solved in
+practice in small dimension. This bound was later improved by Coster et al. [9] and Joux,
+Stern [15] to ℓ(n) > 1.06n. Notice that this transformation does not rule out the hardness
+of subset sum in the low-density regime, since computing shortest vectors is in general also
+known to be NP-hard [2].
+1 Founded by NRW Research Training Group SecHuman.
+© Alexander Helm and Alexander May;
+licensed under Creative Commons License CC-BY
+13th Conference on the Theory of Quantum Computation, Communication and Cryptography (TQC 2018).
+Editor: Stacey Jeﬀery; Article No. 5; pp. 5:1–5:15
+Leibniz International Proceedings in Informatics
+Schloss Dagstuhl – Leibniz-Zentrum für Informatik, Dagstuhl Publishing, Germany
+--- PAGE 2 ---
+5:2
+Subset Sum Quantumly in 1.17n
+In the high-density regime with ℓ= O(log n) dynamic programming solves subset sum
+eﬃciently, see [11]. However, for the case ℓ(n) ≈n only exponential time algorithms are
+known. Impagliazzo and Naor showed constructions of cryptographic primitives in AC0 that
+can be proven as hard as solving random subset sums around density 1. Many eﬃcient
+cryptographic constructions followed, see e.g. [18, 10] for some recent constructions – including
+a CCA-secure subset sum based encryption scheme – and further references.
+Classical complexity of subset sum
+Let us assume that ℓ= poly(n) such that arithmetic in Z2ℓ(n) can be performed in time
+poly(n). Throughout this paper, for ease of notation we omit polynomial factors in exponential
+running times or space consumptions.
+For solving subset sum with a = (a1, . . . , an), one can naively enumerate all e ∈{0, 1}n
+and check whether ⟨e, a⟩≡t mod 2ℓ(n) in time 2n.
+Let a(1) = (a1, . . . , an/2) and a(2) = (an/2+1, . . . , an). In the Meet-in-the-Middle approach
+of Horowitz and Sahni [13], one enumerates all e(1), e(2) ∈{0, 1}n/2 and checks for an identity
+⟨e(1), a(1)⟩≡t −⟨e(2), a(2)⟩mod 2ℓ(n). This improves the time complexity to 2n/2, albeit
+using also space 2n/2.
+Schroeppel and Shamir [21] later improved this to time 2n/2 with only space 2n/4. It
+remains an open problem, whether time complexity 2n/2 can be improved in the worst
+case [4]. However, when studying the complexity of random subset sum instances in the
+average case, the algorithm of Howgrave-Graham and Joux [14] runs in time 20.337n. This
+is achieved by representing e = e(1) + e(2) with e(1), e(2) ∈{0, 1}n ambiguously, also called
+the representation technique. In 2011, Becker, Coron and Joux [5] showed that the choice
+e(1), e(2) ∈{−1, 0, 1}n leads to even more representations, which in turn decreases the
+running time on average case instances to 20.291n, the best classical running time currently
+known.
+Quantum complexity of subset sum
+In 2013, Bernstein, Jeﬀery, Lange and Meurer [6] constructed quantum subset sum algorithms,
+inspired by the classical algorithms above. Namely, Bernstein et al. showed that quantum
+algorithms for the naive and Meet-in-the-Middle approach achieve run time 2n/2 and 2n/3,
+respectively. Moreover, a ﬁrst quantum version of Schroeppel-Shamir with Grover search [12]
+runs in time 23n/8 using only space 2n/8. A second quantum version of Schroeppel-Shamir
+using quantum walks [1, 3] achieves time 20.3n. Eventually, Bernstein, Jeﬀery, Lange and
+Meurer used the quantum walk framework of Magniez et al. [19] to achieve a quantum version
+of the Howgrave-Graham, Joux algorithm with time and space complexity 20.241n.
+Our result
+Interestingly, Bernstein et al.
+did not provide a quantum version of the best classical
+algorithm – the BCJ-algorithm by Becker, Coron and Joux [5] – that already classically
+has some quite tedious analysis. We ﬁll this gap and complete the complexity landscape
+quantumly, by deﬁning an appropriate quantum walk for the BCJ-algorithm within the
+framework of Magniez et al. [19]. Our run time analysis relies on some unproven conjecture
+that we make explicit in Section 4. Under this conjecture, we show that all but a negligible
+fraction of instances of subset sum can be solved quantumly in time and space 20.226n,
+giving polynomial speedups over the best classical complexity 20.291n and the best quantum
+complexity 20.241n.
+--- PAGE 3 ---
+A. Helm and A. May
+5:3
+In a nutshell, our conjecture states that in the run-time analysis we can replace in a
+quantum walk an update with expected constant cost by an update with polynomially
+upper-bounded cost (that might stop), without signiﬁcantly aﬀecting the error probability
+and the structure of the random walk graph. While it might be legitimate to use an unproven
+non-standard conjecture to say something reasonable on the quantum complexity of problems
+in post-quantum cryptography, especially in the context of the present NIST standardization
+process, our conjecture is somewhat unsatisfactory from a theoretical point of view. We hope
+that our work encourages people to base this conjecture on more solid theoretical foundations.
+Apart from that our result holds for random subset sums with ℓ= poly(n), i.e. with
+polynomial density. However, our algorithm behaves worst for subset sum instances with
+unique solution, i.e. in the case ℓ(n) ≥n. In the high-density case ℓ(n) < n, our analysis is
+non-optimal and might be subject to improvements.
+The complexity 20.226n is achieved for subset sum solutions t ≡P
+i∈I ai mod 2ℓ(n) with
+worst case |I| = n/2. We also analyze the complexity for |I| = βn with arbitrary β ∈[0, 1].
+For instance for β = 0.2, our quantum-BCJ algorithm runs in time and space 20.175n.
+The paper is organized as follows. Section 2 deﬁnes some notation. In Section 3, we
+repeat the BCJ algorithm and its classical complexity analysis that we later adapt to the
+quantum case. In Section 4, we analyze the cost of a random walk on the search space deﬁned
+by the BCJ algorithm and deﬁne an appropriate data structure. In Section 5, we put things
+together and analyze the complexity of the BCJ algorithm, enhanced by a quantum walk
+technique.
+2
+Preliminaries
+Let D = {−1, 0, 1} be a digit set, and let α, β ∈Q ∩[0, 1] with 2α + β ≤1. We use
+the notation e ∈Dn[α, β] to denote that e ∈Dn has αn (−1)-entries, (α + β)n 1-entries
+and (1 −2α −β)n 0-entries. Especially, e ∈Dn[0, β] is a binary vector with βn 1-entries.
+Throughout the paper we ignore rounding issues and assume that αn and (α + β)n take on
+integer values.
+We naturally extend the binomial coeﬃcient notation
+ n
+k
+
+=
+n!
+k!(n−k)! to a multinomial
+coeﬃcient notation
+
+n
+k1, . . . , kr
+
+=
+n!
+k1! . . . kr!(n −k1 −. . . −kr)!.
+Let H (x) = −x · log2 (x) −(1 −x) · log2 (1 −x) denote the binary entropy function. From
+Stirling’s formula one easily derives
+αn
+βn
+
+≈2α·H(
+β
+α)n,
+where the ≈-notation suppresses polynomial factors.
+Analogous, let g(x, y) := −x · log2 (x) −y · log2 (y) −(1 −x −y) · log2 (1 −x −y). Then
+ αn
+βn, γn
+
+≈2α·g(
+β
+α , γ
+α)n.
+Let Z2ℓ(n) be the ring of integers modulo 2ℓ(n). For the n-dimensional vectors a =
+(a1, . . . , an) ∈(Z2ℓ(n))n, e = (e1, . . . , en) ∈Dn[α, β] the inner product is denoted
+⟨a, e⟩=
+n
+X
+i=1
+aiei mod 2ℓ(n).
+TQC 2018
+--- PAGE 4 ---
+5:4
+Subset Sum Quantumly in 1.17n
+We deﬁne a random weight-β (solvable) subset sum instance as follows.
+▶Deﬁnition 1 (Random Subset Sum). Let a be chosen uniformly at random from (Z2ℓ(n))n.
+For β ∈[0, 1], choose a random e ∈Dn[0, β] and compute t = ⟨a, e⟩∈Z2ℓ(n).
+Then
+(a, t) ∈(Z2ℓ(n))n+1 is a random subset sum instance.
+For (a, t), any e′ ∈{0, 1}n with
+⟨a, e′⟩≡t mod 2ℓ(n) is called a solution.
+3
+Subset Sum Classically – The BCJ Algorithm
+Let D = {−1, 0, 1} and let (a, t) = (a1, . . . , an, t) ∈(Z2ℓ(n))n+1 be a subset sum instance
+with solution e ∈Dn[0, 1
+2]. That is ⟨e, a⟩≡t mod 2ℓ(n), where n/2 of the coeﬃcients of e
+are 1 and n/2 coeﬃcients are 0.
+Representations
+The core idea of the Becker-Coron-Joux (BCJ) algorithm is to represent the solution e
+ambiguously as a sum
+e = e(1)
+1
++ e(2)
+1
+with e(1)
+1 , e(2)
+1
+∈Dn[α1, 1/4].
+This means that we represent e ∈Dn[0, 1/2] as a sum of vectors with α1n (−1)-entries,
+(1/4 + α1)n 1-entries and (3/4 −2α1)n 0-entries. We call (e(1)
+1 , e(2)
+1 ) a representation of e.
+Thus, every 1-coordinate ei of e can be represented as either 1 + 0 or 0 + 1 via the
+ith-coordinates of e(1)
+1 , e(2)
+1 . Since we have n/2 1-coordinates in e, we can ﬁx among these
+n/4 0-coordinates and n/4 1-coordinates in e(1)
+1 , determining the corresponding entries in
+e(1)
+2 . This can be done in
+ n/2
+n/4
+
+ways.
+Analogously, the 0-coordinates in e can be represented as either (−1)+1, 1+(−1) or 0+0.
+Again, we can ﬁx among these n/2 coordinates α1n (−1)-coordinates, α1n 1-coordinates and
+n/2 −2α1n 0-coordinates in e(1)
+1 . This can be done in
+ n/2
+α1n,α1n
+
+ways.
+Thus, in total we represent our desired solution e in
+R1 =
+n/2
+n/4
+
+n/2
+α1n, α1n
+
+ways.
+However, notice that constructing a single representation of e is suﬃcient for solving subset
+sum. Thus, the main idea of the BCJ algorithm is to compute only a 1/R1-fraction of all
+representations such that on expectation a single representation survives.
+This is done by computing only those representations (e(1)
+1 , e(2)
+1 ) such that the partial
+sums
+⟨e(1)
+1 , a⟩and t −⟨e(2)
+1 , a⟩
+attain a ﬁxed value modulo 2r1, where r1 = ⌊log R1⌋. This value can be chosen randomly,
+but for simplicity of notation we assume in the following that both partial sums are 0 modulo
+2r.
+More precisely, we construct the lists
+L(1)
+1
+=
+{(e(1)
+1 , ⟨e(1)
+1 , a⟩) ∈Dn[α1, 1/4] × Z2ℓ(n) | ⟨e(1)
+1 , a⟩≡0 mod 2r1} and
+L(2)
+1
+=
+{(e(2)
+1 , ⟨e(2)
+1 , a⟩) ∈Dn[α1, 1/4] × Z2ℓ(n) | t −⟨e(2)
+1 , a⟩≡0 mod 2r1}.
+Hence, L(1)
+1 , L(2)
+1
+have the same expected list length, which we denote shortly by
+E[|L1|] =
+ n
+α1n,(1/4+α1)n
+
+2r1
+.
+--- PAGE 5 ---
+A. Helm and A. May
+5:5
+Constructing the lists
+L(1)
+1 , L(2)
+1
+are constructed recursively, see also Fig. 1. Let us ﬁrst explain the construction of
+L(1)
+1 . We represent e(1)
+1
+∈Dn[α1, 1/4] as
+e(1)
+1
+= e(1)
+2
++ e(2)
+2
+with e(1)
+2 , e(2)
+2
+∈Dn[α2, 1/8], where α2 ≥α1/2.
+By the same reasoning as before, the number of representations is
+R2 =
+ α1n
+α1/2n
+ (1/4 + α1)n
+(1/8 + α1/2)n
+
+(3/4 −2α1)n
+(α2 −α1/2)n, (α2 −α1/2)n
+
+,
+where the three factors stand for the number of ways of representing (−1)-, 1- and 0-
+coordinates of e(1)
+1 . Let r2 = ⌊log R2⌋. We deﬁne
+L(j)
+2
+=
+{(e(j)
+2 , ⟨e(j)
+2 , a⟩) ∈Dn[α2, 1/8] × Z2ℓ(n) | ⟨e(j)
+2 , a⟩≡0 mod 2r2} for j = 1, 2, 3,
+L(4)
+2
+=
+{(e(4)
+2 , ⟨e(4)
+2 , a⟩) ∈Dn[α2, 1/8] × Z2ℓ(n) | t −⟨e(4)
+2 , a⟩≡0 mod 2r2}.
+Thus, we obtain on level 2 of our search tree in Fig. 1 expected list sizes
+E[|L2|] =
+ n
+α2n,(1/8+α2)n
+
+2r2
+.
+An analogous recursive construction of level-3 lists L(j)
+3
+from our level-2 lists yields
+E[|L3|] =
+ n
+α3n,(1/16+α3)n
+
+2r3
+,
+where r3 = ⌊log R3⌋with
+R3 =
+ α2n
+α2/2n
+ (1/8 + α2)n
+(1/16 + α2/2)n
+
+(7/8 −2α2)n
+(α3 −α2/2)n, (α3 −α2/2)n
+
+.
+The level-3 lists are eventually constructed by a standard Meet-in-the-Middle approach
+from the following level-4 lists (where we omit the deﬁnition of L(15)
+4
+, L(16)
+4
+that is analogous
+with t −⟨e(·)
+4 , a⟩)
+L(2j−1)
+4
+=
+{(e(2j−1)
+4
+, ⟨e(2j−1)
+4
+, a⟩) ∈Dn/2[α3/2, 1/32] × 0n/2 × Z2ℓ(n)} and
+L(2j)
+4
+=
+{(e(2j)
+4
+, ⟨e(2j)
+4
+, a⟩) ∈0n/2 × Dn/2[α3/2, 1/32] × Z2ℓ(n)} for j = 1, . . . , 7
+of size
+|L4| =
+
+n/2
+(α3/2)n, (1/32 + α3/2)n
+
+.
+Let us deﬁne indicator variables
+Xi,j = ⟨e(2j−1)
+i
+, a⟩and X+
+i,j = ⟨e(2j)
+i
+, a⟩for i = 1, 2, 3, 4 and j = 1, . . . , 2i−1.
+By the randomness of a, we have Pr[Xi,j = c] = Pr[X+
+i,j = c] =
+1
+2ℓ(n) for all c ∈Z2ℓ(n). Thus,
+all Xi,j, X+
+i,j are uniformly distributed in Z2ℓ(n), and therefore also uniformly distributed
+modulo 2ri for any ri ≤ℓ(n). Unfortunately, for ﬁxed i, j the pair Xi,j, X+
+i,j is not independent.
+We assume in the following that this (mild) dependence does not aﬀect the run time analysis.
+▶Heuristic 1. For the BCJ runtime analysis, we can treat all pairs Xi,j, X+
+i,j as independent.
+TQC 2018
+--- PAGE 6 ---
+5:6
+Subset Sum Quantumly in 1.17n
+Figure 1 Tree structure of the BCJ-Algorithm.
+Under Heuristic 1 it can easily be shown that for all but a negligible fraction of random
+subset sum instances the lists sizes are sharply concentrated around their expectation. More
+precisely, a standard Chernoﬀbound shows that for all but a negligible fraction of instances
+the list size of L(j)
+i
+lies in the interval
+E(|Li|) −E(|Li|)1/2 ≤|Li| ≤E(|Li|) + E(|Li|)1/2 for i = 1, 2, 3.
+(1)
+In other words, for all but some pathological instances we have |Li| = O(E(|Li|).
+We give a description of the BCJ algorithm in Algorithm 1. Here we assume in more
+generality that a subset sum instance (a, t) has a solution e ∈Dn[0, β]. As one would expect,
+Algorithm 1 achieves its worst-case complexity for β = 1
+2 with a balanced number of zeros
+and ones in e. However, one can also analyze the complexity for arbitrary β, as we will do
+for our quantum version of BCJ.
+For generalizing our description from before to arbitrary β, we have to simply replace
+e(j)
+i
+∈Dn[αi, 1
+22−i] by e(j)
+i
+∈Dn[αi, β2−i].
+By the discussion before, the ﬁnal condition |L(1)
+0 | > 0 in Algorithm 1 implies that we
+succeed in constructing a representation (e(1)
+1 , e(2)
+1 ) ∈(Dn[α1, βn/2])2 of e ∈Dn[0, β], where
+the e(j)
+1
+recursively admit representations (e(2j−1)
+2
+, e(2j−1)
+2
+) ∈(Dn[α2, βn/4])2), and so forth.
+--- PAGE 7 ---
+A. Helm and A. May
+5:7
+Algorithm 1: Becker-Coron-Joux (BCJ) algorithm.
+Input
+: (a, t) ∈(Z2ℓ(n))n+1, β ∈[0, 1]
+Output
+: e ∈Dn[0, β]
+Parameters : Optimize α1, α2, α3.
+Construct all level-4 lists L(j)
+4
+for j = 1, . . . , 16.
+for i = 3 down to 0 do
+Compute L(j)
+i
+from L(2j−1)
+i+1
+, L(2j)
+i+1 for j = 1, . . . , 2i.
+end
+if |L(1)
+0 | > 0 then output an arbitrary element from L(1)
+0 .
+Thus, one can eventually express
+e = e(1)
+4
++ e(2)
+4
++ . . . + e(16)
+4
+.
+However, notice that we constructed all lists in such a way that on expectation at least one
+representation survives for every list L(j)
+i
+from the for-loop of Algorithm 1. This implies that
+the BCJ algorithm succeeds in ﬁnding the desired solution e, and therefore the leaves of
+our search tree in Fig. 1 contain elements that sum up to e. The following theorem and its
+proof show how to optimize the parameters αi, i = 1, 2, 3 such that BCJ’s running time is
+minimized while still guaranteeing a solution.
+▶Theorem 2 (BCJ 2011). Under Heuristic 1 Algorithm 1 solves all but a negligible fraction
+of random subset sum instances (a, t) ∈(Z2ℓ(n))n+1 (Deﬁnition 1) in time and memory
+20.291n.
+Proof. Numerical optimization yields the parameters
+α1 = 0.0267, α2 = 0.0302, α3 = 0.0180.
+This leads to
+R3 = 20.241n, R2 = 20.532n, R1 = 20.799n representations,
+which in turn yield expected list sizes
+|L4| = 20.266n, E(|L3|) = 20.2909n, E(|L2|) = 20.279n, E(|L1|) = 20.217n, E(|L0|) = 1.
+For i = 1, 2, 3 the level-i lists L(j)
+i
+can be constructed in time 20.2909n by looking at all pairs
+in L(2j−1)
+i−1
+× L(2j)
+i−1. Under Heuristic 1, we conclude by Eq. (1) that for all but a negligible
+fraction of instance we have |Li| = O(E(|Li|) for i = 1, 2, 3. Thus, the total running time
+and memory complexity can be bounded by 20.291n.
+◀
+4
+From Trees to Random Walks to Quantum Walks
+In Section 3, we showed how the BCJ algorithm builds a search tree t whose root contains a
+solution e to the subset sum problem. More precisely, the analysis of the BCJ algorithm in
+the proof of Theorem 2 shows that the leaves of t contain a representation (e(1)
+4 , . . . , e(16)
+4
+) ∈
+L(1)
+4
+× . . . × L(16)
+4
+of e, i.e. e = e(1)
+4
++ . . . + e(16)
+4
+.
+TQC 2018
+--- PAGE 8 ---
+5:8
+Subset Sum Quantumly in 1.17n
+Idea of Random Walk
+In a random walk, we no longer enumerate the lists L(j)
+4
+completely, but only a random subset
+U (j)
+4
+⊆L(j)
+4
+of some ﬁxed size |U4| := |U (j)
+4 |, that has to be optimized. We run on these
+projected leaves the original BCJ algorithm, but with parameters α1, α2, α3 that have to be
+optimized anew. On the one hand, a small |U4| yields small list sizes, which in turn speeds
+up the BCJ algorithm. On the other hand, a small |U4| reduces the probability that BCJ
+succeeds. Namely, BCJ outputs the desired solution e iﬀ(e(1)
+4 , . . . , e(16)
+4
+) ∈U (1)
+4
+×. . .×U (16)
+4
+,
+which happens with probability
+ϵ =
+|U4|
+|L4|
+16
+.
+(2)
+The graph G = (V, E) of our Random Walk
+We deﬁne vertices V with labels U (1)
+4
+× . . . × U (16)
+4
+.
+Each vertex v ∈V contains the
+complete BCJ search tree with leaf lists deﬁned by its label. Two vertices with labels
+ℓ= U (1)
+4
+× . . . × U (16)
+4
+and ℓ′ = V (1)
+4
+× . . . × V (16)
+4
+are adjacent iﬀtheir symmetric diﬀerence
+is |∆(ℓ, ℓ′)| = 1. I.e., we have U (j)
+4
+= V (j)
+4
+for all j but one V (i)
+4
+̸= V (i)
+4
+for which U (i)
+4 , V (i)
+4
+diﬀer by only one element.
+▶Deﬁnition 3 (Johnson graph). Given an N-size set L the Johnson graph J (N, r) is an
+undirected graph GJ = (VJ, EJ) with vertices labeled by all r-size subsets of L. An edge
+between two vertices v, v′ ∈VJ with labels ℓ, ℓ′ exists iﬀ|∆(ℓ, ℓ′)| = 1.
+In our case, we deﬁne N = |L4|, r = |U4| and for each of our 16 lists L(j)
+4
+its corresponding
+Johnson graph Jj(N, r). However, by our construction above we want that two vertices are
+adjacent iﬀthey diﬀer in only one element throughout all 16 lists.
+Let us therefore ﬁrst deﬁne the Cartesian product of graphs. We will then show that our
+graph G = (V, E) is exactly the Cartesian product
+J16(N, r) := J1(N, r) × . . . × J16(N, r).
+▶Deﬁnition 4. Let G1 = (V1, E1), G2 = (V2, E2) be undirected graphs. The Cartesian
+product G1 × G2 = (V,E) is deﬁned via
+V
+=
+V1 × V2 = {v1v2 | v1 ∈V1, v2 ∈V2} and
+E
+=
+{(u1u2, v1v2) | (u1 = v1 ∧(u2, v2) ∈E2) ∨((u1, v1) ∈E1 ∧u2 = v2)}
+Thus, in J1(n, r) × J2(n, r) the labels v1v2 are Cartesian products of the labels U (1)
+4 , U (2)
+4 .
+An edge in J1(n, r) × J2(n, r) is set between two vertices with labels U (1)
+4
+× U (2)
+4 , V (1)
+4
+× V (2)
+4
+iﬀU (1)
+4
+= V (1)
+4
+and U (2)
+4 , V (2)
+4
+diﬀer by exactly one element or vice versa, as desired.
+Mixing time
+The mixing time of a random walk depends on its so-called spectral gap.
+▶Deﬁnition 5 (Spectral gap). Let G be an undirected graph. Let λ1, λ2 be the eigenvalues
+with largest absolute value of the transition matrix of the random walk on G. Then the
+spectral gap of a random walk on G is deﬁned as δ(G) := |λ1| −|λ2|.
+--- PAGE 9 ---
+A. Helm and A. May
+5:9
+For Johnson graphs it is well-known that δ(J(N, r)) =
+N
+r(N−r) = Ω( 1
+r). The following
+lemma shows that for our graph J16(N, r) we have as well
+δ(J16(N, r)) = Ω
+1
+r
+
+= Ω
+ 1
+|U4|
+
+.
+(3)
+▶Lemma 6 (Kachigar, Tillich [16]). Let J (N, r) be a Johnson graph, and let Jm (N, r) :=
+m×
+i=1
+J (n, r). Then δ (Jm) ≥1
+mδ (J).
+Walking on G
+We start our random walk on a random vertex v ∈V , i.e. we choose random U (j)
+4
+⊆L(j)
+4
+for
+j = 1, . . . , 16 and compute the corresponding BCJ tree tv on these sets. This computation of
+the starting vertex v deﬁnes the setup cost TS of our random walk.
+Let us quickly compute TS for the BCJ algorithm, neglecting all polynomial factors.
+The level-4 lists U (j)
+4
+can be computed and sorted with respect to the inner products
+⟨e(j)
+4 , a⟩mod 2r3 in time |U4|. The level-3 lists contain all elements from their two level-4
+children lists that match on the inner products. Thus we expect E(|U3|) = |U4|2 /2r3 elements
+that match on their inner products. Analogous, we compute level-2 lists in expected time
+|U3|2/2r2−r3. However, now we have to ﬁlter out all e(j)
+2
+that do not possess the correct
+weight distribution, i.e. the desired number of (−1)s, 0s, and 1s. Let us call any level-i e(j)
+i
+consistent if e(j)
+i
+has the correct weight distribution on level i. Let p3,2 denote the probability
+that a level-2 vector constructed as a sum of two level-3 vectors is consistent. From Section 3
+we have
+|L3|2
+2r2−r3 · p3,2 = E(|L2|),
+which implies
+p3,2 :=
+ n
+α2n,(1/8+α2)n
+
+ n
+α3n,(1/16+α3)n
+2 · 2r2−r3.
+Thus, after ﬁltering for the correct weight distribution we obtain an expected level-2 list
+size of E(|U2|) = |U3|2/2r2−r3 · p3,2. Analogous, on level 1 we obtain expected list size
+E(|U1|) = |U2|2/2r1−r2 · p2,1 with
+p2,1 :=
+ n
+α1n,(1/4+α1)n
+
+ n
+α2n,(1/8+α2)n
+2 · 2r1−r2.
+The level-0 list can be computed in expected time |U1|2/2n−r1. In total we obtain
+E[TS] = max
+
+|U4|, |U4|2
+2r3 , |U3|2
+2r2−r3 , |U2|2
+2r1−r2 , |U1|2
+2n−r1
+
+Analogous to the reasoning in Section 3 (see Eq. 1), for all but a negligible fraction of random
+subset sum instances we have |Ui| = O (E(|Ui|)). Thus, for all but a negligible fraction of
+instances and neglecting constants we have
+TS =
+max
+n
+|U4|, |U4|2
+2r3 , E(|U3|)2
+2r2−r3 , E(|U2|)2
+2r1−r2 , E(|U1|)2
+2n−r1
+o
+(4)
+≤
+max
+n
+|U4|, |U4|2
+2r3 ,
+|U4|4
+2r2+r3 ,
+|U4|8
+2r1+r2+2r3 ,
+|U4|16
+2n+r1+2r2+4r3
+o
+:= ˜TS.
+(5)
+TQC 2018
+--- PAGE 10 ---
+5:10
+Subset Sum Quantumly in 1.17n
+If tv contains a non-empty root with subset-sum solution e, we denote v marked. Hence,
+we walk our graph G = J1(|L4|, |U4|) × . . . × J16(|L4|, |U4|) until we hit a marked vertex,
+which solves subset sum.
+The cost for checking whether a vertex v is marked is denoted checking cost TC. In
+our case checking can be done easily by looking at tv’s root. Thus, we obtain (neglecting
+polynomials)
+TC = 1.
+(6)
+Since any neighboring vertices v, v′ in G only diﬀer by one element in some leaf U (j)
+4 ,
+when walking from v to v′ we do not have to compute the whole tree tv′ anew, but instead
+we update tv to tv′ by changing the nodes on the path from list U (j)
+4
+to its root accordingly.
+The cost of this step is therefore called update cost TU. Our cost TU heavily depends on the
+way we internally represent tv. In the following, we deﬁne a data structure that allows for
+optimal update cost per operation.
+4.1
+Data Structure for Updates
+Let us assume that we have a data structure that allows the three operations search, insertion
+and deletion in time logarithmic in the number of stored elements. In Bernstein et al. [7],
+it is e.g. suggested to use radix trees. Since our lists have exponential size and we ignore
+polynomials in the run time analysis, every operation has cost 1. This data structure also
+ensures the uniqueness of quantum states |U (1)
+4 , . . . , U (16)
+4
+⟩, which in turn guarantees correct
+interference of quantum states with identical lists.
+Deﬁnition of data structure
+Recall from Section 3, that BCJ level-4 lists are of the form L(j)
+4
+= {(e(j)
+4 , ⟨e(j)
+4 , a⟩)}. For our
+U (j)
+4
+⊂L(j)
+4
+we store in our data structure the e(j)
+4
+and their inner products with a separately
+in
+E(j)
+4
+= {e(j)
+4
+| e(j)
+4
+∈U (j)
+4 } and S(j)
+4
+= {(⟨e(j)
+4 , a⟩, e(j)
+4 ) | e(j)
+4
+∈U (j)
+4 },
+(7)
+where in S(j)
+4
+elements are addressed via their ﬁrst datum ⟨e(j)
+4 , a⟩. Analogous, for U (j)
+i
+,
+i = 3, 2, 1 we also build separate E(j)
+i
+and S(j)
+i
+. For the root list U (1)
+0 , it suﬃces to build
+E(1)
+0 .
+We denote the operations on our data structure as follows. Insert(E(j)
+i
+, e) inserts e
+into E(j)
+i
+, whereas Delete(E(j)
+i
+, e) deletes one entry e from E(j)
+i
+. Furthermore, {ei} ←
+Search(S(j)
+i
+, ⟨e(j)
+i , a⟩) returns the list of all ei with ﬁrst datum ⟨e(j)
+i , a⟩.
+Deletion/Insertion of an element
+Our random walk replaces a list element in exactly one of the leaf lists U (j)
+4 . We can perform
+the update by ﬁrst deleting the replaced element and update the path to the root accordingly,
+and second adding the new element and again updating the path to the root.
+Let us look more closely at the deletion process. On every level we delete a value, and
+then compute via the sibbling vertex, which values we have to be deleted recursively on the
+parent level. For illustration, deletion of e in U (3)
+4
+triggers the following actions.
+--- PAGE 11 ---
+A. Helm and A. May
+5:11
+Delete (E(3)
+4 , e).
+{e(4)
+4 } ←Search(S(4)
+4 , ⟨e, a⟩mod 2r3)
+// E(|{e(4)
+4 }|) = |U4|
+2r3
+For all e(2)
+3
+= e + e′ with e′ ∈{e(4)
+4 }
+Delete (E(2)
+3 , e(2)
+3 )
+{e(1)
+3 } ←Search(S(1)
+3 , ⟨e(2)
+3 , a⟩mod 2r2)
+// E(|{e(1)
+3 }|) =
+|U3|
+2r2−r3
+For all e(1)
+2
+= e(2)
+3
++ e′ with e′ ∈{e(1)
+3 }
+∗Delete (E(1)
+2 , e(1)
+2 )
+∗{e(2)
+2 } ←Search(S(2)
+2 , ⟨e(1)
+2 , a⟩mod 2r1)
+// E(|{e(2)
+2 }|) =
+|U2|
+2r1−r2
+∗For all e(1)
+1
+= e(1)
+2
++ e′ with e′ ∈{e(2)
+2 }
+· Delete (E(1)
+1 , e(1)
+1 ).
+· {e(2)
+1 } ←Search(S(2)
+1 , ⟨e(1)
+1 , a⟩mod 2n)
+// E(|{e(2)
+1 }|) =
+|U1|
+2n−r1
+· For all e(1)
+0
+= e(1)
+1
++ e′ with e′ ∈{e(2)
+1 }
+o Delete (E(1)
+0 , e(1)
+0 ).
+Insertion of an element is analogous to deletion. Hence, the expected update cost is
+E(TU)
+=
+max
+
+1, |U4|
+2r3 , |U4|E(|U3|)
+2r2
+, |U4|E(|U3|)E(|U2|)
+2r1
+, |U4|E(|U3|)E(|U2|)E(|U1|)
+2n
+
+(8)
+≤
+max
+
+1, |U4|
+2r3 , |U4|3
+2r2+r3 ,
+|U4|7
+2r1+r2+2r3 , |U4|15
+2n
+
+:= ˜TU.
+(9)
+Notice that for the upper bounds ˜TS, ˜TU from Eq. (5) and (9) we have
+˜TS = |U4| · ˜TU.
+(10)
+Quantum Walk Framework
+While random walks take time T = TS + 1
+ϵ
+ TC + 1
+δ TU
+
+, their quantum counterparts achieve
+some signiﬁcant speedup due to their rapid mixing, as summarized in the following theorem.
+▶Theorem 7 (Magniez et al. [19]). Let G = (V, E) be a regular graph with eigenvalue gap
+δ > 0. Let ϵ > 0 be a lower bound on the probability that a vertex chosen randomly of G
+is marked. For a random walk on G, let TS, TU, TC be the setup, update and checking cost.
+Then there exists a quantum algorithm that with high probability ﬁnds a marked vertex in
+time
+T = TS + 1
+√ϵ
+
+TC + 1
+√
+δ
+TU
+
+.
+Stopping unusually long updates
+Recall that for setup, we showed that all instances but an exponentially small fraction ﬁnish
+the construction of the desired data structure in time TS. However, the update cost is
+determined by the maximum cost over all superexponentially many vertices in a superposition.
+So even one node with unusually slow update may ruin our run time.
+Therefore, we modify our quantum walk algorithm QW by imposing an upper bound
+of κ = poly(n) steps for the update. After κ steps, we simply stop the update of all nodes
+and proceed as if the update has been completed. We denote by Stop-QW the resulting
+algorithm.
+A ﬁrst drawback of stopping is that some nodes that would get marked in QW, might
+stay unmarked in Stop-QW. However, since the event of stopping should not dependent
+TQC 2018
+--- PAGE 12 ---
+5:12
+Subset Sum Quantumly in 1.17n
+on whether a node is marked or not, the ratio between marked and unmarked nodes and
+thus the success probability ϵ should not change signiﬁcantly between QW and Stop-QW.
+Moreover, under Heuristic 1 and a standard Chernoﬀargument the probability of a node not
+ﬁnishing his update properly after κ steps is exponentially small.
+A second drawback of stopping is that unﬁnished nodes partially destroy the structure
+of the Johnson graph, since diﬀerent (truncated) representations of the same node do no
+longer interfere properly in a quantum superposition. We conjecture that this only mildly
+aﬀects the spectral gap of the graph. A possible direction to prove such a conjecture might
+be to allow some kind of self-repairing process for a node. If a node cannot ﬁnish its update
+in time in one step, it might postpone the remaining work to subsequent steps to amortize
+the cost of especially expensive updates. After the repair work, a node then again joins the
+correct Johnson graph data structure in quantum superposition.
+In the following heuristic, we assume that the change from QW to Stop-QW changes
+the success probability ϵ and the bound δ for the spectral gap only by a polynomial factor.
+This in turn allows us to analyze Stop-QW with the known parameters ϵ, δ from QW.
+▶Heuristic 2. Let ϵ be the fraction of marked states and δ be the spectral gap of the random
+walk in QW. Then the fraction of marked states in Stop-QW is at least ϵstop =
+ϵ
+poly(n),
+and the spectral gap of the random walk on the graph in StopQW is at least δstop =
+δ
+poly(n).
+Moreover, the stationary distribution of Stop-QW is close to the distribution of its setup.
+Namely, we obtain with high probability a random node of the Johnson graph with correctly
+built data structure.
+With the upcoming NIST standardization for post-quantum cryptography, there is an
+even stronger need to analyze quantum algorithms for cryptographic problems. There is
+a strong need to provide more solid theoretical foundations that justify assumptions like
+Heuristic 2, since cryptographic parameter selections will be based on best quantum attacks.
+Hence, any progress in proving Heuristic 2 ﬁnds a broad spectrum of applications in the
+cryptographic community.
+5
+Results
+In this section, we describe the BCJ algorithm enhanced by a quantum random walk, see
+Algorithm 2. Our following main theorem shows the correctness of our quantum version of
+the BCJ algorithm and how to optimize the parameters for achieving the stated complexity.
+▶Theorem 8 (BCJ-QW Algorithm). Under Heuristic 1 and Heuristic 2, Algorithm 2 solves
+with high probability all but a negligible fraction of random subset sum instances (a, t) ∈
+(Z2ℓ(n))n+1 (as deﬁned in Deﬁnition 1) in time and memory 20.226n.
+Proof. By Theorem 7, the running time T of Algorithm 2 can be expressed as
+T = TS +
+1
+√ϵstop
+ 
+TC +
+1
+p
+δstop
+TU
+!
+.
+We recall from Heuristic 2, Eq. (2), (3) and (6)
+ϵstop ≈ϵ =
+|U4|
+|L4|
+16
+, δstop ≈δ = Ω
+ 1
+|U4|
+
+and TC = 1,
+where the ≈-notation suppresses polynomial factors.
+--- PAGE 13 ---
+A. Helm and A. May
+5:13
+Algorithm 2: BCJ-QW algorithm.
+Input
+: (a, t) ∈(Z2ℓ(n))n+1, β ∈[0, 1]
+Output
+: e ∈Dn[0, β]
+Parameters : Optimize α1, α2, α3.
+Construct all level-4 lists E(j)
+4
+and S(j)
+4
+for j = 1, . . . , 16.
+▷Setup (see Eq. (7))
+Construct all level-3 lists E(j)
+3
+and S(j)
+3
+for j = 1, . . . , 8.
+Construct all level-2 lists E(j)
+2
+and S(j)
+2
+for j = 1, . . . , 4.
+Construct all level-1 lists E(j)
+1
+and S(j)
+1
+for j = 1, 2.
+Construct level-0 list E0.
+▷Check
+while E0 ̸= ∅do
+for 1/
+√
+δ times (via phase estimation) do
+Take a quantum step of the walk.
+▷Update
+Update the data structure accordingly, stop after κ = poly(n) steps.
+end
+end
+Output e ∈E0.
+Let us ﬁrst ﬁnd an optimal size of |U4|. Plugging ϵ, δ and TC into T and neglecting
+constants yields run time
+T = TS + |L4|8|U4|−15/2TU.
+Let us substitute TU by its expectation E[TU]. We later show that TU and E[TU] diﬀer by
+only a polynomial factor, and thus do not change the analysis. We can upper bound the
+right hand side using our bounds ˜TS ≥TS, ˜TU ≥E[TU] from Eq. (5) and (9). We minimize
+the resulting term by equating both summands
+˜TS = |L4|8|U4|−15/2 ˜TU.
+Using the relation ˜TS = |U4| · ˜TU from Eq. (10) results in
+|U4| = |L4|16/17.
+Therefore, |L4|8|U4|−15/2 · E[TU] = |U4| · E[TU]. Thus for minimizing the runtime T of
+Algorithm 2, we have to minimize the term max{TS, |U4| · E[TU]}, which equals T up to a
+factor of at most 2. Recall from Eq. (4), which holds under Heuristic 1 and for all but a
+negligible fraction of instances, and Eq. (8) that
+TS
+=
+max
+
+|U4|, |U4|2
+2r3 , E(|U3|)2
+2r2−r3 , E(|U2|)2
+2r1−r2 , E(|U1|)2
+2n−r1
+
+,
+E[TU]
+=
+max
+
+1, |U4|
+2r3 , |U4|E(|U3|)
+2r2
+, |U4|E(|U3|)E(|U2|)
+2r1
+, |U4|E(|U3|)E(|U2|)E(|U1|)
+2n
+
+.
+Numerical optimization for minimizing max{TS, |U4| · E[TU]} leads to parameters
+α1 = 0.0120, α2 = 0.0181, α3 = 0.0125.
+This gives
+2r3 = 20.2259n, 2r2 = 20.4518n, 2r1 = 20.6627n representations,
+TQC 2018
+--- PAGE 14 ---
+5:14
+Subset Sum Quantumly in 1.17n
+0
+0.1
+0.2
+0.3
+0.4
+0.5
+0
+0.05
+0.1
+0.15
+0.2
+β
+c
+Figure 2 c = log T
+n
+as a function of β for BCJ-QW.
+which in turn yield expected list sizes
+|U4| = 20.2259n, E(|U3|) = 20.2259n, E(|U2|) = 20.2109n, E(|U1|) = 20.1424n.
+Plugging these values into our formulas for TS, E[TU] gives
+TS
+=
+max{20.2259n, 20.2259n, 20.2259n, 20.2109n, 2−0.0524n} and
+|U4| · E[TU]
+=
+max{20.2259n, 20.2259n, 20.2259n, 20.2259n, 20.0310n}.
+It follows that E[TU] = 1. Since we have TU ≤κ = poly(n) by deﬁnition in Algorithm 2, the
+values TU and E[TU] diﬀer by only a polynomial factor that we can safely ignore (by rounding
+up the runtime exponent). Thus, we conclude that Algorithm 2 runs in time T = 20.226n
+using |U4| = 20.226n memory.
+◀
+▶Remark. As in the classical BCJ case, a tree depth of 4 seems to be optimal for BCJ-QW.
+When analyzing varying depths, we could not improve over the run time from Theorem 8.
+Complexity for the unbalanced case
+We also analyzed subset sum instances with t = P
+i∈I ai, where |I| = βn for arbitrary
+β ∈[0, 1]. Notice that w.l.o.g. we can assume β ≤1/2, since for β > 1/2 we can solve a
+subset sum instance with target t′ = Pn
+i=1 ai −t. Hence, the complexity graph is symmetric
+around β = 1/2. Fig. 2 shows the run time exponent c for our BCJ-QW algorithm with time
+T = 2cn as a function of β.
+References
+1
+Dorit Aharonov, Andris Ambainis, Julia Kempe, and Umesh Vazirani. Quantum walks on
+graphs. In Proceedings of the thirty-third annual ACM symposium on Theory of computing,
+pages 50–59. ACM, 2001.
+2
+Miklós Ajtai. The shortest vector problem in l2 is np-hard for randomized reductions. In
+Proceedings of the thirtieth annual ACM symposium on Theory of computing, pages 10–19.
+ACM, 1998.
+--- PAGE 15 ---
+A. Helm and A. May
+5:15
+3
+Andris Ambainis. Quantum walk algorithm for element distinctness. SIAM J. Comput.,
+37(1):210–239, 2007. doi:10.1137/S0097539705447311.
+4
+Per Austrin, Mikko Koivisto, Petteri Kaski, and Jesper Nederlof. Dense subset sum may
+be the hardest. arXiv preprint arXiv:1508.06019, 2015.
+5
+Anja Becker, Jean-Sébastien Coron, and Antoine Joux. Improved generic algorithms for
+hard knapsacks. In Annual International Conference on the Theory and Applications of
+Cryptographic Techniques, pages 364–385. Springer, 2011.
+6
+Daniel J Bernstein, Stacey Jeﬀery, Tanja Lange, and Alexander Meurer.
+Quantum al-
+gorithms for the subset-sum problem. In International Workshop on Post-Quantum Cryp-
+tography, pages 16–33. Springer, 2013.
+7
+Daniel J. Bernstein, Stacey Jeﬀery, Tanja Lange, and Alexander Meurer. Quantum Al-
+gorithms for the Subset-Sum Problem, pages 16–33.
+Springer Berlin Heidelberg, Berlin,
+Heidelberg, 2013. doi:10.1007/978-3-642-38616-9_2.
+8
+Ernest F Brickell. Solving low density knapsacks. In Advances in Cryptology, pages 25–37.
+Springer, 1984.
+9
+Matthijs J Coster, Brian A LaMacchia, Andrew M Odlyzko, and Claus P Schnorr. An
+improved low-density subset sum algorithm. In Workshop on the Theory and Application
+of of Cryptographic Techniques, pages 54–67. Springer, 1991.
+10
+Sebastian Faust, Daniel Masny, and Daniele Venturi.
+Chosen-ciphertext security from
+subset sum. In Public-Key Cryptography–PKC 2016, pages 35–46. Springer, 2016.
+11
+Zvi Galil and Oded Margalit. An almost linear-time algorithm for the dense subset-sum
+problem. SIAM Journal on Computing, 20(6):1157–1189, 1991.
+12
+Lov K Grover. A fast quantum mechanical algorithm for database search. In Proceedings of
+the twenty-eighth annual ACM symposium on Theory of computing, pages 212–219. ACM,
+1996.
+13
+Ellis Horowitz and Sartaj Sahni. Computing partitions with applications to the knapsack
+problem. Journal of the ACM (JACM), 21(2):277–292, 1974.
+14
+Nick Howgrave-Graham and Antoine Joux. New generic algorithms for hard knapsacks. In
+Annual International Conference on the Theory and Applications of Cryptographic Tech-
+niques, pages 235–256. Springer, 2010.
+15
+Antoine Joux and Jacques Stern. Improving the critical density of the lagarias-odlyzko
+attack against subset sum problems.
+In International Symposium on Fundamentals of
+Computation Theory, pages 258–264. Springer, 1991.
+16
+Ghazal Kachigar and Jean-Pierre Tillich. Quantum information set decoding algorithms.
+CoRR, abs/1703.00263, 2017.
+URL: http://arxiv.org/abs/1703.00263, arXiv:1703.
+00263.
+17
+Jeﬀrey C Lagarias and Andrew M Odlyzko.
+Solving low-density subset sum problems.
+Journal of the ACM (JACM), 32(1):229–246, 1985.
+18
+Vadim Lyubashevsky, Adriana Palacio, and Gil Segev. Public-key cryptographic primitives
+provably as secure as subset sum. In Theory of Cryptography Conference, pages 382–400.
+Springer, 2010.
+19
+Frédéric Magniez, Ashwin Nayak, Jérémie Roland, and Miklos Santha. Search via quantum
+walk. SIAM Journal on Computing, 40(1):142–164, 2011.
+20
+Andrew M Odlyzko. The rise and fall of knapsack cryptosystems. Cryptology and compu-
+tational number theory, 42:75–88, 1990.
+21
+Richard Schroeppel and Adi Shamir.
+A T=O(2ˆn/2).
+SIAM journal on Computing,
+10(3):456–464, 1981.
+TQC 2018

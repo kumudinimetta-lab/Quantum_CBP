@@ -1,0 +1,1541 @@
+
+--- PAGE 1 ---
+Improved Generic Algorithms for Hard
+Knapsacks
+Anja Becker⋆,1, Jean-S´ebastien Coron3, and Antoine Joux1,2
+1 University of Versailles Saint-Quentin-en-Yvelines
+2 DGA
+3 University of Luxembourg
+Abstract. At Eurocrypt 2010, Howgrave-Graham and Joux described
+an algorithm for solving hard knapsacks of density close to 1 in time
+˜O(20.337n) and memory ˜O(20.256n), thereby improving a 30-year old algo-
+rithm by Shamir and Schroeppel. In this paper we extend the Howgrave-
+Graham–Joux technique to get an algorithm with running time down to
+˜O(20.291n). An implementation shows the practicability of the technique.
+Another challenge is to reduce the memory requirement. We describe a
+constant memory algorithm based on cycle ﬁnding with running time
+˜O(20.72n); we also show a time-memory tradeoﬀ.
+1
+Introduction
+The Knapsack Problem. Given a list of n positive integers (a1, a2, . . . , an)
+and another positive integer S such that:
+S =
+n
+
+i=1
+ϵi · ai ,
+(1)
+where ϵi ∈{0, 1}, the knapsack problem consists in recovering the coeﬃcients ϵi.
+The vector ϵ = (ϵ1, .., ϵn) is called the solution of the knapsack problem. It is well
+known that the decisional version of the knapsack problem is NP-complete [4].
+The ﬁrst cryptosystem based on the knapsack problem was introduced by
+Merkle and Hellmann [10] in 1978, and subsequently broken by Shamir [14]
+using lattice reduction. For random knapsack problems the Lagarias-Odlyzko
+attack [7] can solve knapsacks with density d < 0.64, given an oracle solving the
+shortest vector problem (SVP) in lattices; the density of a knapsack is deﬁned
+as:
+d :=
+n
+log2 maxi ai .
+The Lagarias-Odlyzko attack was further improved by Coster et al. [3] to knap-
+sack densities up to d < 0.94. Since solving SVP is known to be NP-hard [1], in
+practice, the shortest vector oracle is replaced by a lattice reduction algorithm
+such as LLL [8] or BKZ [12].
+⋆The ﬁrst author was mainly funded by a scholarship of the Gottlieb Daimler- und
+Karl Benz-Stiftung.
+K.G. Paterson (Ed.): Eurocrypt 2011, LNCS 6632, pp. 364–385, 2011.
+c
+⃝International Association for Cryptologic Research 2011
+
+--- PAGE 2 ---
+Improved Generic Algorithms for Hard Knapsacks
+365
+The Schroeppel-Shamir Algorithm. For a knapsack of density close to 1
+lattice reduction algorithms do not seem to apply. Until 2009, the best algo-
+rithm for such hard knapsacks was due to Schroeppel and Shamir [13] with
+time complexity ˜O(2n/2) and memory ˜O(2n/4). This is the same running time
+as the straightforward meet-in-the-middle algorithm but with a lower memory
+requirement of ˜O(2n/4) instead of ˜O(2n/2). A drawback is that the Schroeppel-
+Shamir algorithm requires sophisticated data structure such as balanced trees
+which can be diﬃcult to implement in practice. A simpler but heuristic vari-
+ant of Schroeppel-Shamir was described in [5] with the same time and memory
+complexity; we recall this variant in Sect. 2.1. We also recall how to solve unbal-
+anced knapsack problems, where the Hamming weight of the coeﬃcient vector
+ϵ = (ϵ1, . . . , ϵn) can be much smaller than n.
+The Howgrave-Graham–Joux Algorithm. At Eurocrypt 2010, Howgrave-
+Graham and Joux introduced a more eﬃcient algorithm [5] for hard knapsacks.
+While in Schroeppel-Shamir’s algorithm the knapsack instance is divided into
+two halves with no overlap, the new algorithm allows for overlaps, which in-
+duces more degrees of freedom. This enables to reduce the running time down to
+˜O(20.337n) while keeping the memory requirement reasonably low at ˜O(20.256n).
+We recall the Howgrave-Graham–Joux algorithm in Sect. 2.2.
+Our Contributions. The main contribution of our paper is to extend the
+Howgrave-Graham–Joux technique to get a new algorithm with running time
+down to ˜O(20.291n). The knapsack instance is divided in two halves with possible
+overlap, as in the Howgrave-Graham–Joux algorithm, but the set of possible
+coeﬃcients is extended from {0, 1} to {−1, 0, +1}. This means that a coeﬃcient
+ϵ(1)
+i
+= −1 in the ﬁrst half can be compensated with a coeﬃcient ϵ(2)
+i
+= +1
+in the second half, the resulting coeﬃcient ϵi = 0 of the golden solution being
+ϵi = ϵ(1)
+i
++ ϵ(2)
+i
+= (−1) + (+1) = 0. Adding (a few) −1 coeﬃcients brings an
+additional degree of freedom that enables to again decrease the running time; we
+describe our new algorithm in Sect. 3. We show the practicality of the technique
+with an implementation.
+Another challenge in solving knapsack problems is to reduce the memory
+requirement. We ﬁrst describe a simple constant memory algorithm based on
+cycle ﬁnding with running time ˜O(20.75n). We show how to improve this algo-
+rithm down to ˜O(20.72n) running time still requiring constant memory, by using
+the Howgrave-Graham–Joux technique. Eventually, we present a time-memory
+tradeoﬀfor the Schroeppel-Shamir algorithm downto ˜O(2n/16) memory.
+2
+Existing Algorithms
+2.1
+The Schroeppel-Shamir Algorithm
+We present the Schroeppel-Shamir algorithm [13] under the simpler heuristic
+variant described in [5]. We consider a knapsack as in (1) and for simplicity we
+assume that n is a multiple of 4. We write the knapsack sum S as:
+
+--- PAGE 3 ---
+366
+A. Becker, J.-S. Coron, and A. Joux
+S = σ1 + σ2 + σ3 + σ4
+where each σi is a knapsack of n/4 elements, that is,
+σ1 =
+n/4
+
+i=1
+ϵiai,
+σ2 =
+n/2
+
+i=n/4+1
+ϵiai,
+σ3 =
+3n/4
+
+i=n/2+1
+ϵiai, σ4 =
+n
+
+i=3n/4+1
+ϵiai . (2)
+We guess a middle value σM of n/4 bits which leads to the equations:
+σ1 + σ2 = σM
+mod 2n/4 and σ3 + σ4 = S −σM
+mod 2n/4 .
+We solve the two equations separately and merge the result. More precisely, we
+ﬁrst construct a sorted list {σ2} of all 2n/4 possible values for σ2. Then for each
+possible σ1, we use the sorted list {σ2} to ﬁnd all σ2 such that σ1 + σ2 = σM
+mod 2n/4. This gives a list {σ12} of knapsack values σ12 = σ1 + σ2 such that
+σ12 = σM
+mod 2n/4; the size of the list {σ12} is heuristically ˜O(2n/4) and it can
+be built in time ˜O(2n/4). We build the list {σ34} of knapsack values σ34 = σ3+σ4
+such that σ34 = S −σM mod 2n/4 in an analogue way. Eventually, we ﬁnd a
+collision between the two lists {σ12} and {S −σ34} of two elements σ12 and
+σ34, respectively. For the right guess of σM we have found elements such that
+σ12 + σ34 = S, thereby solving the knapsack problem.
+The time required to build the two lists {σ12} and {σ34} is ˜O(2n/4). Then by
+sorting those two lists the collision can be found in time ˜O(2n/4). Since we have
+to guess σM which is a n/4-bit value, the total running time is ˜O(2n/2) and the
+required memory is ˜O(2n/4).
+Unbalanced Case. We say that a knapsack is unbalanced when the Hamming
+weight of the coeﬃcient vector ϵ = (ϵ1, . . . , ϵn) is known and equal to ℓwhere
+ℓsigniﬁcantly diﬀers from n/2. As shown in [5], one can adapt the previous
+algorithm as follows: instead of taking all possible knapsacks of n/4 elements
+we only consider knapsacks of Hamming weight exactly ℓ/4 (assuming that ℓ
+is divisible by 4). Note that if the correct solution is not perfectly balanced
+between the four quarters, then such solution will be missed. This problem is
+easily solved by permuting the order of the elements in the knapsacks until the
+Hamming weight of each quarter is equal to ℓ/4. As explained in [5], the expected
+number of required repetitions is polynomial in n. Thus, this change does not
+modify the value of the exponent in the running time.
+For ℓ= τ · n the size of the lists {σ2} and {σ4} becomes
+n/4
+ℓ/4
+
+≈2h(τ)n/4
+where:
+h(x) := −x · log2 x −(1 −x) · log2(1 −x) .
+Again, we can guess a middle value σM modulo 2h(τ)n/4; as previously the two
+lists {σ12} and {σ34} can be built in time ˜O(2h(τ)n/4) and a collision is found
+in time ˜O(2h(τ)n/4). Therefore, the total time complexity is ˜O(2h(τ)n/2) and the
+memory complexity is ˜O(2h(τ)n/4).
+
+--- PAGE 4 ---
+Improved Generic Algorithms for Hard Knapsacks
+367
+2.2
+The Howgrave-Graham–Joux Algorithm
+We consider the knapsack (1). For simplicity we assume again that n is a multiple
+of four and additionally that the Hamming weight of the coeﬃcients ϵi is equal
+to n/2. To ﬁnd a solution x ∈{0, 1}n, the basic idea of Howgrave-Graham and
+Joux [5] is to split the knapsack into two subknapsacks of size n and of Hamming
+weight n/4. In other words, we write S as the sum σ1 + σ2 of two subknapsacks
+with Hamming weight n/4 chosen among the n knapsack elements,
+n
+
+i=1
+aiyi
+  
+σ1
++
+n
+
+i=1
+aizi
+  
+σ2
+= S
+(3)
+where yi, zi ∈{0, 1}. Clearly, the combination of two solutions y ∈{0, 1}n and
+z ∈{0, 1}n gives a solution to the original knapsack when the two solutions
+do not overlap. In other words, we represent any xi by a binary tuple (yi, zi),
+replacing 0 by (0, 0) and 1 by (1, 0) or (0, 1), respectively. As a consequence, a
+single solution of the original knapsack problem decomposes into many diﬀerent
+representations. This is used to reduce the overall running time as described in
+the following. We choose a modulus M, a random element R ∈ZM and we only
+consider decompositions such that:
+σ1 =
+n
+
+i=1
+aiyi ≡R
+(mod M) and σ2 =
+n
+
+i=1
+aizi ≡S −R
+(mod M) .
+Since both σ1 and σ2 are knapsacks of Hamming weight n/4 over n elements,
+the expected number of solutions to each of these two modular subknapsacks is
+L =
+ n
+n/4
+
+M
+.
+Assuming that the lists of solutions of the two subknapsacks can be obtained
+very eﬃciently (in time ˜O(L)), it remains to paste the partial solutions together
+to obtain a solution to the original knapsack. We therefore search a collision
+between the values σ1 and S−σ2, for all y and z in the two lists of solutions. Since
+the expected number of such collisions is small, this can be done in ˜O(L). To
+minimize the overall running time, M is chosen to be as large as possible. More
+precisely, one chooses M as a number close to the number of decompositions
+of the original solution into two solutions of the two subknapsacks, i.e. M ≈
+2n/2. Under these assumptions, the running time would be reduced down to
+˜O(2h(1/4)n/2n/2) = ˜O(20.3113).
+However, there are several technical diﬃculties with this approach. First, there
+is an exponentially small number of bad weights (a1, .., an) where the algorithm
+fails. Second, the assumption that the list of solutions of each subknapsack can
+be obtained in time ˜O(L) is quite strong and diﬃcult to achieve. [5] describes a
+heuristic algorithm, supported by an implementation, and claims that it achieves
+
+--- PAGE 5 ---
+368
+A. Becker, J.-S. Coron, and A. Joux
+the ˜O(20.3113n) running time. However, May and Meurer recently discovered a
+mistake in the analysis of this algorithm [9]; they showed that the asymptotic
+running time of the Howgrave-Graham–Joux algorithm is actually ˜O(20.337n);
+see [2] for more details.
+3
+New Algorithm with Better Time Complexity
+3.1
+Theoretical Improvement
+Our basic idea is to enhance the algorithm of [5] by allowing more representa-
+tions of the solution of the initial knapsack. Instead of decomposing the original
+solution into two binary coeﬃcient vectors of weight n/4, we consider decompo-
+sitions that contain 0s, 1s and -1s. More precisely, we choose a parameter α and
+search for decompositions containing (1/4 + α)n 1s and αn -1s. Put diﬀerently,
+we split the 1s of the original solution into pairs (0, 1) or (1, 0) as before and the
+0s into pairs (0, 0), (1, −1) or (−1, 1). The number of such decompositions is
+ND =
+	n/2
+n/4
+
+	
+n/2
+αn, αn, (1/2 −2α)n
+
+.
+As in Sect. 2.2, we choose a modulus M ≈ND, a random value R modulo M
+and search for solutions of the two subknapsacks
+σ1 =
+n
+
+i=1
+aiyi ≡R
+(mod M) and σ2 =
+n
+
+i=1
+aizi ≡S −R
+(mod M) ,
+where y and z contain (1/4 + α)n 1s and αn -1s each. The expected number of
+solutions to each of these new modular subknapsacks is
+L =
+
+n
+(1/4+α)n,αn,(3/4−2α)n
+
+M
+.
+Using:
+	
+n
+xn, yn, (1 −x −y)n
+
+= ˜O(2g(x,y)n)
+where:
+g(x, y) := −x log2 x −y log2 y −(1 −x −y) log2(1 −x −y)
+we obtain:
+log2 L ≈n ·
+	
+g(1/4 + α, α) −1
+2 −g(2α, 2α)
+2
+
+.
+Assuming that creating the lists and searching for collisions can be done in time
+˜O(L) and minimizing on α, we obtain a time complexity ˜O(L) = ˜O(20.151 n) for
+α ≈0.103.
+This analysis shows that adding more representations of the original solution
+has the potential to give better algorithms. However, there are many obstacles to
+
+--- PAGE 6 ---
+Improved Generic Algorithms for Hard Knapsacks
+369
+achieve such a good algorithm. A ﬁrst obstacle is that the size of the modulus M
+should never be larger than the size of the knapsack elements. Indeed, we want
+the knapsack after reduction modulo M to behave like a random knapsack, which
+is not the case if M is larger than the original knapsack elements. Thus, we want
+to ensure M < 2n. Optimizing for α under this condition, we get α = 0.05677
+and L ≈20.173 n.
+3.2
+The Basic Building Block
+Before describing our algorithm, we recall a classical basic building block that
+we extensively use. This building block performs the following task: given two
+lists of numbers La and Lb of respective sizes |La| and |Lb|, together with two
+integers M and R, the algorithm computes the list LR such that:
+LR = {x + y | x ∈La, y ∈Lb s.t. x + y ≡R
+(mod M)} .
+To solve this problem, we use a classical algorithm [16] whose description is given
+in pseudo-code by Algorithm 1.
+Algorithm 1. Compute list LR
+Sort the lists La and Lb (by increasing order of the values modulo M);
+Let Target ←R;
+Let i ←0 and j ←|Lb| −1;
+while i < |La| and j ≥0 do
+Let Sum ←(La[i] (mod M)) + (Lb[j] (mod M));
+if Sum < Target then Increment i;
+if Sum > Target then Decrement j;
+if Sum = Target then
+Let i0, i1 ←i;
+while i1 < |La| and La[i1] ≡La[i0] (mod M) do Increment i1;
+Let j0, j1 ←j;
+while j1 ≥0 and Lb[j1] ≡Lb[j0] (mod M) do Decrement j1;
+for i ←i0 to i1 −1 do
+for j ←j1 + 1 to j0 do Append La[i] + Lb[j] to LR
+end
+Let i ←i1 and j ←j1;
+end
+end
+Let Target ←R + M;
+Let i ←0 and j ←|Lb| −1;
+Repeat the above loop with the new target;
+The complexity of Algorithm 1 is ˜O(max(|La|, |Lb|, |LR|)). Moreover, assum-
+ing that the values of the initial lists modulo M are randomly distributed, the
+expected size of LR is |La| · |Lb|/M. However, this cannot be guaranteed in
+general.
+
+--- PAGE 7 ---
+370
+A. Becker, J.-S. Coron, and A. Joux
+Using a slight variation of Algorithm 1, it is also possible given La and Lb
+together with a target integer R to construct the set:
+LR = {x + y | x ∈La, y ∈Lb s.t. x + y = R} .
+The only diﬀerences are that we sort the lists by value (not by modular values)
+and then run the loop with a single target value R (instead of 2).
+3.3
+Devising a Concrete Algorithm
+In order to achieve a concrete algorithm along the lines of the theoretical analysis
+from Sect. 3.1, we must be able to solve the subknapsacks that arise after de-
+composing the original knapsack problem in a reasonably eﬃcient manner. The
+diﬃculty here is that a direct use of an adapted Schroeppel-Shamir algorithm is
+too costly.
+Instead, we use the idea of decomposing a knapsack into two subknapsacks
+several times. More precisely, we introduce three levels of decomposition; see
+Fig. 1 for an illustration. The ﬁrst decomposition follows the method described in
+Sect. 3.1, with a diﬀerent (smaller) choice for the value α denoting the proportion
+of -1s added on each side. At the second or middle level, we decompose each
+subknapsack from the ﬁrst level into two. We also add some new -1s in the
+decompositions. The number of additional -1s for each of the four subknapsacks
+at the middle level is controlled by a new parameter β. In the last level, we
+ﬁnally decompose into a total of eight diﬀerent subknapsacks. At this level, we
+use a parameter γ to denote the proportion of extra -1s in the subknapsacks.
+σ(1)
+ω
+σ(2)
+ω
+σ(3)
+ω
+σ(4)
+ω
+σ(5)
+ω
+σ(6)
+ω
+σ(7)
+ω
+σ(8)
+ω
+σ(1)
+ω
+σ(2)
+ω
+σ(3)
+ω
+σ(4)
+ω
+σ(5)
+ω
+σ(6)
+ω
+σ(7)
+ω
+σ(8)
+ω
++
++
++
++
++
++
++
+= S
+σ(1)
+κ
+σ(2)
+κ
+σ(3)
+κ
+σ(4)
+κ
+σ(1)
+ν
+σ(2)
+ν
+Golden solution ϵ
+corresponding to sum σϵ
+L(3)
+κ
+L(2)
+ν
+≡Mν R(1)
+ν
+≡Mκ R(1)
+κ
++ R(2)
+κ
+≡Mω R(1)
+ω
++ R(2)
+ω
++ R(3)
+ω
++ R(4)
+ω
+≡Mκ R(1)
+κ
+≡Mω R(1)
+ω
++ R(2)
+ω
+γ
+β
+α
+Fig. 1. Iterative decomposition in three steps. σ(j)
+χ
+: partial sum, R(j)
+χ
+: target value,
+Mχ : modulus, α, β and γ : proportion of additional −1s.
+
+--- PAGE 8 ---
+Improved Generic Algorithms for Hard Knapsacks
+371
+Notation. We use a diﬀerent Greek letter (ϵ, κ, ω or ν) to denote the coeﬃ-
+cient vectors of each subknapsack. In the original knapsack, we carry on using
+the letter ϵ. At the ﬁrst level of decomposition, we now use ν(1) and ν(2) for
+the coeﬃcient vectors of the two subknapsacks. At the middle level, we choose
+the notation κ(1) to κ(4). At the bottom level, we use the letters ω(1) to ω(8).
+We then let Nχ(x) denote the number of occurrences of x ∈{−1, 0, 1} in the
+coeﬃcient vector χ. For a knapsack of n elements, we have:
+Nϵ(1) = n/2,
+Nϵ(−1) = 0,
+Nν(1) ≈(1/4 + α)n,
+Nν(−1) ≈αn,
+Nκ(1) ≈(1/8 + α/2 + β)n,
+Nκ(−1) ≈(α/2 + β)n,
+Nω(1) ≈(1/16 + α/4 + β/2 + γ)n,
+Nω(−1) ≈(α/4 + β/2 + γ)n .
+We always have Nχ(0) = n −Nχ(1) −Nχ(−1). Since all these numbers need to
+be rounded to integers for a concrete knapsack instance, we write ≈instead of
+= above. For each of the coeﬃcient vectors χ(j) we introduce the corresponding
+partial sum:
+σ(j)
+χ
+=
+n
+
+i=1
+χ(j)
+i ai .
+To control the size of the lists of solutions that arise at each level of decompo-
+sition, we introduce a modulus and target values for each of the subknapsacks.
+We denote the modulus corresponding to the bottom level by Mω, we introduce
+7 random values R(j)
+ω
+(for 1 ≤j ≤7) and let R(8)
+ω
+= S −7
+j=1 R(j)
+ω . We solve
+the eight modular subknapsacks:
+σ(j)
+ω
+≡R(j)
+ω
+(mod Mω)
+for 1 ≤j ≤8 .
+We denote by L(j)
+ω , the list of solutions of each of these subknapsacks.
+Basic Principle and Modular Constraints. To build solutions at the middle
+level κ, we consider sums of two partial solutions from two neighboring lists
+L(2j−1)
+ω
+and L(2j)
+ω
+containing solutions of the last level. By construction, we see
+that:
+σ(j)
+κ
+= σ(2j−1)
+ω
++ σ(2j)
+ω
+≡R(2j−1)
+ω
++ R(2j)
+ω
+(mod Mω)
+which means that all these partial sums already have some ﬁxed value modulo
+Mω. To prune the size of the lists of solutions at this level, we add an extra
+constraint modulo Mκ (chosen coprime to Mω). Thus, we introduce three random
+values R(j)
+κ
+(for 1 ≤j ≤3) and let R(4)
+κ
+= S −3
+j=1 R(j)
+κ . The new lists of
+solutions are denoted by L(j)
+κ .
+For the ﬁrst level, we proceed similarly, adding partial solutions from L(2j−1)
+κ
+and L(2j)
+κ
+. Clearly, the resulting sums already have ﬁxed values modulo Mκ
+and Mω. Again, we introduce a modulus Mν, a random value R(1)
+ν
+and we let
+R(2)
+ν
+= S −R(1)
+ν
+to reduce the size of the lists.
+
+--- PAGE 9 ---
+372
+A. Becker, J.-S. Coron, and A. Joux
+Finally, the (presumably unique) solution of the original knapsack is found
+by searching for a collision of the form σ(1)
+ν
++ σ(2)
+ν
+= S with σ(1)
+ν
+∈L(1)
+ν
+and
+σ(2)
+ν
+∈L(2)
+ν . Figure 1 illustrates the technique.
+To transform this informal description into a formal algorithm and to analyze
+its complexity, we need to specify how the lists L(j)
+ω
+are constructed. We also
+explain how to merge solutions from one level to solutions at the next level and
+specify the choices of the moduli Mω, Mκ and Mν in the next paragraph.
+Algorithmic Details. The eight lists L(j)
+ω
+can be constructed using a straight-
+forward adaptation of the simple birthday paradox algorithm. It suﬃces to split
+the n elements into two random subsets of size n/2 and to assume that the
+1s and -1s are evenly1 distributed between the two halves. As with the case of
+binary coeﬃcient vectors, the probability of this event is the inverse of a poly-
+nomial in n. Thus by repeating polynomially many times, we recover all of L(j)
+ω
+with overwhelming probability. Assuming that the elements in L(j)
+ω
+are random
+modulo Mω, the expected size of L(j)
+ω
+is:
+Lω = Lω
+Mω
+=
+
+n
+Nω(1),Nω(−1),Nω(0)
+
+Mω
+,
+where Lω is the multinomial coeﬃcient that counts the number of ways to
+choose Nω(1) 1s, Nω(−1) -1s and Nω(0) 0s among n elements. Since the num-
+ber of ways to choose Nω(1)/2 1s, Nω(−1)/2 -1s and Nω(0)/2 0s among n/2
+elements is ≈L1/2
+ω
+for large n, the running time of the construction of each L(j)
+ω
+is max(|L(j)
+ω |, L1/2
+ω ).
+At the middle level, the expected size of L(j)
+κ
+is upper bounded by
+Lκ =
+Lκ
+Mω · Mκ
+=
+
+n
+Nκ(1),Nκ(−1),Nκ(0)
+
+Mω · Mκ
+.
+This is only an upper bound on the expected size since the deﬁnition of Lκ
+ignores the fact that we discard solutions that cannot be decomposed with the
+modular constraints of the lower level.
+To construct these lists, we match values from L(2j−1)
+ω
+and L(2j)
+ω
+modulo Mκ
+using Algorithm 1 from Sect. 3.2. We let K(j)
+κ
+denote the resulting list. We then
+remove inconsistent solutions from K(j)
+κ
+in order to produce L(j)
+κ . We say that a
+solution is inconsistent when the vector ω(2j−1) +ω(2j) contains 2s or -2s and/or
+does not have the number of 1s, -1s and 0s speciﬁed by Nκ(1), Nκ(−1) and Nκ(0).
+According to Sect. 3.2, the cost of this step is max(|L(2j−1)
+ω
+|, |L(2j)
+ω
+|, |K(j)
+κ |).
+Proceeding in the same way, we give an upper bound on the expected size of
+L(j)
+ν
+by
+Lν =
+Lν
+Mω · Mκ · Mν
+=
+
+n
+Nν(1),Nν(−1),Nν(0)
+
+Mω · Mκ · Mν
+.
+1 Or almost evenly when the number of 1s and/or -1s are odd.
+
+--- PAGE 10 ---
+Improved Generic Algorithms for Hard Knapsacks
+373
+Using the same notation as above, the cost to construct the two lists L(j)
+ν
+is
+max(|L(2j−1)
+κ
+|, |L(2j)
+κ
+|, |K(j)
+ν |).
+Finally, the last step is to apply the integer variant of Algorithm 1 to the two
+integer lists L(1)
+ν
+and L(2)
+ν , obtaining a list K0 of (possibly inconsistent) solutions.
+The cost of this step is max(|L(1)
+ν |, |L(2)
+ν |, |K0|).
+To estimate the size of K0, we count the number of expected solutions in a
+modular merge modulo the multiple of Mω ·Mκ ·Mν closest to 2n. This overesti-
+mates the size of K0 since it is slightly easier to ﬁnd a knapsack solution modulo
+this value than a knapsack solution over the integers. This yields an estimate
+equal to:
+L2
+ν · Mν · Mκ · Mω
+2n
+.
+If K0 contains at least one consistent solution, we obtain a solution of the initial
+knapsack problem.
+To conclude the description of the algorithm, we need to specify the values
+of the moduli Mω, Mκ and Mν. The key idea at this point is to choose each
+modulus to ensure that each solution appearing at a given level is represented
+(on average) by a single decomposition at the previous level. Indeed, if we add
+a larger modular constraint, we lose solutions from one level to the next and if
+we choose a smaller constraints, we construct each solution many times which
+increases the overall cost. Using binomials and multinomials to compute the
+number of decompositions we obtain the following conditions for the values of
+the moduli:
+Mω ≈
+ Nκ(1)
+Nκ(1)/2
+
+·
+ Nκ(−1)
+Nκ(−1)/2
+
+·
+
+Nκ(0)
+Nω(1)−Nκ(1)/2,Nω(−1)−Nκ(−1)/2, ⋆
+
+≈
+2(1/8+α+2 β−2γ log2 γ−(7/8−α−2 β−2γ) log2 (7/8−α−2 β−2γ)+(7/8−α−2 β) log2 (7/8−α−2 β) ,
+Mκ · Mω ≈
+ Nν(1)
+Nν(1)/2
+
+·
+ Nν(−1)
+Nν(−1)/2
+
+·
+
+Nν(0)
+Nκ(1)−Nν(1)/2,Nκ(−1)−Nν(−1)/2, ⋆
+
+≈
+2(1/4+2α−2β log2 β−(3/4−2α−2β) log2(3/4−2α−2β)+(3/4−2α) log2(3/4−2α))n ,
+Mν · Mκ · Mω ≈
+n/2
+n/4
+
+·
+
+n/2
+Nν(−1),Nν(−1), ⋆
+
+≈2(1/2−2α log2 α−(1/2−2α) log2(1/2−2α)+(1/2) log2(1/2))n
+≈2(−2α log2 α−(1/2−2α) log2(1/2−2α))n .
+The ⋆symbol in the above multinomials denotes the number of remaining ele-
+ments (corresponding to 0s) after specifying the number of 1s and -1s introduced
+to decompose the set of 0s from the lower level.
+The overall running time of the algorithm is the maximum of the individual
+costs to run Algorithm 1 and the construction of the eight lists, which gives:
+˜O(max(max
+j
+|L(j)
+ω |, max
+j
+L1/2
+ω , max
+j
+|K(j)
+κ |, max
+j
+|L(j)
+κ |, max
+j
+|K(j)
+ν |, max
+j
+|L(j)
+ν |, |K0|)) .
+
+--- PAGE 11 ---
+374
+A. Becker, J.-S. Coron, and A. Joux
+Assuming that each list has a size close to its expected value (see Sect. 3.5), the
+expected running time is:
+T (α, β, γ) = ˜O(max(Lω, L1/2
+ω , L2
+ω
+Mκ
+, Lκ, L2
+κ
+Mν
+, Lν, L2
+ν · Mν · Mκ · Mω
+2n
+)) .
+Since none of the Kχ lists need to be stored, the amount of memory required is:
+˜O(max(Lω, L1/2
+ω , Lκ, Lν)) .
+Finally, there is an additional, very important, parameter to consider, the proba-
+bility of success psucc taken over the possible random choices of the R(j)
+χ
+values.
+This parameter is quite tricky to estimate because it varies depending on the
+initial knapsack that we are solving. As an illustration, consider the knapsack
+whose elements are all equal to 0. It is clear that unless all the random R(j)
+χ
+are
+chosen equal to 0 then the algorithm cannot succeed. As a consequence, in this
+case the probability of success is very low. There are many other bad knapsacks;
+however, for a random knapsack, the expected probability of success is not too
+small (see Sect. 3.4 for a discussion).
+Numerical Results for the Complexity Analysis. Minimizing the expected
+running time T (α, β, γ) results in:
+α = 0.0267,
+β = 0.0168,
+γ = 0.0029 .
+With these values, we obtain:
+Lω ≈20.532 n, Lω ≈20.291 n, Lκ ≈20.279 n, Lν ≈20.217 n and
+Mω ≈20.241 n, Mκ ≈20.291 n, Mν ≈20.267 n .
+As a consequence, we ﬁnd that both the time and memory complexity are equal
+to ˜O(20.291 n). We can also check that the product of the three moduli Mω · Mκ ·
+Mν is smaller than the size of the numbers in the initial knapsack, i.e. 2n.
+However, we remark that γ is so small that for any achievable knapsack size
+n, the number of −1s added at the last level is 0 in practice. Thus, in order
+to improve the practical choices of the number of −1s at the higher levels, it is
+better to adjust the minimization with the added constraint γ = 0. This leads
+to the alternative values:
+α = 0.0194,
+β = 0.0119,
+γ = 0 .
+With these values, we obtain:
+Lω ≈20.463 n, Lω ≈20.295 n, Lκ ≈20.284 n, Lν ≈20.234 n and
+Mω ≈20.168 n, Mκ ≈20.295 n, Mν ≈20.272 n .
+We can also remark that by choosing α = β = γ = 0, we recover the time
+complexity ˜O(20.337 n) given by May and Meurer [9] for the algorithm of [5].
+However, in our case, the memory complexity is also ˜O(20.337 n), which indicates
+that our algorithm can probably be improved in this respect. In the full version
+of the paper [2], we also consider the unbalanced case and possible extensions.
+
+--- PAGE 12 ---
+Improved Generic Algorithms for Hard Knapsacks
+375
+3.4
+Analysis of the Probability of Success
+In order to analyze the probability of success, it is convenient to bear in mind Fig.
+1. We are starting from an unknown but ﬁxed golden solution of the knapsack
+and we wish to decompose it seven times. (At each step we represent the 0s, 1s
+and −1s of the current coeﬃcient vector by a tuple (i, j) where i, j ∈{0, 1, −1}.)
+For each of the seven splits, we add a modular constraint modulo a number
+very close to the total number of decompositions. For example, during the top
+level split, we are specifying that the sum of the left hand-side after the splitting
+should be congruent to R(1)
+ν
+modulo Mν, to R(1)
+κ
++ R(2)
+κ
+modulo Mκ and to
+R(1)
+ω + R(2)
+ω
++ R(3)
+ω + R(4)
+ω
+modulo Mω. Since the three moduli are coprime, this
+is equivalent to simply specifying a value modulo Mν · Mκ · Mω. Each of the
+decompositions is considered successful if the current golden solution admits at
+least one way of splitting which satisﬁes the modular constraint. In this case, we
+focus on one of the admissible solutions for which we search for a decomposition
+in the level below. Fixing the solution on the left-hand side also determines the
+solution of the right-hand side.
+Clearly, if each of the seven decompositions succeeds, the initial solution can
+be found by the algorithm. Assuming independence, the overall probability of
+success is at least equal2 to the product of the probability of success of the
+individual decompositions. If we do not assume independence, we can still say
+that the overall probability of failure is smaller than the individual probabilities
+of failure.
+Purely Random Heuristic Model. One approach to the analysis of the
+probability of an individual decomposition succeeding is to assume that for each
+of the possible decompositions, the resulting modular sum is a random value.
+We already know that there are knapsacks for which this assumption does not
+hold, as illustrated by the all-zero example. This is true for a large number of
+random, however, and is a very useful benchmark for the following analysis. For
+simplicity, we assume here that the number of possible decompositions is equal
+to the modulus M for a large set of random knapsacks.
+In this case, it is well-known that for large values of M, the proportion of
+modular values which are not attained after picking M random values is close
+to e−1 ≃0.36.
+Experimental Behavior of Decompositions. In Section 5, we describe an
+implementation of our algorithm on a 80-bit knapsack. To better understand
+the behavior of this implementation, it is useful to determine the probability of
+success of each decomposition. Three levels of decomposition occur. At the top
+level, a balanced golden solution with 40 zeros and 40 ones needs to be split
+into two partial solutions with 22 ones and two -1s each. At the middle level, a
+golden solution with 22 ones and two -1s is to be split into two partial solutions
+2 The probability can be larger, since we ignore multiple correct splits when they
+occur.
+
+--- PAGE 13 ---
+376
+A. Becker, J.-S. Coron, and A. Joux
+0
+200000
+400000
+600000
+800000
+1e+06
+0
+200
+400
+600
+800
+1000
+1200
+1400
+1600
+1800
+Knapsack Sums
+Random Values
+Fig. 2. Cumulative number of knapsacks (in a million) with less than a given number
+of not obtained values
+with 12 ones and two -1s. Finally, at the bottom level, we split 12 ones and two
+-1s into twice 6 ones and one -1.
+At the top level, the number of possible decompositions of a golden solution
+is larger than
+40
+22
+
+40
+2,2,36
+
+≈256. As a consequence, it is not possible to perform
+experimental statistics of the modular values of such a large set. At the middle
+level, the number of decompositions is larger than
+22
+11
+2
+1
+
+46
+1,1,44
+
+≈232. Thus,
+it is possible to perform some experiments, but doing a large number of tests
+to perform a statistical analysis of the modular values is very cumbersome. At
+the bottom level, the number of decompositions of a golden solution is
+12
+6
+2
+1
+
+=
+1848. This is small enough to perform signiﬁcant statistics and, in particular,
+to study the fraction of modular values which are not obtained (depending on
+a random choice of 14 knapsack elements, 12 1s and two −1s, to be split). The
+value of the modulus used in this experiment is 1847, the closest prime to 1848.
+During our experimental study, we created one million modular subknapsacks
+from 14 randomly selected values modulo 1847. Among these values 12 elements
+correspond to additions and 2 to subtractions. From this set we computed ( in
+Z1847) all of the 1848 values that can be obtained by summing 6 out of the 12
+addition elements and subtracting one of the subtraction elements. In each ex-
+periment, we counted the number of values which were not obtained; the results
+are presented in Fig. 2. On the vertical axis we display the cumulative number of
+knapsacks which result in x or less unobtained values. To allow comparison with
+the purely random model, we display the same curve computed for one million
+of experiments where 1848 random numbers modulo 1847 are chosen. In par-
+ticular, we see on this graph that for 99.99% of the random knapsacks we have
+
+--- PAGE 14 ---
+Improved Generic Algorithms for Hard Knapsacks
+377
+constructed the fraction of unobtained value stays below 2/3. This means that
+experimentally, the probability of success of a decomposition at the bottom level
+is, at least, 1/3 for a very large fraction of knapsacks. Assuming independence
+between the probability of success of the seven splits and a similar behavior
+of three levels3, we conclude that for 99.93% of random knapsacks an average
+number of 37 = 2187 repetitions suﬃces to solve the initial problem.
+Distribution of Modular Sums. When considering the decomposition of
+a given golden solution (at any level), we can construct the set B of all left-
+hand sides which can appear. For this set B we wish to study the distribution
+of the scalar product a · x = n
+i=1 aixi (mod M), for given knapsack weights
+ai. Let Pa1,..,an(B, c) denote the probability that a knapsack of elements a =
+(a1, .., an) ∈Zn
+M results in the value c modulo M for a uniformly at random
+chosen solution (x1, .., xn) from B,
+Pa1,··· ,an(B, c) = 1
+|B|
+
+
+(x1, · · · , xn) ∈B such that
+n
+
+i=1
+aixi ≡c
+(mod M)
+ .
+Our main tool to theoretically study the distribution of the scalar products is
+the following theorem [11, Theorem 3.2]:
+Theorem 1. For any set B ⊂Zn
+M, the identity:
+1
+M n
+
+(a1,··· ,an)∈Zn
+M
+
+c∈ZM
+	
+Pa1,··· ,an(B, c) −1
+M
+
+2
+= M −1
+M|B|
+holds.
+With this equation we can prove a weak but suﬃcient result about the proportion
+of missed values during a decomposition. Let Λ > 0 be an arbitrary integer. We
+want to ﬁnd an upper bound for the fraction fΛ of “bad” knapsacks modulo
+M with less than M/Λ obtained values. First, we remark that for a knapsack
+(a1, · · · , an) that reaches less than M/Λ values, at least (Λ −1)M/Λ values
+modulo M are obtained 0 times. Since
+
+c∈ZM
+Pa1,··· ,an(B, c) = 1
+some values c need to be obtained many times. As a consequence, we ﬁnd that
+
+c∈ZM
+	
+Pa1,··· ,an(B, c) −1
+M
+
+2
+≥Λ −1
+Λ
+· M ·
+1
+M 2 + 1
+Λ · M · (Λ −1)2
+M 2
+= Λ −1
+M
+.
+3 The limited number of experiments we have performed for the middle level seem to
+indicate a comparable behavior. We performed 100 experiments and the number of
+not obtained values remained in the range 42% – 43.1%.
+
+--- PAGE 15 ---
+378
+A. Becker, J.-S. Coron, and A. Joux
+This implies that the number Nbad of “bad” knapsacks satisﬁes:
+Nbad ≤M n ·
+M −1
+(Λ −1)|B| .
+With this bound, it is possible to construct a variation of our algorithm with a
+provable probability of success. Given Λ ≥10 as a function of n, we repeat each
+split for 2 Λ random and independently picked values. The probability of failure
+of such a repeated split is at most e−2 ≈0.135, except for a “bad” knapsack.
+Thus, the global probability of failure on the seven splits is smaller than 95%. By
+choosing M smaller than |B| (but close to it), we ensure that the total fraction
+of bad knapsacks is at most:
+7
+Λ −1 .
+This fraction becomes arbitrarily small by choosing a large enough value of Λ.
+Note that the running time is multiplied by (2 Λ)3, since there are three nested
+levels of decompositions. If a probability of success of 5% is not suﬃcient, it is
+possible to increase the probability by repeating the complete algorithm with
+independent random numbers. A polynomial number of repetition leads to a
+probability of success exponentially close to 1 (with the exception of the “bad”
+knapsacks).
+3.5
+Analysis of the Size of the Lists
+Concerning the size of the lists that occur during the algorithm, both the simple
+heuristic model and the experimental results (see Section 5) predict that the size
+of the lists are always very close to the theoretical values at the bottom level
+and smaller (due to the overestimation) at the levels above. It remains to use
+Theorem 1 to give an upper bound on the size of the various lists.
+For the sizes of the lists Lχ, we can use a direct application of the theorem.
+The set of concern, B, is the set of all repartitions of 1s, 0s and -1s fulﬁlling
+the conditions of Lχ. The modulus M is the product of all active moduli at the
+current and preceding levels. That is, for level ω we have M = Mω; for level κ,
+M = Mω · Mκ, and for level ν we take M = Mω · Mκ · Mν.
+Once again, we ﬁx an integer Λ and consider the number FΛ of knapsacks for
+which more than M/(2 Λ) values c have a probability that satisﬁes:
+Pa1,··· ,an(B, c) ≥Λ/M .
+Due to Theorem 1, we ﬁnd:
+FΛ
+M n · M
+2 Λ · (Λ −1)2
+M 2
+≤M −1
+M|B| ≤1
+|B| .
+As a consequence:
+FΛ ≤
+2 Λ
+(Λ −1)2 · M
+|B| · M n ≤
+2 Λ
+(Λ −1)2 · M n .
+
+--- PAGE 16 ---
+Improved Generic Algorithms for Hard Knapsacks
+379
+The key point is that for a knapsack which is not one of the FΛ knapsacks above
+and for most values of c (all but at most M/(2 Λ)), the size of Lχ is smaller than
+Λ times the expected value |B|/M, that is,
+|Lχ| ≤Λ |B|
+M
+.
+To bound the size of the lists Kχ, we proceed slightly diﬀerently. The set B
+consists of 1s, 0s and -1s that are allowed in the L lists and are matched to
+construct Kχ. We write M = M1 · M2, where M1 is the product of the active
+moduli for the L list and M2 is the modulus that is added when constructing Kχ.
+Let σ (mod M) denote the target sum as a new modulo constraint for elements
+in Kχ. Let σL (mod M1) and σR (mod M1) respectively denote the values of
+the sums in the left-side and right-side lists L. Of course, we have σL + σR ≡σ
+(mod M1). We can write:
+|Kχ| =
+
+c ∈ZM
+c ≡σL
+(mod M1)
+(|B| · Pa1,··· ,an(B, c)) · (|B| · Pa1,··· ,an(B, σ −c))
+≤
+⎡
+⎢⎢⎢⎢⎢⎣
+
+c ∈ZM
+c ≡σL
+(|B| · Pa1,··· ,an(B, c))2 ×
+
+c ∈ZM
+c ≡σR
+(|B| · Pa1,··· ,an(B, c))2
+⎤
+⎥⎥⎥⎥⎥⎦
+1/2
+.(4)
+Thus to estimate the size of the lists Kχ, we need to ﬁnd an upper bound for
+the value of sums of the form:
+
+c ∈ZM
+c ≡c1
+(mod M1)
+Pa1,··· ,an(B, c)2 .
+To do this, it is useful to rewrite the relation from Theorem 1 as:
+1
+M n
+
+(a1,··· ,an)∈Zn
+M
+
+c∈ZM
+Pa1,··· ,an(B, c)2 = M + |B| −1
+M|B|
+.
+Given Λ, we let GΛ denote the number of knapsacks for which more than
+M1/(8 Λ) values c1 have a sum of squared probabilities that satisfy:
+
+c ∈ZM
+c ≡c1
+(mod M1)
+Pa1,··· ,an(B, c)2 ≥
+Λ2
+M 2
+1 M2
+.
+We ﬁnd that
+GΛ
+M n · M1
+8 Λ ·
+Λ2
+M 2
+1 M2
+≤M + |B| −1
+M|B|
+;
+
+--- PAGE 17 ---
+380
+A. Becker, J.-S. Coron, and A. Joux
+and as a consequence
+GΛ ≤8
+Λ · M + |B|
+|B|
+· M n .
+Moreover, we can check with our concrete algorithm that we always have |B| ≥M
+for the construction of the lists Kχ. Thus we have GΛ ≤(16/Λ)M n. For a
+knapsack which is not one of the GΛ knapsacks above and for most values4
+of σL mod M1, the size of Kχ is smaller than Λ2 times the expected value
+|B|2/(M 2
+1 M2), that is,
+|Kχ| ≤Λ2 |B|2
+M 2
+1 · M2
+.
+Note, that this bound includes the case |K0|.
+3.6
+Provable Variant of the Concrete Algorithm
+Following the ideas presented in Sect. 3.4, we can now describe a variant of our
+concrete algorithm with provable probabilistic run-time and space requirements.
+First, ﬁx a large enough value of Λ. We redeﬁne the notion of a “bad” knapsack
+in this section, by saying that a knapsack is bad if it fails to fulﬁll one of the
+three criteria developed in Sect. 3.4 and Sect. 3.5. That is, if there are too many
+values that yield incorrect splits or lists of type L or K which are too large. We
+ﬁnd that the total fraction of bad knapsacks is smaller than
+7
+	
+1
+Λ −1 +
+2 Λ
+(Λ −1)2 + 16
+Λ
+
+≤140
+Λ
+for Λ ≥7 .
+By choosing a large enough value for Λ, this fraction can become arbitrarily
+small.
+Once again, we consider a variation of the concrete algorithm where at each
+level we repeat the choice of random numbers often enough to be successful.
+For a “good” knapsack there are three ways a decomposition can fail . Firstly,
+we could choose a random value which does not permit a decomposition of the
+golden solution; Secondly, we could choose a random value which makes Lχ
+overﬂow; Thirdly, we could choose a random value which makes Kχ overﬂow.
+Note that the last two events can be detected, in which case we erase the lists
+that have been constructed for this random value and turn to the next. For each
+modulus, the proportion of random values which are incorrect with respect to
+at least one criteria is smaller than
+Λ −1
+Λ
++ 1
+2 Λ + 2
+8 Λ = 1 −1
+4 Λ .
+Thus by repeating each split 8Λ times, we make sure that the probability of
+failure of a given split is at most e−2. Once again, this yields a global probability
+of success of 5%, which becomes exponentially close to 1 by repeating polynomi-
+ally many times. Given a real ε > 0, by setting Λ = 2ε n we obtain the following
+theorem:
+4 For all but at most 2M1/(8 Λ) – the factor 2 in the numerator comes from the fact
+that there are two terms to bound in ((4)).
+
+--- PAGE 18 ---
+Improved Generic Algorithms for Hard Knapsacks
+381
+Theorem 2. For any real ε > 0 and for a fraction of at least 1 −140 · 2−ε n
+of equibalanced knapsacks with density D < 1 given by an n-tuple (a1, · · · , an)
+and a target value S, if ϵ = (ϵ1, · · · , ϵn) is a solution of the knapsack then the
+algorithm described in Sect. 3.3 modiﬁed as above ﬁnds the solution ϵ sought
+after in time ˜O(2(0.291+3ε) n).
+We recall that in the theorem, the term equibalanced means that the solution ϵ
+contains exactly the same number of 0s and 1s.
+4
+Memory Complexity Improvement
+In this section we ﬁrst show a new algorithm of constant memory requirement
+and running time ˜O(23n/4). We then show how to decrease its time complexity
+down to ˜O(20.72n) using a technique similar to Howgrave-Graham and Joux
+[5]. Finally, we show a time memory tradeoﬀfor Schroeppel-Shamir’s algorithm
+down to ˜O(2n/16) memory.
+4.1
+An Algorithm with Running Time ˜
+O(23n/4) and Memory ˜
+O(1)
+We describe a simple algorithm that solves the knapsack problem in time ˜O(23n/4)
+and constant memory, using a meet-in-the-middle attack. This is done by for-
+mulating the meet-in-the-middle attack as a collision search problem (see [15]);
+then a constant memory cycle-ﬁnding algorithm can be used.
+We deﬁne two functions f1, f2 : {0, 1}n/2 →{0, 1}n/2:
+f1(x) =
+n/2
+
+i=1
+aixi
+mod 2n/2,
+f2(y) = S −
+n
+
+i=n/2+1
+aiyi
+mod 2n/2
+where xi denotes the i-th bit of x, and similarly for yi. If we can ﬁnd x, y ∈
+{0, 1}n/2 such that f1(x) = f2(y), then we get:
+n/2
+
+i=1
+aixi +
+n
+
+i=n/2+1
+aiyi = S
+mod 2n/2 .
+This gives a solution of the knapsack problem that is only valid modulo 2n/2.
+Since there are heuristically ˜O(2n/2) such solutions holding modulo 2n/2, and
+only a single one that holds over Z, a random (x, y) such that f1(x) = f2(y)
+leads to the correct knapsack solution with probability roughly 2−n/2. Below we
+show that we can generate such random solution in time ˜O(2n/4) and constant
+memory. This gives an algorithm with total running time ˜O(23n/4) and constant
+memory.
+From the two functions f1, f2 we deﬁne the function f : {0, 1}n/2 →{0, 1}n/2
+where:
+f(x) =
+
+f1(x)
+if g(x) = 0
+f2(x)
+if g(x) = 1
+
+--- PAGE 19 ---
+382
+A. Becker, J.-S. Coron, and A. Joux
+where g : {0, 1}n/2 →{0, 1} is a random bit function. Then a collision f(x) =
+f(y) for f gives a desired collision f1(x) = f2(y) with probability 1/2. The
+function f : {0, 1}n/2 →{0, 1}n/2 is a random function, therefore using Floyd’s
+cycle ﬁnding algorithm [6] we can ﬁnd a collision for f in time 2n/4 and constant
+memory.
+However we need to obtain a random collision whereas Floyd’s cycle ﬁnding
+algorithm is likely to produce always the same collision. A simple solution is to
+further randomize the function f; more precisely we apply Floyd’ cycle-ﬁnding
+algorithm to f ′ : {0, 1}n/2 →{0, 1}n/2 with f ′(x) = P(f(x)), where P is a
+random permutation in {0, 1}n/2. Then a new permutation P is used every time
+a new collision (x, y) is required for f.
+4.2
+An Algorithm with Running Time ˜
+O(20.72n) and Memory ˜
+O(1)
+In this section we show how to slightly decrease the running time down to
+˜O(20.72n), still with constant memory; for this we use the Howgrave-Graham–
+Joux technique recalled in Sect. 2.1. Again for simplicity we assume that n is a
+multiple of 4, and that the Hamming weight of the knapsack solution ϵ is exactly
+n/2. As in (3) we write S as the sum σ1 +σ2 of two subknapsacks with Hamming
+weight n/4 chosen among the n knapsack elements.
+We let W be the set of n-bit strings of Hamming weight n/4. We have #W =
+2h(1/4) ≃20.81n. We deﬁne the two functions f1, f2 : W →{0, 1}h(1/4)n:
+f1(y) =
+n
+
+i=1
+aiyi
+mod 2h(1/4)n,
+f2(z) = S −
+n
+
+i=1
+aizi
+mod 2h(1/4)n
+where yi denotes the i-th bit of y, and similarly for zi. We consider y, z ∈W
+such that:
+f1(y) = f2(z) .
+(5)
+Since f1 and f2 are random functions heuristically there are 2h(1/4)n solutions to
+(5). Moreover given the correct solution ϵ of the knapsack, as in Sect. 2.1 there
+are
+n/2
+n/4
+
+≃2n/2 ways of writing this correct solution as σ1 + σ2 = S (see (3)).
+All these 2n/2 solutions are solutions of (5). Therefore the probability p that a
+random solution of (5) leads to the correct knapsack solution is:
+p =
+2n/2
+2h(1/4)n ≃2−.31n .
+The input space of f1, f2 has size 2h(1/4)n. Therefore using the same cycle-ﬁnding
+algorithm as in the previous section, a random solution of (5) can be found in
+time ˜O(2h(1/4)n/2). The total time complexity is therefore:
+˜O(2h(1/4)n/2)/p = ˜O(2h(1/4)n/2) · 2(h(1/4)−1/2)n
+= ˜O(2(3h(1/4)/2−1/2)n) = ˜O(2.72n) .
+Finally, we note that it is possible to further improve this complexity by adding
+−1s in the decomposition (as in Sect. 3) but the time complexity improvement
+is almost negligible.
+
+--- PAGE 20 ---
+Improved Generic Algorithms for Hard Knapsacks
+383
+4.3
+A Time-Memory Tradeoﬀon Schroeppel-Shamir Down to 2n/16
+Memory
+The original Schroeppel-Shamir algorithm works in time ˜O(2n/2) and memory
+˜O(2n/4). In this section we describe a continuous time-memory tradeoﬀdown to
+˜O(2n/16) memory. That is we describe a variant of Schroeppel-Shamir with:
+Running time: ˜O(2(11/16−ε)n),
+Memory: ˜O(2(1/16+ε)n)
+for any 0 ≤ϵ ≤3/16. For simplicity we ﬁrst describe the algorithm with exactly
+˜O(2n/16) memory. We write the knapsack as S = σ1 + σ2 + σ3 + σ4 as in (2)
+where each σi is a knapsack of n/4 elements.
+We guess three values R1, R2 and R3 of 3n/16-bit each and we let R4 such
+that R1 + R2 + R3 + R4 = S mod 23n/16. We consider the four subknapsack
+equations
+σi = Ri
+mod 23n/16 .
+We solve these four equations independently by using the original Schroeppel-
+Shamir algorithm. Therefore in time ˜O(2n/8) and memory ˜O(2n/16) we obtain
+four lists {σ1}, {σ2}, {σ3} and {σ4} satisfying the four equations. Eventually to
+recover the knapsack solution we merge these four lists using the same merging
+procedure as in the original Schroeppel-Shamir algorithm; since each list has size
+˜O(2n/16), the merging procedure runs in time ˜O(2n/8) and memory ˜O(2n/16).
+Since we have guessed three values of 3n/16-bit each, the total running time is:
+˜O(23n/16)3 ·
+
+˜O(2n/8) + ˜O(2n/8)
+
+= ˜O(211n/16)
+as required, and the memory consumption is ˜O(2n/16).
+It is easy to generalize the previous algorithm to memory ˜O(2(1/16+ε)n) for
+any 0 ≤ϵ < 3/16. For this we take the Ri’s of size (3/16 −ε)n-bit each. We
+can still build the four lists {σi} in time ˜O(2n/8) using Schroeppel-Shamir, but
+this time the size of the lists is ˜O(2(1/16+ε)n), therefore it requires ˜O(2(1/16+ε)n)
+memory. The merging procedure now runs in time ˜O(2(1/8+2ε)n), still with mem-
+ory ˜O(2(1/16+ε)n). Therefore the total running time is:
+˜O(2(3/16−ε)n)3 ·
+
+˜O(2n/8) + ˜O(2(1/8+2ε)n)
+
+= ˜O(2(11/16−ε)n)
+as required, for a memory consumption ˜O(2(1/16+ε)n).
+Surprisingly there remains a gap between our variant of Schroeppel-Shamir
+with ˜O(2n/16) memory and our constant memory algorithm from Sect. 4.1.
+Namely we were unable to ﬁnd a variant of Schroeppel-Shamir requiring less
+than ˜O(2n/16) memory, nor a cycle-based algorithm requiring more than ˜O(1)
+memory.
+5
+Implementation and Experimental Evidence
+In order to verify the correctness of the algorithm presented in Sect. 3.3, we have
+implemented it. We ran our implementation on 50 random knapsacks containing
+
+--- PAGE 21 ---
+384
+A. Becker, J.-S. Coron, and A. Joux
+Table 1. Experimental versus theoretical sizes of the intermediate lists
+List type
+Min. size
+Max. size
+Theoretical estimate
+Lω
+12 024 816
+12 056 576
+Lω = (
+80
+6,1,73)
+1 847
+≈12 039 532
+Kκ
+61 487 864
+61 725 556
+L2
+ω
+2 352 689 ≈61 610 489
+Lκ
+12 473 460
+20 224 325
+Lκ =
+(
+80
+12,2,66)
+1 847·2 352 689 ≈31 583 129
+Kν
+14 409 247
+23 453 644
+L2
+κ
+17 394 593 ≈57 345 064
+Lν
+183 447
+268 964
+Lν =
+(
+80
+22,2,56)
+1 847·2 352 689·17 394 593 ≈592 402
+K0
+178
+1 090
+L2
+ν·1 847·2 352 689·17 394 593
+280
+≈21 942
+80 elements on 80 bits. The target sum was constructed in each case as a sum of
+40 knapsack elements. For each of these knapsacks, we ran our implementation
+several times, choosing new random modular constraints for each execution, until
+a solution was found. We added two -1s at the ﬁrst level, one -1 at the second
+and none at the third level. At the same time, we collected some statistics about
+the behavior of our code.
+The total running time to solve the 50 knapsacks was 14 hours and 50 minutes
+on a Intel R⃝CoreTM i7 CPU M 620 at 2.67GHz. The total number of repetitions
+of the basic algorithm was equal to 280. We observed that a maximum of 16
+repetitions (choice of a diﬀerent random value in level ν) was suﬃcient to ﬁnd the
+solution. Also, 53% of the 50 random knapsacks needed only up to 4 repetitions.
+On average, each knapsack required 5.6 repetitions.
+During the execution of the 280 repetitions of the basic algorithm, we also
+noted the length of the lists L and K (still containing inconsistent solutions) that
+occurred at each level. The moduli were chosen as primes of size as discussed in
+Sect. 3.3: Mω = 1 847, Mκ = 2 353 689, and Mν = 17 394 593. The experimental
+and theoretical list sizes are given in Table 1.
+We see in Table 1 that the sizes of Lω and Kκ are very close to the predicted
+values and do not vary a lot. We refer to the full version of our paper [2] for a
+more detailed discussion; see also [2] for implementation results on 96 bits.
+Acknowledgments. We would like to thank Alexander May and Alexander
+Meurer for pointing out the inconsistency issue in Howgrave-Graham–Joux al-
+gorithm. We also thank Dan Bernstein for helpful comments on a preliminary
+version of this work.
+
+--- PAGE 22 ---
+Improved Generic Algorithms for Hard Knapsacks
+385
+References
+1. Ajtai, M.: The shortest vector problem in L2 is NP-hard for randomized reductions
+(extended abstract). In: STOC 1998, pp. 10–19 (1998)
+2. Becker, A., Coron, J.-S., Joux, A.: Improved generic algorithms for hard knapsacks.
+Eprint archive (2011)
+3. Coster, M.J., Joux, A., LaMacchia, B.A., Odlyzko, A.M., Schnorr, C.-P., Stern,
+J.: Improved low-density subset sum algorithms. Computational Complexity 2,
+111–128 (1992)
+4. Garey, M.R., Johnson, D.S.: Computers and Intractability: A Guide to the Theory
+of NP-Completeness. W. H. Freeman, New York (1979)
+5. Howgrave-Graham, N., Joux, A.: New generic algorithms for hard knapsacks. In:
+Gilbert, H. (ed.) EUROCRYPT 2010. LNCS, vol. 6110, pp. 235–256. Springer,
+Heidelberg (2010)
+6. Knuth, D.E.: The Art of Computer Programming, 2nd edn. Seminumerical Algo-
+rithms, vol. II. Addison-Wesley, Reading (1981)
+7. Lagarias, J.C., Odlyzko, A.M.: Solving low-density subset sum problems. J.
+ACM 32(1), 229–246 (1985)
+8. Lenstra, A.K., Lenstra, H.W., Lov´asz, L.: Factoring polynomials with rational co-
+eﬃcients. Mathematische Annalen 261, 515–534 (1982)
+9. May, A., Meurer, A.: Personal communication
+10. Merkle, R.C., Hellman, M.E.: Hiding information and signatures in trapdoor knap-
+sacks. IEEE Transactions on Information Theory 24, 525–530 (1978)
+11. Nguyen, P.Q., Shparlinski, I.E., Stern, J.: Distribution of modular sums and the
+security of the server aided exponentiation. In: Progress in Computer Science and
+Applied Logic, Final Proceedings of Cryptography and Computational Number
+Theory Workshop, Singapore, vol. 20, pp. 331–224 (2001)
+12. Schnorr, C.-P.: A hierarchy of polynomial time lattice basis reduction algorithms.
+Theor. Comput. Sci. 53, 201–224 (1987)
+13. Schroeppel, R., Shamir, A.: A T = O(2n/2), S = O(2n/4) algorithm for certain
+NP-complete problems. SIAM J. Comput. 10(3), 456–464 (1981)
+14. Shamir, A.: A polynomial time algorithm for breaking the basic Merkle-Hellman
+cryptosystem. In: CRYPTO 1982, pp. 279–288 (1982)
+15. van Oorschot, P.C., Wiener, M.J.: Improving implementable meet-in-the-middle at-
+tacks by orders of magnitude. In: Koblitz, N. (ed.) CRYPTO 1996. LNCS, vol. 1109,
+pp. 229–236. Springer, Heidelberg (1996)
+16. Wagner, D.: A generalized birthday problem. In: Yung, M. (ed.) CRYPTO 2002.
+LNCS, vol. 2442, pp. 288–303. Springer, Heidelberg (2002)

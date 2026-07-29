@@ -1,0 +1,1852 @@
+
+--- PAGE 1 ---
+arXiv:quant-ph/0005055v1  15 May 2000
+Quantum Amplitude Ampliﬁcation
+and Estimation
+Gilles Brassard ∗
+Peter Høyer †
+Michele Mosca ‡
+Alain Tapp §
+2 May 2000
+Abstract
+Consider a Boolean function χ : X →{0, 1} that partitions set
+X between its good and bad elements, where x is good if χ(x) = 1
+and bad otherwise. Consider also a quantum algorithm A such that
+A|0⟩= P
+x∈X αx|x⟩is a quantum superposition of the elements of X,
+and let a denote the probability that a good element is produced if
+A|0⟩is measured. If we repeat the process of running A, measuring
+the output, and using χ to check the validity of the result, we shall
+expect to repeat 1/a times on the average before a solution is found.
+Amplitude ampliﬁcation is a process that allows to ﬁnd a good x after
+an expected number of applications of A and its inverse which is pro-
+portional to 1/√a, assuming algorithm A makes no measurements.
+∗D´epartement IRO, Universit´e de Montr´eal, C.P. 6128, succursale centre-ville,
+Montr´eal (Qu´ebec), Canada H3C 3J7. email: brassard@iro.umontreal.ca. Supported
+in part by Canada’s Nserc and Qu´ebec’s Fcar.
+† BRICS, Department of Computer Science, University of Aarhus, Ny Munkegade,
+Bldg. 540, DK-8000 Aarhus C, Denmark. email: hoyer@brics.dk. Part of this work was
+done while at D´epartement IRO, Universit´e de Montr´eal. Basic Research in Computer
+Science is supported by the Danish National Research Foundation.
+‡ CACR, Department of C&O, Faculty of Mathematics, University of Waterloo,
+Waterloo, Ontario, Canada N2L 3G1. email: mmosca@cacr.math.uwaterloo.ca. Most
+of this work was done while at Centre for Quantum Computation, Clarendon Laboratory,
+University of Oxford. Supported in part by Canada’s Nserc and UK’s Cesg.
+§ CACR, email: atapp@cacr.math.uwaterloo.ca. Most of this work was done while
+at D´epartement IRO, Universit´e de Montr´eal. Supported in part by a postdoctoral fellow-
+ship from Canada’s nserc.
+
+--- PAGE 2 ---
+This is a generalization of Grover’s searching algorithm in which A
+was restricted to producing an equal superposition of all members
+of X and we had a promise that a single x existed such that χ(x) = 1.
+Our algorithm works whether or not the value of a is known ahead of
+time. In case the value of a is known, we can ﬁnd a good x after a
+number of applications of A and its inverse which is proportional to
+1/√a even in the worst case. We show that this quadratic speedup can
+also be obtained for a large family of search problems for which good
+classical heuristics exist. Finally, as our main result, we combine ideas
+from Grover’s and Shor’s quantum algorithms to perform amplitude
+estimation, a process that allows to estimate the value of a. We ap-
+ply amplitude estimation to the problem of approximate counting, in
+which we wish to estimate the number of x ∈X such that χ(x) = 1.
+We obtain optimal quantum algorithms in a variety of settings.
+Keywords:
+Quantum computation. Searching. Counting. Lower bound.
+1
+Introduction
+Quantum computing is a ﬁeld at the junction of theoretical modern physics
+and theoretical computer science.
+Practical experiments involving a few
+quantum bits have been successfully performed, and much progress has been
+achieved in quantum information theory, quantum error correction and fault
+tolerant quantum computation. Although we are still far from having desk-
+top quantum computers in our oﬃces, the quantum computational paradigm
+could soon be more than mere theoretical exercise.
+The discovery by Peter Shor [15] of a polynomial-time quantum algorithm
+for factoring and computing discrete logarithms was a major milestone in the
+history of quantum computing. Another signiﬁcant result is Lov Grover’s
+quantum search algorithm [8, 9]. Grover’s algorithm does not solve NP–com-
+plete problems in polynomial time, but the wide range of its applications more
+than compensates for this.
+In this paper, we generalize Grover’s algorithm in a variety of directions.
+Consider a problem that is characterized by a Boolean function χ(x, y) in
+the sense that y is a good solution to instance x if and only if χ(x, y) = 1.
+(There could be more than one good solution to a given instance.) If we have
+a probabilistic algorithm P that outputs a guess P(x) on input x, we can call
+P and χ repeatedly until a solution to instance x is found. If χ(x, P(x)) = 1
+2
+
+--- PAGE 3 ---
+with probability px > 0, we expect to repeat this process 1/px times on the
+average. Consider now the case when we have a quantum algorithm A instead
+of the probabilistic algorithm. Assume A makes no measurements: instead
+of a classical answer, it produces quantum superposition |Ψx⟩when run on
+input x. Let ax denote the probability that |Ψx⟩, if measured, would be a
+good solution. If we repeat the process of running A on x, measuring the
+output, and using χ to check the validity of the result, we shall expect to
+repeat 1/ax times on the average before a solution is found. This is no better
+than the classical probabilistic paradigm.
+In Section 2, we describe a more eﬃcient approach to this problem, which
+we call amplitude ampliﬁcation. Intuitively, the probabilistic paradigm in-
+creases the probability of success roughly by a constant on each iteration; by
+contrast, amplitude ampliﬁcation increases the amplitude of success roughly
+by a constant on each iteration. Because amplitudes correspond to square
+roots of probabilities, it suﬃces to repeat the amplitude ampliﬁcation pro-
+cess approximately 1/√ax times to achieve success with overwhelming prob-
+ability.
+For simplicity, we assume in the rest of this paper that there is
+a single instance for which we seek a good solution, which allows us to
+dispense with input x, but the generalization to the paradigm outlined
+above is straightforward. Grover’s original database searching quantum al-
+gorithm is a special case of this process, in which χ is given by a function
+f : {0, 1, . . . , N −1} →{0, 1} for which we are promised that there exists a
+unique x0 such that f(x0) = 1. If we use the Fourier transform as quantum
+algorithm A—or more simply the Walsh–Hadamard transform in case N is
+a power of 2—an equal superposition of all possible x’s is produced, whose
+success probability would be 1/N if measured. Classical repetition would
+succeed after an expected number N of evaluations of f. Amplitude ampli-
+ﬁcation corresponds to Grover’s algorithm: it succeeds after approximately
+√
+N evaluations of the function.
+We generalize this result further to the case when the probability of suc-
+cess a of algorithm A is not known ahead of time: it remains suﬃcient to
+evaluate A and χ an expected number of times that is proportional to 1/√a.
+Moreover, in the case a is known ahead of time, we give two diﬀerent tech-
+niques that are guaranteed to ﬁnd a good solution after a number of iterations
+that is proportional to 1/√a in the worst case.
+It can be proven that Grover’s algorithm goes quadratically faster than
+any possible classical algorithm when function f is given as a black box.
+However, it is usually the case in practice that information is known about f
+3
+
+--- PAGE 4 ---
+that allows us to solve the problem much more eﬃciently than by exhaustive
+search. The use of classical heuristics, in particular, will often yield a solution
+signiﬁcantly more eﬃciently than straight quantum amplitude ampliﬁcation
+would. In Section 3, we consider a broad class of classical heuristics and show
+how to apply amplitude ampliﬁcation to obtain quadratic speedup compared
+to any such heuristic.
+Finally, Section 4 addresses the question of estimating the success prob-
+ability a of quantum algorithm A.
+We call this process amplitude es-
+timation.
+As a special case of our main result (Theorem 12), an esti-
+mate for a is obtained after any number M of iterations which is within
+2π
+p
+a(1 −a)/M + π2/M2 of the correct value with probability at least 8/π2,
+where one iteration consists of running algorithm A once forwards and once
+backwards, and of computing function χ once.
+As an application of this
+technique, we show how to approximately count the number of x such that
+f(x) = 1 given a function f : {0, 1, . . . , N −1} →{0, 1}.
+If the correct
+answer is t > 0, it suﬃces to compute the function
+√
+N times to obtain an
+estimate roughly within
+√
+t of the correct answer. A number of evaluations
+of f proportional to 1
+ε
+p
+N/t yields a result that is likely to be within εt of
+the correct answer. (We can do slightly better in case ε is not ﬁxed.) If it is
+known ahead of time that the correct answer is either t = 0 or t = t0 for some
+ﬁxed t0, we can determine which is the case with certainty using a number
+of evaluations of f proportional to
+p
+N/t0. If we have no prior knowledge
+about t, the exact count can be obtained with high probability after a num-
+ber of evaluations of f that is proportional to
+p
+t(N −t) when 0 < t < N
+and
+√
+N otherwise. Most of these results are optimal.
+We assume in this paper that the reader is familiar with basic notions of
+quantum computing.
+2
+Quantum amplitude ampliﬁcation
+Suppose we have a classical randomized algorithm that succeeds with some
+probability p. If we repeat the algorithm, say, j times, then our probability
+of success increases to roughly jp (assuming jp ≪1). Intuitively, we can
+think of this strategy as each additional run of the given algorithm boosting
+the probability of success by an additive amount of roughly p.
+A quantum analogue of boosting the probability of success would be to
+boost the amplitude of being in a certain subspace of a Hilbert space. The
+4
+
+--- PAGE 5 ---
+general concept of amplifying the amplitude of a subspace was discovered by
+Brassard and Høyer [4] as a generalization of the boosting technique applied
+by Grover in his original quantum searching paper [8]. Following [4] and [3],
+we refer to their idea as amplitude ampliﬁcation and detail the ingredients
+below.
+Let H denote the Hilbert space representing the state space of a quantum
+system. Every Boolean function χ : Z →{0, 1} induces a partition of H into
+a direct sum of two subspaces, a good subspace and a bad subspace. The good
+subspace is the subspace spanned by the set of basis states |x⟩∈H for which
+χ(x) = 1, and the bad subspace is its orthogonal complement in H. We say
+that the elements of the good subspace are good, and that the elements of
+the bad subspace are bad.
+Every pure state |Υ⟩in H has a unique decomposition as |Υ⟩= |Υ1⟩+
+|Υ0⟩, where |Υ1⟩denotes the projection onto the good subspace, and |Υ0⟩
+denotes the projection onto the bad subspace.
+Let aΥ = ⟨Υ1|Υ1⟩denote
+the probability that measuring |Υ⟩produces a good state, and similarly, let
+bΥ = ⟨Υ0|Υ0⟩. Since |Υ1⟩and |Υ0⟩are orthogonal, we have aΥ + bΥ = 1.
+Let A be any quantum algorithm that acts on H and uses no measure-
+ments. Let |Ψ⟩= A|0⟩denote the state obtained by applying A to the initial
+zero state. The ampliﬁcation process is realized by repeatedly applying the
+following unitary operator [4] on the state |Ψ⟩,
+Q = Q(A, χ) = −AS0 A−1Sχ.
+(1)
+Here, the operator Sχ conditionally changes the sign of the amplitudes of the
+good states,
+|x⟩7−→
+(
+−|x⟩
+if χ(x) = 1
+|x⟩
+if χ(x) = 0,
+while the operator S0 changes the sign of the amplitude if and only if the
+state is the zero state |0⟩. The operator Q is well-deﬁned since we assume
+that A uses no measurements and, therefore, A has an inverse.
+The usefulness of operator Q stems from its simple action on the sub-
+space HΨ spanned by the vectors |Ψ1⟩and |Ψ0⟩.
+Lemma 1 We have that
+Q|Ψ1⟩= (1 −2a)|Ψ1⟩−
+2a|Ψ0⟩
+Q|Ψ0⟩= 2(1 −a)|Ψ1⟩+ (1 −2a)|Ψ0⟩,
+5
+
+--- PAGE 6 ---
+where a = ⟨Ψ1|Ψ1⟩.
+It follows that the subspace HΨ is stable under the action of Q, a prop-
+erty that was ﬁrst observed by Brassard and Høyer [4] and rediscovered by
+Grover [10].
+Suppose 0 < a < 1. Then HΨ is a subspace of dimension 2, and otherwise
+HΨ has dimension 1. The action of Q on HΨ is also realized by the operator
+UΨUΨ0,
+(2)
+which is composed of 2 reﬂections. The ﬁrst operator, UΨ0 = I−
+2
+1−a|Ψ0⟩⟨Ψ0|,
+implements a reﬂection through the ray spanned by the vector |Ψ0⟩, while
+the second operator UΨ = I −2|Ψ⟩⟨Ψ| implements a reﬂection through the
+ray spanned by the vector |Ψ⟩.
+Consider the orthogonal complement H⊥
+Ψ of HΨ in H. Since the operator
+AS0A−1 acts as the identity on H⊥
+Ψ, operator Q acts as −Sχ on H⊥
+Ψ. Thus, Q2
+acts as the identity on H⊥
+Ψ, and every eigenvector of Q in H⊥
+Ψ has eigenvalue
++1 or −1. It follows that to understand the action of Q on an arbitrary initial
+vector |Υ⟩in H, it suﬃces to consider the action of Q on the projection of
+|Υ⟩onto HΨ.
+Since operator Q is unitary, the subspace HΨ has an orthonormal basis
+consisting of two eigenvectors of Q,
+|Ψ±⟩= 1
+√
+2
+ 1
+√a|Ψ1⟩±
+ı
+√1 −a|Ψ0⟩
+
+,
+(3)
+provided 0 < a < 1, where ı = √−1 denotes the principal square root of −1.
+The corresponding eigenvalues are
+λ± = e±ı2θa,
+(4)
+where the angle θa is deﬁned so that
+sin2(θa) = a = ⟨Ψ1|Ψ1⟩
+(5)
+and 0 ≤θa ≤π/2.
+We use operator Q to boost the success probability a of the quantum
+algorithm A. First, express |Ψ⟩= A|0⟩in the eigenvector basis,
+A|0⟩= |Ψ⟩= −ı
+√
+2
+ eıθa|Ψ+⟩−e−ıθa|Ψ−⟩
+
+.
+(6)
+6
+
+--- PAGE 7 ---
+It is now immediate that after j applications of operator Q, the state is
+Qj|Ψ⟩= −ı
+√
+2
+ e(2j+1)ıθa|Ψ+⟩−e−(2j+1)ıθa|Ψ−⟩
+
+(7)
+=
+1
+√a sin((2j + 1)θa) |Ψ1⟩+
+1
+√1 −a cos((2j + 1)θa) |Ψ0⟩.
+(8)
+It follows that if 0 < a < 1 and if we compute Qm|Ψ⟩for some integer m ≥0,
+then a ﬁnal measurement will produce a good state with probability equal
+to sin2((2m + 1)θa).
+If the initial success probability a is either 0 or 1, then the subspace
+HΨ spanned by |Ψ1⟩and |Ψ0⟩has dimension 1 only, but the conclusion
+remains the same: If we measure the system after m rounds of amplitude
+ampliﬁcation, then the outcome is good with probability sin2((2m + 1)θa),
+where the angle θa is deﬁned so that Equation 5 is satisﬁed and so that
+0 ≤θa ≤π/2.
+Therefore, assuming a > 0, to obtain a high probability of success, we
+want to choose integer m such that sin2((2m + 1)θa) is close to 1. Unfortu-
+nately, our ability to choose m wisely depends on our knowledge about θa,
+which itself depends on a. The two extreme cases are when we know the
+exact value of a, and when we have no prior knowledge about a whatsoever.
+Suppose the value of a is known. If a > 0, then by letting m = ⌊π/4θa⌋,
+we have that sin2((2m + 1)θa) ≥1 −a, as shown in [3]. The next theorem is
+immediate.
+Theorem 2 (Quadratic speedup) Let A be any quantum algorithm that
+uses no measurements, and let χ : Z →{0, 1} be any Boolean function.
+Let a the initial success probability of A.
+Suppose a > 0, and set m =
+⌊π/4θa⌋, where θa is deﬁned so that sin2(θa) = a and 0 < θa ≤π/2. Then,
+if we compute QmA |0⟩and measure the system, the outcome is good with
+probability at least max(1 −a, a).
+Note that any implementation of algorithm QmA|0⟩requires that the
+value of a is known so that the value of m can be computed. We refer to
+Theorem 2 as a quadratic speedup, or the square-root running-time result.
+The reason for this is that if an algorithm A has success probability a > 0,
+then after an expected number of 1/a applications of A, we will ﬁnd a good
+solution. Applying the above theorem reduces this to an expected number
+of at most (2m + 1)/max(1 −a, a) ∈Θ( 1
+√a) applications of A and A−1.
+7
+
+--- PAGE 8 ---
+As an application of Theorem 2, consider the search problem [9] in which
+we are given a Boolean function f : {0, 1, . . . , N −1} →{0, 1} satisfying the
+promise that there exists a unique x0 ∈{0, 1, . . . , N −1} on which f takes
+value 1, and we are asked to ﬁnd x0. If f is given as a black box, then on a
+classical computer, we need to evaluate f on an expected number of roughly
+half the elements of the domain in order to determine x0.
+By contrast, Grover [9] discovered a quantum algorithm that only requires
+an expected number of evaluations of f in the order of
+√
+N. In terms of
+amplitude ampliﬁcation, Grover’s algorithm reads as follows: Let χ = f, and
+let A = W be the Walsh-Hadamard transform on n qubits that maps the
+initial zero state |0⟩to
+1
+√
+N
+PN−1
+x=0 |x⟩, an equally-weighted superposition of all
+N = 2n elements in the domain of f. Then the operator Q = −AS0A−1Sχ is
+equal to the iterate −WS0WSf applied by Grover in his searching paper [9].
+The initial success probability a of A is exactly 1/N, and if we measure
+after m = ⌊π/4θa⌋iterations of Q, the probability of measuring x0 is lower
+bounded by 1 −1/N [3].
+Now, suppose that the value of a is not known. In Section 4, we discuss
+techniques for ﬁnding an estimate of a, whereafter one then can apply a
+weakened version of Theorem 2 in which the exact value of a is replaced by
+an estimate of it. Another idea is to try to ﬁnd a good solution without prior
+computation of an estimate of a. Within that approach, by adapting the
+ideas in Section 6 in [3] we can still obtain a quadratic speedup.
+Theorem 3 (Quadratic speedup without knowing a) There exists a
+quantum algorithm QSearch with the following property.
+Let A be any
+quantum algorithm that uses no measurements, and let χ : Z →{0, 1} be any
+Boolean function. Let a denote the initial success probability of A. Algorithm
+QSearch ﬁnds a good solution using an expected number of applications of
+A and A−1 which are in Θ( 1
+√a) if a > 0, and otherwise runs forever.
+The algorithm in the above theorem utilizes the given quantum algo-
+rithm A as a subroutine and the operator Q. The complete algorithm is as
+follows:
+Algorithm( QSearch(A, χ) )
+1. Set l = 0 and let c be any constant such that 1 < c < 2.
+2. Increase l by 1 and set M = ⌈cl⌉.
+8
+
+--- PAGE 9 ---
+3. Apply A on the initial state |0⟩, and measure the system. If the out-
+come |z⟩is good, that is, if χ(z) = 1, then output z and stop.
+4. Initialize a register of appropriate size to the state A|0⟩.
+5. Pick an integer j between 1 and M uniformly at random.
+6. Apply Qj to the register, where Q = Q(A, χ).
+7. Measure the register. If the outcome |z⟩is good, then output z and
+stop. Otherwise, go to step 2.
+The intuition behind this algorithm is as follows. In a 2-dimensional real
+vector space, if we pick a unit vector (x, y) = (cos(·), sin(·)) uniformly at
+random then the expected value of y2 is 1/2. Consider Equation 8. If we
+pick j at random between 1 and M for some integer M such that Mθa is
+larger than, say, 100π, then we have a good approximation to a random unit
+vector, and we will succeed with probability close to 1/2.
+To turn this intuition into an algorithm, the only obstacle left is that we
+do not know the value of θa, and hence do not know an appropriate value
+for M. However, we can overcome this by using exponentially increasing
+values of M, an idea similar to the one used in “exponential searching”
+(which is a term that does not refer to the running time of the method, but
+rather to an exponentially increasing growth of the size of the search space).
+The correctness of algorithm QSearch is immediate and thus to prove
+the theorem, it suﬃces to show that the expected number of applications
+of A and A−1 is in the order of 1/√a. This can be proven by essentially the
+same techniques applied in the proof of Theorem 3 in [3] and we therefore
+only give a very brief sketch of the proof.
+On the one hand, if the initial success probability a is at least 3/4, then
+step 3 ensures that we soon will measure a good solution. On the other hand,
+if 0 < a < 3/4 then, for any given value of M, the probability of measuring
+a good solution in step 7 is lower bounded by
+1
+2
+
+1 −
+1
+2M√a
+
+.
+(9)
+Let c0 > 0 be such that c = 2(1 −c0) and let M0 = 1/(2c0
+√a ). The
+expected number of applications of A is upper bounded by T1 + T2, where
+T1 denotes the maximum number of applications of A the algorithm uses
+9
+
+--- PAGE 10 ---
+while M < M0, and where T2 denotes the expected number of applications
+of A the algorithm uses while M ≥M0. Clearly T1 ∈O(M0) = O( 1
+√a) and
+we now show that T2 ∈O( 1
+√a) as well.
+For all M ≥M0, the measurement in step 7 yields a good solution with
+probability at least 1
+2(1 −c0), and hence it fails to yield a good solution with
+probability at most p0 = 1
+2(1 + c0). Thus for all i ≥0, with probability at
+most pi
+0, we have that M ≥M0ci at some point after step 2 while running
+the algorithm. Hence T2 is at most on the order of P
+i≥0 M0(cp0)i which is
+in O(M0) since cp0 < 1. The total expected number of applications of A is
+thus in O(M0), which is O( 1
+√a).
+For the lower bound, if M were in o
+  1
+√a
+
+, then the probability that we
+measure a good solution in step 7 would be vanishingly small. This completes
+our sketch of the proof of Theorem 3.
+2.1
+Quantum de-randomization when the success
+probability is known
+We now consider the situation where the success probability a of the quantum
+algorithm A is known. If a = 0 or a = 1, then amplitude ampliﬁcation will
+not change the success probability, so in the rest of this section, we assume
+that 0 < a < 1. Theorem 2 allows us to boost the probability of success to
+at least max(1 −a, a). A natural question to ask is whether it is possible
+to improve this to certainty, still given the value of a. It turns out that the
+answer is positive. This is unlike classical computers, where no such general
+de-randomization technique is known. We now describe 2 optimal methods
+for obtaining this, but other approaches are possible.
+The ﬁrst method is by applying amplitude ampliﬁcation, not on the orig-
+inal algorithm A, but on a slightly modiﬁed version of it. By Equation 8,
+if we measure the state QmA|0⟩, then the outcome is good with probabil-
+ity sin2((2m + 1)θa). In particular, if ˜m = π/4θa −1/2 happens to be an
+integer, then we would succeed with certainty after ˜m applications of Q.
+In general, m = ⌈˜m⌉iterations is a fraction of 1 iteration too many, but
+we can compensate for that by choosing θa = π/(4m + 2), an angle slightly
+smaller than θa. Any quantum algorithm that succeeds with probability a
+such that sin2(θa) = a, will succeed with certainty after m iterations of am-
+plitude ampliﬁcation. Given A and its initial success probability a, it is easy
+to construct a new quantum algorithm that succeeds with probability a ≤a:
+10
+
+--- PAGE 11 ---
+Let B denote the quantum algorithm that takes a single qubit in the initial
+state |0⟩and rotates it to the superposition
+p
+1 −a/a |0⟩+
+p
+a/a |1⟩. Apply
+both A and B, and deﬁne a good solution as one in which A produces a good
+solution, and the outcome of B is the state |1⟩. Theorem 4 follows.
+Theorem 4 (Quadratic speedup with known a) Let A be any quan-
+tum algorithm that uses no measurements, and let χ : Z →{0, 1} be any
+Boolean function. There exists a quantum algorithm that given the initial
+success probability a > 0 of A, ﬁnds a good solution with certainty using a
+number of applications of A and A−1 which is in Θ( 1
+√a) in the worst case.
+The second method to obtain success probability 1 requires a generaliza-
+tion of operator Q. Given angles 0 ≤φ, ϕ < 2π, redeﬁne Q as follows,
+Q = Q(A, χ, φ, ϕ) = −AS0(φ)A−1Sχ(ϕ).
+(10)
+Here, the operator Sχ(ϕ) is the natural generalization of the Sχ operator,
+|x⟩7−→
+(
+eıϕ|x⟩
+if χ(x) = 1
+|x⟩
+if χ(x) = 0.
+Similarly, the operator S0(φ) multiplies the amplitude by a factor of eıφ if and
+only if the state is the zero state |0⟩. The action of operator Q(A, χ, φ, ϕ)
+is also realized by applying an operator that is composed of two pseudo-
+reﬂections: the operator AS0(φ)A−1 and the operator −Sχ(ϕ).
+The next lemma shows that the subspace HΨ spanned by |Ψ1⟩and |Ψ0⟩is
+stable under the action of Q, just as in the special case Q(A, χ, π, π) studied
+above.
+Lemma 5 Let Q = Q(A, χ, φ, ϕ). Then
+Q|Ψ1⟩= eıϕ((1 −eıφ)a −1)|Ψ1⟩+
+eıϕ(1 −eıφ)a|Ψ0⟩
+Q|Ψ0⟩=
+(1 −eıφ)(1 −a)|Ψ1⟩−((1 −eıφ)a + eıφ)|Ψ0⟩,
+where a = ⟨Ψ1|Ψ1⟩.
+Let ˜m = π/4θa −1/2, and suppose that ˜m is not an integer.
+In the
+second method to obtain a good solution with certainty, we also apply ⌈˜m⌉
+iterations of amplitude ampliﬁcation, but now we slow down the speed of the
+11
+
+--- PAGE 12 ---
+very last iteration only, as opposed to of all iterations as in the ﬁrst method.
+For the case ˜m < 1, this second method has also been suggested by Chi and
+Kim [6]. We start by applying the operator Q(A, χ, φ, ϕ) with φ = ϕ = π
+a number of ⌊˜m⌋times to the initial state |Ψ⟩= A|0⟩. By Equation 8, this
+produces the superposition
+1
+√a sin
+ (2⌊˜m⌋+ 1)θa
+
+|Ψ1⟩+
+1
+√1 −a cos
+ (2⌊˜m⌋+ 1)θa
+
+|Ψ0⟩.
+Then, we apply operator Q one more time, but now using angles φ and ϕ,
+both between 0 and 2π, satisfying
+eıϕ(1 −eıφ)√a sin
+ (2⌊˜m⌋+ 1)θa
+
+= ((1 −eıφ)a + eıφ)
+1
+√1 −a cos
+ (2⌊˜m⌋+ 1)θa
+
+.
+(11)
+By Lemma 5, this ensures that the resulting superposition has inner product
+zero with |Ψ0⟩, and thus a subsequent measurement will yield a good solution
+with certainty.
+The problem of choosing φ, ϕ ∈R such that Equation 11 holds is equiv-
+alent to requiring that
+cot
+ (2⌊˜m⌋+ 1)θa
+
+= eıϕ sin(2θa)
+ −cos(2θa) + ı cot(φ/2)
+−1.
+(12)
+By appropriate choices of φ and ϕ, the right hand side of Equation 12 can be
+made equal to any nonzero complex number of norm at most tan(2θa). Thus,
+since the left hand side of this equation is equal to some real number smaller
+than tan(2θa), there exist φ, ϕ ∈R such that Equation 12 is satisﬁed, and
+hence also such that the expression in Equation 11 vanishes. In conclusion,
+applying Q(A, χ, φ, ϕ) with such φ, ϕ ∈R at the very last iteration allows us
+to measure a good solution with certainty.
+3
+Heuristics
+As explained in the previous section, using the amplitude ampliﬁcation tech-
+nique to search for a solution to a search problem, one obtains a quadratic
+speedup compared to a brute force search. For many problems, however,
+good heuristics are known for which the expected running time, when ap-
+plied to a “real-life” problem, is in o(
+√
+N), where N is the size of the search
+12
+
+--- PAGE 13 ---
+space. This fact would make amplitude ampliﬁcation much less useful un-
+less a quantum computer is somehow able to take advantage of these classical
+heuristics. In this section we concentrate on a large family of classical heuris-
+tics that can be applied to search problems. We show how these heuristics
+can be incorporated into the general amplitude ampliﬁcation process.
+By a heuristic, we mean a probabilistic algorithm, running in polyno-
+mial time, that outputs what one is searching for with some non-negligible
+probability.
+Suppose we have a family F of functions such that each f ∈F is of the
+form f : X →{0, 1}. For a given function f we seek an input x ∈X such that
+f(x) = 1. A heuristic is a function G : F × R →X, for an appropriate ﬁnite
+set R. The heuristic G uses a random seed r ∈R to generate a guess for an x
+such that f(x) = 1. For every function f ∈F, let tf = |{x ∈X | f(x) = 1}|,
+the number of good inputs x, and let hf = |{r ∈R | f(G(f, r)) = 1}|, the
+number of good seeds. We say that the heuristic is eﬃcient for a given f if
+hf/|R| > tf/|X|, that is, if using G and a random seed to generate inputs
+to f succeeds with a higher probability than directly guessing inputs to f
+uniformly at random. The heuristic is good in general if
+EF
+ hf
+|R|
+
+> EF
+ tf
+|X|
+
+.
+Here EF denotes the expectation over all f according to some ﬁxed distri-
+bution. Note that for some f, hf might be small but repeated uses of the
+heuristic, with seeds uniformly chosen in R, will increase the probability of
+ﬁnding a solution.
+Theorem 6 Let F ⊆{f | f : X →{0, 1}} be a family of Boolean functions
+and D be a probability distribution over F. If on a classical computer, using
+heuristic G : F ×R →X, one ﬁnds x0 ∈X such that f(x0) = 1 for random f
+taken from distribution D in expected time T then using a quantum computer,
+a solution can be found in expected time in O(
+√
+T ).
+Proof A simple solution to this problem is to embed the classical heuristic
+G into the function used in the algorithm QSearch. Let χ(r) = f(G(f, r))
+and x = G(f, QSearch(W, χ)), so that f(x) = 1. By Theorem 3, for each
+function f ∈F, we have an expected running time in Θ(
+p
+|R|/hf ). Let Pf
+denote the probability that f occurs. Then P
+f∈F Pf = 1, and we have that
+13
+
+--- PAGE 14 ---
+the expected running time is in the order of P
+f∈F
+p
+|R|/hf Pf, which can
+be rewritten as
+X
+f∈F
+s
+|R|
+hf
+Pf
+p
+Pf ≤
+ X
+f∈F
+|R|
+hf
+Pf
+!1/2  X
+f∈F
+Pf
+!1/2
+=
+ X
+f∈F
+|R|
+hf
+Pf
+!1/2
+by Cauchy–Schwarz’s inequality.
+⊓⊔
+An alternative way to prove Theorem 6 is to incorporate the heuristic
+into the operator A and do a minor modiﬁcation to f. Let A be the quan-
+tum implementation of G. It is required that the operator A be unitary,
+but clearly in general the classical heuristic does not need to be reversible.
+As usual in quantum algorithms one will need ﬁrst to modify the heuris-
+tic G : F × R →X to make it reversible, which can be done eﬃciently using
+standard techniques [2]. We obtain a reversible function G′
+f : R×0 →R×X.
+Let A be the natural unitary operation implementing G′
+f and let us modify
+χ (the good set membership function) to consider only the second part of
+the register, that is χ((r, x)) = 1 if and only if f(x) = 1. We then have that
+a = hf/|R| and by Theorem 3, for each function f ∈F, we have an expected
+running time in Θ(
+p
+|R|/hf ). The rest of the reasoning is similar. This
+alternative technique shows, using a simple example, the usefulness of the
+general scheme of amplitude ampliﬁcation described in the preceding section,
+although it is clear that from a computational point of view this is strictly
+equivalent to the technique given in the earlier proof of the theorem.
+4
+Quantum amplitude estimation
+Section 2 dealt in a very general way with combinatorial search problems,
+namely, given a Boolean function f : X →{0, 1} ﬁnd an x ∈X such that
+f(x) = 1. In this section, we deal with the related problem of estimating
+t = |{x ∈X | f(x) = 1}|, the number of inputs on which f takes the value 1.
+We can describe this counting problem in terms of amplitude estimation.
+Using the notation of Section 2, given a unitary transformation A and a
+Boolean function χ, let |Ψ⟩= A|0⟩. Write |Ψ⟩= |Ψ1⟩+ |Ψ0⟩as a superposi-
+tion of the good and bad components of |Ψ⟩. Then amplitude estimation is
+the problem of estimating a = ⟨Ψ1|Ψ1⟩, the probability that a measurement
+of |Ψ⟩yields a good state.
+14
+
+--- PAGE 15 ---
+The problem of estimating t = |{x ∈X | f(x) = 1}| can be formulated
+in these terms as follows. For simplicity, we take X = {0, 1, . . . , N −1}. If
+N is a power of 2, then we set χ = f and A = W. If N is not a power of 2,
+we set χ = f and A = FN, the quantum Fourier transform which, for every
+integer M ≥1, is deﬁned by
+FM : |x⟩7−→
+1
+√
+M
+M−1
+X
+y=0
+e2πıxy/M|y⟩
+(0 ≤x < M).
+(13)
+Then in both cases we have a = t/N, and thus an estimate for a directly
+translates into an estimate for t.
+To estimate a, we make good use of the properties of operator Q =
+−AS0 A−1Sf. By Equation 8 in Section 2, we have that the amplitudes of
+|Ψ1⟩and |Ψ0⟩as functions of the number of applications of Q, are sinusoidal
+functions, both of period
+π
+θa. Recall that 0 ≤θa ≤π/2 and a = sin2(θa), and
+thus an estimate for θa also gives an estimate for a.
+To estimate this period, it is a natural approach [5] to apply Fourier
+analysis like Shor [15] does for a classical function in his factoring algorithm.
+This approach can also be viewed as an eigenvalue estimation [12, 7] and is
+best analysed in the basis of eigenvectors of the operator at hand [13]. By
+Equation 4, the eigenvalues of Q on the subspace spanned by |Ψ1⟩and |Ψ0⟩
+are λ+ = eı2θa and λ−= e−ı2θa. Thus we can estimate a simply by estimating
+one of these two eigenvalues. Errors in our estimate ˜θa for θa translate into
+errors in our estimate ˜a = sin2(˜θa) for a, as described in the next lemma.
+Lemma 7 Let a = sin2(θa) and ˜a = sin2(˜θa) with 0 ≤θa, ˜θa ≤2π then
+˜θa −θa
+ ≤ε ⇒|˜a −a| ≤2ε
+p
+a(1 −a) + ε2 .
+Proof For ε ≥0, using standard trigonometric identities, we obtain
+sin2(θa + ε) −sin2(θa)
+=
+p
+a(1 −a) sin(2ε) + (1 −2a) sin2(ε) and
+sin2(θa) −sin2(θa −ε)
+=
+p
+a(1 −a) sin(2ε) + (2a −1) sin2(ε).
+The inequality follows directly.
+⊓⊔
+We want to estimate one of the eigenvalues of Q. For this purpose, we
+utilize the following operator Λ. For any positive integer M and any unitary
+operator U, the operator ΛM(U) is deﬁned by
+|j⟩|y⟩7−→|j⟩(Uj|y⟩)
+(0 ≤j < M).
+(14)
+15
+
+--- PAGE 16 ---
+Note that if |Φ⟩is an eigenvector of U with eigenvalue e2πıω, then ΛM(U)
+maps |j⟩|Φ⟩to e2πıωj|j⟩|Φ⟩.
+Deﬁnition 8 For any integer M > 0 and real number 0 ≤ω < 1, let
+|SM(ω)⟩=
+1
+√
+M
+M−1
+X
+y=0
+e2πıωy |y⟩.
+We then have, for all 0 ≤x ≤M −1
+FM |x⟩= |SM(x/M)⟩.
+The state |SM(ω)⟩encodes the angle 2πω (0 ≤ω < 1) in the phases of
+an equally weighted superposition of all basis states. Diﬀerent angles have
+diﬀerent encodings, and the overlap between |SM(ω0)⟩and |SM(ω1)⟩is a
+measure for the distance between the two angles ω0 and ω1.
+Deﬁnition 9 For any two real numbers ω0, ω1
+∈
+R, let d(ω0, ω1)
+=
+minz∈Z{|z + ω1 −ω0|}.
+Thus 2πd(ω0, ω1) is the length of the shortest arc on the unit circle going
+from e2πıω0 to e2πıω1.
+Lemma 10 For 0 ≤ω0 < 1 and 0 ≤ω1 < 1 let ∆= d(ω0, ω1). If ∆= 0 we
+have |⟨SM(ω0)|SM(ω1)⟩|2 = 1. Otherwise
+|⟨SM(ω0)|SM(ω1)⟩|2 = sin2(M∆π)
+M2 sin2(∆π).
+Proof
+|⟨SM(ω0)|SM(ω1)⟩|2
+=
+
+ 
+1
+√
+M
+M−1
+X
+y=0
+e−2πıω0y⟨y|
+!  
+1
+√
+M
+M−1
+X
+y=0
+e2πıω1y|y⟩
+!
+2
+=
+1
+M2
+
+M−1
+X
+y=0
+e2πı∆y
+
+2
+=
+sin2(M∆π)
+M2 sin2(∆π).
+⊓⊔
+16
+
+--- PAGE 17 ---
+Consider the problem of estimating ω where 0 ≤ω < 1, given the state
+|SM(ω)⟩. If ω = x/M for some integer 0 ≤x < M, then F−1
+M |SM(x/M)⟩=
+|x⟩by deﬁnition, and thus we have a perfect phase estimator. If Mω is not
+an integer, then observing F−1
+M |SM(ω)⟩still provides a good estimation of ω,
+as shown in the following theorem.
+Theorem 11 Let X be the discrete random variable corresponding to the
+classical result of measuring F−1
+M |SM(ω)⟩in the computational basis. If Mω
+is an integer then Prob(X = Mω) = 1. Otherwise, letting ∆= d(ω, x/M),
+Prob(X = x) =
+sin2(M∆π)
+M2 sin2(∆π) ≤
+1
+(2M∆)2 .
+For any k > 1 we also have
+Prob (d(X/M, ω) ≤k/M) ≥1 −
+1
+2(k −1)
+and, in the case k = 1 and M > 2,
+Prob (d(X/M, ω) ≤1/M) ≥
+8
+π2 .
+Proof Clearly
+Prob(X = x) =
+⟨x|F−1|SM(ω)⟩
+2
+=
+(F|x⟩)†|SM(ω)⟩
+2
+= |⟨SM(x/M)|SM(ω)⟩|2
+thus using Lemma 10 we directly obtain the ﬁrst part of the theorem. We
+use this fact to prove the next part of the theorem.
+Prob (d(X/M, ω) ≤k/M)
+=
+1 −Prob(d(X/M, ω) > k/M)
+≥
+1 −2
+∞
+X
+j=k
+1
+4M2( j
+M )2
+≥
+1 −
+1
+2(k −1).
+17
+
+--- PAGE 18 ---
+For the last part, we use the fact that for M > 2, the given expression
+attains its minimum at ∆= 1/(2M) in the range 0 ≤∆≤1/M.
+Prob (d(X/M, ω) ≤1/M)
+=
+Prob(X = ⌊Mω⌋) + Prob(X = ⌈Mω⌉)
+=
+sin2(M∆π)
+M2 sin2(∆π) + sin2(M( 1
+M −∆)π)
+M2 sin2(( 1
+M −∆)π)
+≥
+8
+π2.
+⊓⊔
+The following algorithm computes an estimate for a, via an estimate
+for θa.
+Algorithm( Est Amp(A, χ, M) )
+1. Initialize two registers of appropriate sizes to the state |0⟩A|0⟩.
+2. Apply FM to the ﬁrst register.
+3. Apply ΛM(Q) where Q = −AS0 A−1Sχ.
+4. Apply F−1
+M to the ﬁrst register.
+5. Measure the ﬁrst register and denote the outcome |y⟩.
+6. Output ˜a = sin2(π y
+M ).
+Steps 1 to 5 are illustrated on Figure 1.
+This algorithm can also be
+summarized, following the approach in [11], as the unitary transformation
+
+(F−1
+M ⊗I) ΛM(Q) (FM ⊗I)
+
+applied on state |0⟩A|0⟩, followed by a measurement of the ﬁrst register and
+classical post-processing of the outcome. In practice, we could choose M to
+be a power of 2, which would allow us to use a Walsh–Hadamard transform
+instead of a Fourier transform in step 2.
+18
+
+--- PAGE 19 ---
+Qj
+FM
+F−1
+M
+|0⟩
+|0⟩
+|0⟩
+|0⟩
+A|0⟩
+|y⟩
+s
+s
+Figure 1: Quantum circuit for amplitude estimation.
+Theorem 12 (Amplitude Estimation) For any positive integer k, the al-
+gorithm Est Amp(A, χ, M) outputs ˜a (0 ≤˜a ≤1) such that
+|˜a −a| ≤2πk
+p
+a(1 −a)
+M
++ k2 π2
+M2
+with probability at least
+8
+π2 when k = 1 and with probability greater than
+1 −
+1
+2(k−1) for k ≥2. It uses exactly M evaluations of f. If a = 0 then ˜a = 0
+with certainty, and if a = 1 and M is even, then ˜a = 1 with certainty.
+Proof After step 1, by Equation 6, we have state
+|0⟩A|0⟩
+=
+−ı
+√
+2
+|0⟩
+ eıθa|Ψ+⟩−e−ıθa|Ψ−⟩
+
+.
+After step 2, ignoring global phase, we have
+1
+√
+2M
+M−1
+X
+j=0
+|j⟩
+ eıθa|Ψ+⟩−e−ıθa|Ψ−⟩
+
+19
+
+--- PAGE 20 ---
+and after applying ΛM(Q) we have
+1
+√
+2M
+M−1
+X
+j=0
+|j⟩
+ eıθae2ıjθa|Ψ+⟩−e−ıθae−2ıjθa|Ψ−⟩
+
+=
+eıθa
+√
+2M
+M−1
+X
+j=0
+e2ıjθa|j⟩|Ψ+⟩−
+e−ıθa
+√
+2M
+M−1
+X
+j=0
+e−2ıjθa|j⟩|Ψ−⟩
+= eıθa
+√
+2 |SM( θa
+π )⟩|Ψ+⟩−e−ıθa
+√
+2 |SM(1 −θa
+π )⟩|Ψ−⟩.
+We then apply F−1
+M to the ﬁrst register and measure it in the computational
+basis.
+The rest of the proof follows from Theorem 11.
+Tracing out the sec-
+ond register in the eigenvector basis, we see that the ﬁrst register is in an
+equally weighted mixture of F−1
+M |SM( θa
+π )⟩and F−1
+M |SM(1 −θa
+π )⟩. Thus the
+measured value |y⟩is the result of measuring either the state F−1
+M |SM( θa
+π )⟩or
+the state F−1
+M |SM(1 −θa
+π )⟩. The probability of measuring |y⟩given the state
+F−1
+M |SM(1 −θa
+π )⟩is equal to the probability of measuring |M −y⟩given the
+state F−1
+M |SM( θa
+π )⟩.
+Since sin2  π (M−y)
+M
+
+= sin2  π y
+M
+
+, we can assume we
+measured |y⟩given the state F−1
+M |SM( θa
+π )⟩and ˜θa = π y
+M estimates θa as de-
+scribed in Theorem 11. Thus we obtain bounds on d(˜θa, θa) that translate,
+using Lemma 7, into the appropriate bounds on |˜a −a|.
+⊓⊔
+A straightforward application of this algorithm is to approximately count
+the number of solutions t to f(x) = 1. To do this we simply set A = W if
+N is a power of 2, or in general A = FN or any other transformation that
+maps |0⟩to
+1
+√
+N
+PN−1
+j=0 |j⟩. Setting χ = f, we then have a = ⟨Ψ1|Ψ1⟩= t/N,
+which suggests the following algorithm.
+Algorithm( Count(f, M) )
+1. Output t′ = N × Est Amp(FN, f, M).
+By Theorem 12, we obtain the following.
+20
+
+--- PAGE 21 ---
+Theorem 13 (Counting) For any positive integers M and k, and any
+Boolean function f : {0, 1, . . . , N −1} →{0, 1}, the algorithm Count(f, M)
+outputs an estimate t′ to t = |f −1(1)| such that
+t′ −t
+ ≤2πk
+p
+t(N −t)
+M
++ π2k2 N
+M2
+with probability at least 8/π2 when k = 1, and with probability greater than
+1 −
+1
+2(k−1) for k ≥2. If t = 0 then t′ = 0 with certainty, and if t = N and M
+is even, then t′ = N with certainty.
+Note that Count(f, M) outputs a real number. In the following count-
+ing algorithms we will wish to output an integer, and therefore we will
+round oﬀthe output of Count to an integer. To assure that the round-
+ing oﬀcan be done eﬃciently1 we will round oﬀto an integer ˜t satisfying
+˜t −Count(f, M)
+ ≤2
+3.
+If we want to estimate t within a few standard deviations, we can apply
+algorithm Count with M =
+√
+N
+
+.
+Corollary 14 Given a Boolean function f : {0, 1, . . . , N −1} →{0, 1} with
+t deﬁned as above, rounding oﬀthe output of Count
+ f,
+√
+N
+ 
+gives an
+estimate ˜t such that
+˜t −t
+ < 2π
+r
+t(N −t)
+N
++ 11
+(15)
+with probability at least 8/π2 and requires exactly
+√
+N
+
+evaluations of f.
+We now look at the case of estimating t with some relative error, also re-
+ferred to as approximately counting t with accuracy ε. For this we require the
+following crucial observation about the output t′ of algorithm Count(f, L).
+Namely t′ is likely to be equal to zero if and only if L ∈o(
+p
+N/t). Thus, we
+can ﬁnd a rough estimate of
+p
+N/t simply by running algorithm Count(f, L)
+with exponentially increasing values of L until we obtain a non-zero output.
+Having this rough estimate L of
+p
+N/t we can then apply Theorem 13 with
+M in the order of 1
+εL to ﬁnd an estimate ˜t of t with the required accuracy.
+The precise algorithm is as follows.
+1For example, if t′ + 1
+2 is super-exponentially close to an integer n we may not be able
+to decide eﬃciently if t′ is closer to n or n −1.
+21
+
+--- PAGE 22 ---
+Algorithm( Basic Approx Count(f, ε) )
+1. Start with ℓ= 0.
+2. Increase ℓby 1.
+3. Set t′ = Count(f, 2ℓ).
+4. If t′ = 0 and 2ℓ< 2
+√
+N then go to step 2.
+5. Set M =
+ 20π2
+ε 2ℓ
+.
+6. Set t′ = Count(f, M).
+7. Output an integer ˜t satisfying
+˜t −t′ ≤2
+3.
+Theorem 15 Given a Boolean function f with N and t deﬁned as above,
+and any 0 < ε ≤1, Basic Approx Count(f, ε) outputs an estimate ˜t such
+that
+˜t −t
+ ≤εt
+with probability at least 2
+3, using an expected number of evaluations of f which
+is in Θ
+ 1
+ε
+p
+N/t
+
+. If t = 0, the algorithm outputs ˜t = t with certainty and f
+is evaluated a number of times in Θ
+ √
+N
+
+.
+Proof When t = 0, the analysis is straightforward. For t > 0, let θ denote
+θt/N and m =
+
+log2( 1
+5θ)
+
+. From Theorem 11 we have that the probability
+that step 3 outputs Count(f, 2ℓ) = 0 for ℓ= 1, 2, . . . , m is
+m
+Y
+ℓ=1
+sin2(2ℓθ)
+22ℓsin2(θ) ≥
+m
+Y
+ℓ=1
+cos2(2ℓθ) = sin2(2m+1θ)
+22m sin2(2θ) ≥cos2   2
+5
+
+.
+The previous inequalities are obtained by using the fact that sin(Mθ) ≥
+M sin(θ) cos(Mθ) for any M ≥0 and 0 ≤Mθ < π
+2, which can be readily
+seen by considering the Taylor expansion of tan(x) at x = Mθ.
+Now assuming step 3 has outputted 0 at least m times (note that
+2m ≤
+1
+5θ ≤1
+5
+p
+N/t < 2
+√
+N), after step 5 we have M ≥20π2
+ε 2m+1 ≥4π2
+εθ and
+by Theorem 13 (and the fact that θ ≤π
+2 sin(θ) = π
+2
+p
+t/N) the probability
+22
+
+--- PAGE 23 ---
+that Count(f, M) outputs an integer t′ satisfying |t′ −t| ≤ε
+4t + ε2
+64t is at
+least 8/π2. Let us suppose this is the case. If εt < 1, then |˜t −t| < 1 and,
+since ˜t and t are both integers, we must have t = ˜t. If εt ≥1, then rounding
+oﬀt′ to ˜t introduces an error of at most 2
+3 ≤2ε
+3 t, making the total error at
+most ε
+4t + ε2
+64t + 2ε
+3 t < εt. Therefore the overall probability of outputting an
+estimate with error at most εt is at least cos2   2
+5
+
+× (8/π2) > 2
+3.
+To upper bound the number of applications of f, note that by Theorem 13,
+for any integer L ≥18π
+p
+N/t, the probability that Count(f, L) outputs 0 is
+less than 1/4. Thus the expected value of M at step 6 is in Θ(1
+ε
+p
+N/t).
+⊓⊔
+We remark that in algorithm Basic Approx Count, we could alterna-
+tively to steps 1 to 4 use algorithm QSearch of Section 2, provided we have
+QSearch also output its ﬁnal value of M. In this case, we would use (a mul-
+tiple of) that value as our rough estimate of
+p
+N/t, instead of using the ﬁnal
+value of 2ℓfound in step 4 of Basic Approx Count.
+Algorithm Basic Approx Count is optimal for any ﬁxed ε, but not in
+general. In Appendix A we give an optimal algorithm, while we now present
+two simple optimal algorithms for counting the number of solutions exactly.
+That is, we now consider the problem of determining the exact value of
+t = |f −1(−1)|. In the special case that we are given a nonzero integer t0 and
+promised that either t = 0 or t = t0, then we can determine which is the case
+with certainty using a number of evaluations of f in O(
+p
+N/t0). This is an
+easy corollary of Theorem 4 and we state it without proof.
+Theorem 16 Let f : {0, 1, . . . , N −1} →{0, 1} be a given Boolean function
+such that the cardinality of the preimage of 1 is either 0 or t0. Then there
+exists a quantum algorithm that determines with certainty which is the case
+using a number of evaluations of f which is in Θ
+ p
+N/t0
+
+, and in the latter
+case, also outputs a random element of f −1(1).
+For the general case in which we do not have any prior knowledge about t,
+we oﬀer the following algorithm.
+Algorithm( Exact Count(f) )
+1. Set t′
+1 = Count
+ f,
+
+14π
+√
+N
+
+and t′
+2 = Count
+ f,
+
+14π
+√
+N
+
+.
+2. Let Mi =
+
+30
+p
+(t′
+i + 1)(N −t′
+i + 1)
+
+for i = 1, 2.
+23
+
+--- PAGE 24 ---
+3. Set M = min{M1, M2}.
+4. Set t′ = Count(f, M).
+5. Output an integer ˜t satisfying
+˜t −t′ ≤2
+3.
+The main idea of this algorithm is the same as that of algorithm
+Basic Approx Count. First we ﬁnd a rough estimate t′
+r of t, and then
+we run algorithm Count(f, M) with a value of M that depends on t′
+r.
+By Theorem 13, if we set M to be in the order of
+p
+t′
+r(N −t′
+r), then the
+output t′ = Count(f, M) is likely to be so that |t′ −t| < 1
+3, in which case
+˜t = t.
+Theorem 17 Given a Boolean function f with N and t deﬁned as above,
+algorithm Exact Count requires an expected number of evaluations of f
+which is in Θ(
+p
+(t + 1)(N −t + 1) ) and outputs an estimate ˜t which equals
+t with probability at least 2
+3 using space only linear in log(N).
+Proof Apply Theorem 13 with k = 7. For each i = 1, 2, with probability
+greater than 11
+12, outcome t′
+i satisﬁes
+t′
+i −t
+ <
+q
+t(N−t)
+N
++ 1/4, in which case
+we also have that
+p
+t(N −t) ≤
+√
+2
+30 Mi. Thus, with probability greater than
+ 11
+12
+2, we have
+p
+t(N −t)
+M
+≤
+√
+2
+30 .
+Suppose this is the case. Then by Theorem 13, with probability at least 8/π2,
+|t′ −t| ≤2π
+√
+2
+30
++ 4π2
+302 < 1
+3
+and consequently
+|˜t −t| < 1.
+Hence, with probability at least
+  11
+12
+2 × 8/π2 > 2
+3, we have ˜t = t.
+The number of applications of f is 2
+
+14π
+√
+N
+
++ M. Consider the ex-
+pected value of Mi for i = 1, 2. Since
+p
+(t′
+i + 1)(N −t′
+i + 1) ≤
+p
+(t + 1)(N −t + 1) +
+p
+N|t′
+i −t|
+24
+
+--- PAGE 25 ---
+for any 0 ≤t′
+i, t ≤N, we just need to upper bound the expected value
+of
+p
+N|t′
+i −t|. By Theorem 13, for any k ≥2,
+|t′
+i −t| ≤k
+r
+t(N −t)
+N
++ k2
+with probability at least 1 −1
+k. Hence Mi is less than
+30(1 + k)
+p
+(t + 1)(N −t + 1) +
+√
+N
+
++ 1
+(16)
+with probability at least 1 −1
+k.
+In particular, the minimum of M1 and M2 is greater than the expression
+given in Equation 16 with probability at most
+1
+k2. Since any positive random
+variable Z satisfying Prob(Z > k) ≤
+1
+k2 has expectation upper bounded by
+a constant, the expected value of M is in O
+ p
+(t + 1)(N −t + 1)
+
+.
+⊓⊔
+It follows from Theorem 4.10 of [1] that any quantum algorithm
+capable
+of
+deciding
+with
+high
+probability
+whether
+or
+not
+a
+func-
+tion f : {0, 1, . . . , N −1} →{0, 1} is such that |f −1(1)| ≤t, given some
+0 < t < N,
+must query f
+a number of times which is at least in
+Ω
+ p
+(t + 1)(N −t + 1)
+
+times. Therefore, our exact counting algorithm is
+optimal up to a constant factor.
+Note also that successive applications of Grover’s algorithm in which we
+strike out the solutions as they are found will also provide an algorithm
+to perform exact counting.
+In order to obtain a constant probability of
+success, if the algorithm fails to return a new element, one must do more
+than a constant number of trials. In particular, repeating until we get log(N)
+failures will provide an overall constant probability of success. Unfortunately,
+the number of applications of f is then in O
+ √
+tN + log(N)
+p
+N/t
+
+and the
+cost in terms of additional quantum memory is prohibitive, that is in Θ(t).
+5
+Concluding remarks
+Let f : {0, 1, . . . , N −1} →{0, 1} be a function provided as a black box,
+in the sense that the only knowledge available about f is given by evaluat-
+ing it on arbitrary points in its domain. We are interested in the number
+of times that f must be evaluated to achieve certain goals, and this num-
+ber is our measure of eﬃciency.
+Grover’s algorithm can ﬁnd the x0 such
+25
+
+--- PAGE 26 ---
+that f(x0) = 1 quadratically faster in the expected sense than the best pos-
+sible classical algorithm provided the solution is known to be unique [8, 9].
+We have generalized Grover’s algorithm in several directions.
+⋄The quadratic speedup remains when the solution is not unique, even
+if the number of solutions is not known ahead of time.
+⋄If the number of solutions is known (and nonzero), we can ﬁnd one
+quadratically faster in the worst case than would be possible classically
+even in the expected case.
+⋄If the number t of solutions is known to be either 0 or t0, we can tell
+which is the case with certainty, and exhibit a solution if t > 0, in a
+time in O(
+p
+N/t0 ) in the worst case. By contrast, the best classical
+algorithm would need N −t0 + 1 queries in the worst case.
+This is
+much better than a quadratic speedup when t0 is large.
+⋄The quadratic speedup remains in a variety of settings that are not con-
+strained to the black-box model: even if additional information about
+f can be used to design eﬃcient classical heuristics, we can still ﬁnd
+solutions quadratically faster on a quantum computer, provided the
+heuristic falls under the broad scope of our technique.
+⋄We give eﬃcient quantum algorithms to estimate the number of
+solutions in a variety of error models. In all cases, our quantum algo-
+rithms are proven optimal, up to a multiplicative constant, among
+all possible quantum algorithms.
+In most cases, our quantum algo-
+rithms are known to be quadratically faster than the best possible
+classical algorithm. In the case of counting the number of solutions
+up to relative error ε, our optimal quantum algorithm is quadrati-
+cally faster than the best known classical algorithm for ﬁxed ε, but
+in fact it is better than that when ε is not a constant. Since we do
+not believe that a super-quadratic quantum improvement for a non-
+promise black-box problem is possible, we conjecture that there exists
+a classical algorithm that uses a number of queries in O(min{M2, N}),
+where M =
+q
+N
+⌊εt⌋+1 +
+√
+t(N−t)
+⌊εt⌋+1
+is proportional to the number of queries
+required by our optimal quantum algorithm. This conjecture is further
+supported by the fact that we can easily ﬁnd a good estimate for M2,
+26
+
+--- PAGE 27 ---
+without prior knowledge of t, using a number of classical queries in
+O( 1
+ε +
+N
+t+1).
+⋄We can amplify eﬃciently the success probability not only of classical
+search algorithms, but also of quantum algorithms. More precisely, if a
+quantum algorithm can output an x that has probability a > 0 of being
+such that f(x) = 1, then a solution can be found after evaluating f an
+expected number of time in O(1/√a ). If the value of a is known, a
+solution can be found after evaluating f a number of time in O(1/√a )
+even in the worst case. We call this process amplitude ampliﬁcation.
+Again, this is quadratically faster than would be possible if the quantum
+search algorithm were available as a black box to a classical algorithm.
+⋄Finally, we provide a general technique, known as amplitude estima-
+tion, to estimate eﬃciently the success probability a of quantum search
+algorithms. This is the natural quantum generalization of the above-
+mentioned technique to estimate the number of classical solutions to
+the equation f(x) = 1.
+The following table summarizes the number of applications of the given
+function f in the quantum algorithms presented in this paper. The table
+also compares the quantum complexities with the classical complexities of
+these problems, when the latter are known.
+Any lower bounds indicated
+(implicit in the use of the “Θ” notation) correspond to those in the black-
+box model of computation. In the case of the eﬃciency of quantum counting
+with accuracy ε, we refer to the algorithm given below in the Appendix.
+Problem
+Quantum Complexity
+Classical Complexity
+Decision
+Θ(
+p
+N/(t + 1) )
+Θ(N/(t + 1))
+Searching
+Θ(
+p
+N/(t + 1) )
+Θ(N/(t + 1))
+Counting with error
+√
+t
+Θ(
+√
+N )
+Counting with accuracy ε
+Θ
+q
+N
+⌊εt⌋+1 +
+√
+t(N−t)
+⌊εt⌋+1
+
+O( 1
+ε2N/(t + 1))
+Exact counting
+Θ
+ p
+(t + 1)(N −t + 1)
+
+Θ(N)
+27
+
+--- PAGE 28 ---
+We leave as open the problem of ﬁnding a quantum algorithm that
+exploits the structure of some searching or counting problem in a genuinely
+quantum way. By this, we mean in a way that is not equivalent to applying
+amplitude ampliﬁcation or amplitude estimation to a classical heuristic. Note
+that Shor’s factoring algorithm does this in the diﬀerent context of integer
+factorization.
+Acknowledgements
+We are grateful to Joan Boyar, Harry Buhrman, Artur Ekert, Ashwin Nayak,
+JeﬀShallitt, Barbara Terhal and Ronald de Wolf for helpful discussions.
+A
+Tight Algorithm for Approximate
+Counting
+Here we combine the ideas of algorithms Basic Approx Count and Ex-
+act Count to obtain an optimal algorithm for approximately counting. That
+this algorithm is optimal follows readily from Corollary 1.2 and Theorem 1.13
+of Nayak and Wu [14].
+Theorem 18 Given a Boolean function f with N and t deﬁned as above, and
+any ε such that
+1
+3N < ε ≤1, the following algorithm Approx Count(f, ε)
+outputs an estimate ˜t such that
+˜t −t
+ ≤εt
+with probability at least 2
+3, using an expected number of evaluations of f in
+the order of
+S =
+s
+N
+⌊εt⌋+ 1 +
+p
+t(N −t)
+⌊εt⌋+ 1 .
+If t = 0 or t = N, the algorithm outputs ˜t = t with certainty.
+We assume that εN > 1/3, since otherwise approximately counting with
+accuracy ε reduces to exact counting. Set
+S′ = min
+(
+1
+√ε
+r
+N
+t
+
+1 +
+r
+N −t
+εN
+
+,
+p
+(t + 1)(N −t + 1)
+)
+(17)
+28
+
+--- PAGE 29 ---
+and note that S′ ∈Θ(S) where S is deﬁned as in Theorem 18. The algo-
+rithm works by ﬁnding approximate values for each of the diﬀerent terms in
+Equation 17. The general outline of the algorithm is as follows.
+Algorithm( Approx Count(f, ε) )
+1. Find integer L1 approximating
+p
+N/(t + 1).
+2. Find integer L2 approximating
+p
+(N −t)/(εN).
+3. Set M1 =
+1
+√εL1(1 + L2).
+4. If M1 >
+√
+N then ﬁnd integer M2 approximating
+p
+(t + 1)(N −t + 1).
+If M1 ≤
+√
+N then set M2 = ∞.
+5. Set M = min{M1, M2}.
+6. Set t′ = Count(f, ⌈10πM⌉).
+7. Output an integer ˜t satisfying
+˜t −t′ ≤2
+3.
+Proof To ﬁnd L1, we run steps 1 to 4 of algorithm Basic Approx Count
+and then set L1 = ⌈9π × 2l⌉. A proof analogous to that of Theorem 15 gives
+that
+• L1 >
+p
+N/(t + 1) with probability at least 0.95, and
+• the expected value of L1 is in Θ
+ p
+N/(t + 1)
+
+.
+This requires a number of evaluations of f which is in Θ(L1) , and thus, the
+expected number of evaluations of f so far is in O(S′).
+In step 2, for some constant c to be determined below, we use 2
+ c
+√ε
+
+evaluations of f to ﬁnd integer L2 satisfying
+• L2 >
+p
+(N −t)/(εN) with probability at least 0.95, and
+• the expected value of L2 is in O
+ p
+(N −t + 1)/(εN)
+
+.
+29
+
+--- PAGE 30 ---
+Since N −t = |f −1(0)|, ﬁnding such L2 boils down to estimating, with
+accuracy in Θ(√ε ), the square root of the probability that f takes the value 0
+on a random point in its domain. Or equivalently, the probability that ¬f
+takes the value 1, where ¬f = 1 −f.
+Suppose for some constant c, we
+run Count(¬f,
+ c
+√ε
+
+) twice with outputs ˜r1 and ˜r2. By Theorem 13, each
+output ˜ri (i = 1, 2) satisﬁes that
+
+r
+˜ri
+εN −
+r
+N −t
+εN
+ ≤
+r
+2πk
+c
+4
+r
+N −t
+εN
++ πk
+c
+with probability at least 1 −
+1
+2(k−1) for every k ≥2. It follows that ˜r =
+min
+p
+˜r1/(εN),
+p
+˜r2/(εN)
+	
+has expected value in O
+ p
+(N −t + 1)/(εN)
+
+.
+Setting k = 21, c = 8πk, and L2 = ⌈2˜r⌉+ 1, ensures that L2 satisﬁes the two
+properties mentioned above. The number of evaluations of f in step 2 is in
+Θ( 1
+√ε) which is in O(S′).
+In step 3, we set M1 =
+1
+√εL1(1 + L2). Note that
+• M1 >
+1
+√ε
+q
+N
+t+1
+
+1 +
+q
+N−t
+εN
+
+with probability at least 0.952, and
+• the expected value of M1 is in the order of
+1
+√ε
+q
+N
+t+1
+
+1 +
+q
+N−t+1
+εN
+
+.
+In step 4, analogously to algorithm Exact Count, a number of evalua-
+tions of f in Θ(
+√
+N) suﬃces to ﬁnd an integer M2 such that
+• M2 >
+p
+(t + 1)(N −t + 1) with probability at least 0.95, and
+• the expected value of M2 is in Θ
+ p
+(t + 1)(N −t + 1)
+
+.
+Fortunately, since
+p
+(t + 1)(N −t + 1) ≥
+√
+N, we shall only need M2 if
+M1 >
+√
+N. We obtain that, after step 5,
+• M is greater than
+min
+(
+1
+√ε
+r
+N
+t + 1
+ 
+1 +
+r
+N −t
+εN
+!
+,
+p
+(t + 1)(N −t + 1)
+)
+with probability at least 0.953 > 0.85, and
+• the expected value of M is in O(S′).
+30
+
+--- PAGE 31 ---
+To derive this latter statement, we use the fact that the expected value
+of the minimum of two random variables is at most the minimum of their
+expectation.
+Finally, by Theorem 13, applying algorithm Count(f, ⌈10πM⌉) given
+such an M, produces an estimate t′ of t such that |t′ −t| ≤εt
+3 (which implies
+that |˜t −t| ≤εt) with probability at least 8/π2. Hence our overall success
+probability is at least 0.85 × 8/π2 > 2/3, and the expected number of evalu-
+ations of f is in O(S′).
+⊓⊔
+References
+[1] Beals, Robert, Harry Buhrman, Richard Cleve, Michele Mosca and
+Ronald de Wolf, “Quantum lower bounds by polynomials”, Proceed-
+ings of 39th Annual Symposium on Foundations of Computer Science,
+November 1998, pp. 352 – 361.
+[2] Bennett, Charles H., “Notes on the history of reversible computation”,
+IBM Journal of Research and Development, 1988, Vol. 32, pp. 16 – 23.
+[3] Boyer, Michel, Gilles Brassard, Peter Høyer and Alain Tapp,
+“Tight bounds on quantum searching”, Fortschritte Der Physik, special
+issue on quantum computing and quantum cryptography, 1998, Vol. 46,
+pp. 493 – 505.
+[4] Brassard, Gilles and Peter Høyer, “An exact quantum polynomial-
+time algorithm for Simon’s problem”, Proceedings of Fifth Israeli Sym-
+posium on Theory of Computing and Systems, IEEE Computer Society
+Press, June 1997, pp. 12 – 23.
+[5] Brassard, Gilles, Peter Høyer and Alain Tapp, “Quantum count-
+ing”,
+Proceedings of 25th International Colloquium on Automata,
+Languages, and Programming, Lecture Notes in Computer Science,
+Vol. 1443, Springer-Verlag, July 1998, pp. 820 – 831.
+[6] Chi, Dong–Pyo and Jinsoo Kim, “Quantum database searching by a sin-
+gle query”, Lecture at First NASA International Conference on Quan-
+tum Computing and Quantum Communications, Palm Springs, Febru-
+ary 1998.
+31
+
+--- PAGE 32 ---
+[7] Cleve, Richard, Artur Ekert, Chiara Macchiavello and Michele
+Mosca, “Quantum algorithms revisited”, Proceedings of the Royal So-
+ciety, London, Vol. A354, 1998, pp. 339 – 354.
+[8] Grover, Lov K., “A fast quantum mechanical algorithm for database
+search”, Proceedings of 28th Annual ACM Symposium on Theory of
+Computing, May 1996, pp. 212 – 219.
+[9] Grover, Lov K., “Quantum mechanics helps in searching for a needle in
+a haystack”, Physical Review Letters, Vol. 79, July 1997, pp. 325 – 328.
+[10] Grover, Lov K., “Quantum computers can search rapidly by using
+almost any transformation”, Physical Review Letters, Vol. 80, May 1998,
+pp. 4329 – 4332.
+[11] Høyer, Peter, “Conjugated operators in quantum algorithms”, Physical
+Review A, Vol. 59, May 1999, pp. 3280 – 3289.
+[12] Kitaev, A. Yu., “Quantum measurements and the Abelian stabilizer
+problem”, November 1995. Available at Los Alamos e-Print archive as
+<http://arXiv.org/abs/quant-ph/9511026>.
+[13] Mosca, Michele, “Quantum searching and counting by eigenvector
+analysis”, Proceedings of Randomized Algorithms, Satellite Workshop of
+23rd International Symposium on Mathematical Foundations of Com-
+puter Science, Brno, Czech Republic, August 1998, pp. 90 – 100.
+[14] Nayak, Ashwin and Felix Wu, “The quantum query complexity
+of approximating the median and related statistics”, Proceedings of
+31st Annual ACM Symposium on Theory of Computing, May 1999,
+pp. 384 – 393.
+[15] Shor, Peter W., “Polynomial-time algorithms for prime factorization
+and discrete logarithms on a quantum computer”, SIAM Journal on
+Computing, Vol. 26, October 1997, pp. 1484 – 1509.
+32

@@ -1,0 +1,1014 @@
+--- PAGE 1 ---
+Quantum algorithms for the subset-sum problem
+Daniel J. Bernstein1,2, Stacey Jeﬀery3, Tanja Lange2, and Alexander Meurer4
+1 Department of Computer Science
+University of Illinois at Chicago
+Chicago, IL 60607–7045, USA
+djb@cr.yp.to
+2 Department of Mathematics and Computer Science
+Technische Universiteit Eindhoven
+P.O. Box 513, 5600 MB Eindhoven, The Netherlands
+tanja@hyperelliptic.org
+3 Institute for Quantum Computing, University of Waterloo, Canada
+sjeffery@uwaterloo.ca
+4 Ruhr-University Bochum, Horst G¨ortz Institute for IT-Security
+alexander.meurer@rub.de
+Abstract. This paper introduces a subset-sum algorithm with heuristic
+asymptotic cost exponent below 0.25. The new algorithm combines the
+2010 Howgrave-Graham–Joux subset-sum algorithm with a new stream-
+lined data structure for quantum walks on Johnson graphs.
+Keywords: subset sum, quantum search, quantum walks, radix trees,
+decoding, SVP, CVP
+1
+Introduction
+The subset-sum problem is the problem of deciding, given integers x1, x2, . . . , xn
+and s, whether there exists a subset I of {1, 2, . . . , n} such that P
+i∈I xi = s; i.e.,
+whether there exists a subsequence of x1, x2, . . . , xn with sum s. Being able to
+solve this decision problem implies being able to ﬁnd such a subset if one exists:
+for n > 1 one recursively tries x1, x2, . . . , xn−1 with sum s or, if that fails, sum
+s −xn.
+The reader should imagine, as a typical “hard” case, that x1, x2, . . . , xn are
+independent uniform random integers in {0, 1, . . . , 2n}, and that s is chosen as
+a uniform random integer between (n/2 −√n)2n−1 and (n/2 + √n)2n−1. The
+number of subsets I ⊆{1, 2, . . . , n} with P
+i∈I xi = s then has a noticeable
+chance of being larger than 0 but is quite unlikely to be much larger, say larger
+than n.
+This work was supported by the National Science Foundation under grant 1018836,
+by the Netherlands Organisation for Scientiﬁc Research (NWO) under grant
+639.073.005, by NSERC Strategic Project Grant FREQUENCY, by the US ARO,
+and by the European Commission under Contract ICT-2007-216676 ECRYPT
+II. Permanent ID of this document: 797dcbe9c3389410ae4d5ae6dba33ab7. Date:
+2013.04.07.
+--- PAGE 2 ---
+2
+Bernstein, Jeﬀery, Lange, Meurer
+The subset-sum problem is, historically, one of the ﬁrst problems to be proven
+NP-complete. A polynomial-time non-quantum algorithm for the subset-sum
+problem would violate the standard P ̸= NP conjecture; a polynomial-time
+quantum algorithm for the subset-sum problem would violate the standard
+NP ̸⊆BQP conjecture. There is, however, a very large gap between polyno-
+mial time and the time needed for a naive search through all 2n subsets of
+{1, 2, . . . , n}. The standard NP ̸⊆BQP conjecture does not rule out faster
+exponential-time algorithms, or even subexponential-time algorithms, or even
+algorithms that take polynomial time for most inputs. This paper studies faster
+exponential-time algorithms.
+Variations. Often one is interested only in sums of ﬁxed weight, or of limited
+weight. We are now given integers x1, x2, . . . , xn, s, and w; the problem is to
+decide whether there is a subset I of {1, 2, . . . , n} such that P
+i∈I xi = s and
+#I = w. In the special case s = 0 with w ̸= 0, such a subset I immediately
+produces a short nonzero vector in the lattice L of vectors v ∈Zn satisfying
+P
+i xivi = 0: speciﬁcally, the characteristic function of I is a vector of length
+√w in L. In many applications this is the shortest nonzero vector in L; in some
+applications this vector can be found by standard SVP algorithms.
+For s ̸= 0 one can instead compute a vector r ∈Rn satisfying P
+i xiri = s, and
+then observe that subtracting the characteristic function of I from r produces
+an element of L. In many applications this is the vector in L closest to r; in some
+applications this vector can be found by standard CVP algorithms.
+A variant of the same problem is the central algorithmic problem in coding
+theory. The input now consists of vectors x1, x2, . . . , xn, a vector s, and an integer
+w; these vectors all have the same length and have entries in the ﬁeld F2 of
+integers modulo 2. The problem, as above, is to decide whether there is a subset
+I of {1, 2, . . . , n} such that P
+i∈I xi = s and #I = w.
+We do not mean to suggest that these problems are identical. However, the
+algorithmic techniques used to attack subset-sum problems are among the central
+algorithmic techniques used to attack lattice problems and decoding problems.
+For example, the best attack known against code-based cryptography, at least
+asymptotically, is a very recent decoding algorithm by Becker, Joux, May, and
+Meurer [4], improving upon a decoding algorithm by May, Meurer, and Thomae
+[24]; the algorithm of [4] is an adaptation of a subset-sum algorithm by Becker,
+Coron, and Joux [3], improving analogously upon a subset-sum algorithm by
+Howgrave-Graham and Joux [17].
+There is also a line of work on building cryptographic systems whose security
+is more directly tied to the subset-sum problem. For example, Lyubashevsky,
+Palacio, and Segev in [22] propose a public-key encryption system and prove that
+being able to break it implies being able to solve modular subset-sum problems
+of the following type: ﬁnd a random subset I ⊆{1, 2, . . . , n} given random
+x1, x2, . . . , xn modulo M and given P
+i∈I xi modulo M, where M is roughly
+(10n log n)n. They claim in [22, Section 1] that “there are currently no known
+quantum algorithms that perform better than classical ones on the subset sum
+problem”.
+--- PAGE 3 ---
+Quantum algorithms for the subset-sum problem
+3
+Exponent Quantum Split Algorithm
+1
+No
+1
+Brute force
+0.5
+Yes
+1
+Quantum search; §2
+0.5
+No
+1/2
+Left-right split; §2
+0.5
+No
+1/4
+Left-right split with a modulus; §4
+0.375
+Yes
+1/4
+Quantum search with a modulus; §4
+0.337. . .
+No
+1/16 Moduli + representations; §5
+0.333. . .
+Yes
+1/3
+Quantum left-right split; §2
+0.333. . .
+Yes
+1/2
+Quantum walk; §3
+0.3
+Yes
+1/4
+Quantum walk with a modulus; §4
+0.291. . .
+No
+1/16 Moduli + representations + overlap; [3]
+0.241. . .
+Yes
+1/16 New; quantum walk + moduli + representations; §5
+Table 1.1. Heuristic asymptotic performance of various subset-sum algorithms. An
+algorithm using 2(e+o(1))n operations is listed as “exponent” e.
+Contents of this paper. We introduce the ﬁrst subset-sum algorithm that
+beats 2n/4. Speciﬁcally, we introduce a quantum algorithm that, under rea-
+sonable assumptions, uses at most 2(0.241...+o(1))n qubit operations to solve a
+subset-sum problem. This algorithm combines quantum walks with the central
+“representations” idea of [17]. Table 1.1 compares this exponent 0.241 . . . to the
+exponents of other algorithms.
+One can reasonably speculate that analogous quantum speedups can also be
+applied to the algorithms of [24] and [4]. However, establishing this will require
+considerable extra work, similar to the extra work of [24] and [4] compared to
+[17] and [3] respectively.
+Cost metric and other conventions. This paper follows the tradition of
+measuring algorithm cost as the number of bit operations or, more generally,
+qubit operations. In particular, random access to an array of size 2O(n) is assumed
+to cost only nO(1), even if the array index is a quantum superposition.
+We systematically suppress cost factors polynomial in n; our concern is with
+asymptotic exponents such as the 0.241 . . . in 2(0.241...+o(1))n. We also assume
+that the inputs x1, x2, . . . , xn, s have nO(1) bits. These conventions mean, for
+example, that reading the entire input x1, x2, . . . , xn, s costs only 1.
+Almost all of the algorithms discussed here split size-n sets into parts, either
+2 or 3 or 4 or 16 parts, as indicated by the “Split” column in Table 1. Any
+reasonably balanced split is adequate, but to simplify the algorithm statements
+we assume that n is a multiple of 2 or 3 or 4 or 16 respectively.
+The algorithms in this paper are designed to work well for random inputs,
+particularly in the “hard” case that x1, x2, . . . , xn, s each have about n bits. Our
+analyses — like the analyses of state-of-the-art algorithms for integer factoriza-
+tion, discrete logarithms, and many other problems of cryptographic interest —
+are heuristic. We do not claim that the algorithms work for all inputs, and we
+do not claim that what we call the “hard” case is the worst case. Even for ran-
+dom inputs we do not claim that our analyses are proven, but we do speculate
+--- PAGE 4 ---
+4
+Bernstein, Jeﬀery, Lange, Meurer
+that they are provable by an adaptation of the proof ideas stated in [17, eprint
+version].
+Acknowledgments. This work was initiated during the Post-Quantum Cryp-
+tography and Quantum Algorithms workshop at the Lorentz Center in Novem-
+ber 2012. We acknowledge helpful discussions with Andris Ambainis, Fr´ed´eric
+Magniez, Nicolas Sendrier, and Jean-Pierre Tillich.
+2
+Searches
+Deﬁne Σ as the function that maps I ⊆{1, 2, . . . , n} to P
+i∈I xi. Recall that we
+assume that x1, x2, . . . , xn, s have nO(1) bits, and that we suppress polynomial
+cost factors; evaluating Σ therefore has cost 1.
+The subset-sum problem is the problem of deciding whether there exists I
+with Σ(I) = s, i.e., whether the function Σ −s has a root. A classical search for
+a root of Σ −s uses 2n evaluations of Σ −s, for a total cost of 2n. Of course, the
+search can ﬁnish much sooner if it ﬁnds a root (one expects only 2n−1 evaluations
+on average if there is 1 root, and fewer if there are more roots); but as discussed
+in Section 1 we focus on “hard” cases where there are not many roots, and
+then the cost is 2n (again, suppressing polynomial factors) with overwhelming
+probability.
+This section reviews two standard ways to speed up this brute-force search.
+The ﬁrst way is Grover’s quantum search algorithm. The second way is de-
+composing Σ(I) as Σ(I1) + Σ(I2), where I1 = I ∩{1, 2, . . . , n/2} and I2 =
+I ∩{n/2 + 1, . . . , n}; this split was introduced by Horowitz and Sahni in [16].
+Review: The performance of quantum search. Consider any computable
+function f with a b-bit input and a unique root. Grover’s algorithm [15] ﬁnds
+the root (with negligible failure chance) using approximately 2b/2 quantum eval-
+uations of f and a small amount of overhead.
+More generally, consider any computable function f with a b-bit input and
+r > 0 roots. Boyer, Brassard, Høyer, and Tapp in [6] introduced a generalization
+of Grover’s algorithm (almost exactly the same as Grover’s original algorithm but
+stopping after a particular r-dependent number of iterations) that ﬁnds a root
+(again with negligible failure chance) using approximately (2b/r)1/2 quantum
+evaluations of f and a small amount of overhead. One can easily achieve the
+same result by using Grover’s original algorithm sensibly (as mentioned in [15]):
+choose a fast but suﬃciently random map from b −⌈lg r⌉bits to b bits; the
+composition of this map with f has a good chance of having a unique root;
+apply Grover’s algorithm to this composition; repeat several times so that the
+failure chance becomes negligible.
+Even more generally, consider any computable function f with a b-bit input. A
+more general algorithm in [6] ﬁnds a root using approximately (2b/r)1/2 quantum
+evaluations of f and a small amount of overhead, where r is the number of roots.
+If no root exists then the algorithm says so after approximately 2b/2 quantum
+evaluations of f. As above, the algorithm can fail (or take longer than expected),
+--- PAGE 5 ---
+Quantum algorithms for the subset-sum problem
+5
+but only with negligible probability; and, as above, the same result can also be
+obtained from Grover’s algorithm.
+As a trivial application, take b = n and f = Σ −s: ﬁnding a root of Σ −s
+costs 2n/2. Some implementation details of this quantum subset-sum algorithm
+appeared in [9] in 2009. We emphasize, however, that the same operation count
+is achieved by well-known non-quantum algorithms, and is solidly beaten by
+recent non-quantum algorithms.
+Review: Left-right split. Deﬁne L1 = {(Σ(I1), I1) : I1 ⊆{1, 2, . . . , n/2}} and
+L2 = {(s −Σ(I2), I2) : I2 ⊆{n/2 + 1, n/2 + 2, . . . , n}}. Note that each of these
+sets has size just 2n/2.
+Compute L1 by enumerating sets I1. Store the elements of L1 in a table, and
+sort the table by its ﬁrst coordinate. Compute L2 by enumerating sets I2. For
+each (s−Σ(I2), I2) ∈L2, look for s−Σ(I2) by binary search in the sorted table.
+If there is a collision Σ(I1) = s −Σ(I2), print out I1 ∪I2 as a root of Σ −s and
+stop. If there are no collisions, print “there is no subset-sum solution” and stop.
+This algorithm costs 2n/2. It uses 2n/2 memory, and one can object that
+random access to memory is expensive, but we emphasize that this paper follows
+the tradition of simply counting operations. There are several standard variants
+of this algorithm: for example, one can sort L1 and L2 together, or one can store
+the elements of L1 in a hash table.
+Quantum left-right split. Redeﬁne L1 as {(Σ(I1), I1) : I1 ⊆{1, 2, . . . , n/3}};
+note that n/2 has changed to n/3. Compute and sort L1 as above; this costs
+2n/3.
+Consider the function f that maps a subset I2 ⊆{n/3 + 1, n/3 + 2, . . . , n} to
+0 if s −Σ(I2) is a ﬁrst coordinate in L1, otherwise to 1. Binary search in the
+sorted L1 table costs only 1, so computing f costs only 1.
+Now use quantum search to ﬁnd a root of f, i.e., a subset I2 ⊆{n/3 + 1, . . . , n}
+such that s −Σ(I2) is a ﬁrst coordinate in L1. There are 2n/3 bits of input to
+f, so the quantum search costs 2n/3.
+Finally, ﬁnd an I1 such that s −Σ(I2) = Σ(I1), and print I1 ∪I2. Like the
+previous algorithm, this algorithm ﬁnds a root of Σ −s if one exists; any root I
+of Σ −s can be expressed as I1 ∪I2.
+Note that, with the original split of {1, . . . , n} into left and right halves,
+quantum search would not have reduced cost (modulo polynomial factors). Gen-
+eralizing the original algorithm to allow an unbalanced split, and in particular a
+split into n/3 and 2n/3, is pointless without quantum computers but essential
+for the quantum optimization. The split into n/3 and 2n/3 imitates the approach
+used by Brassard, Høyer, and Tapp in [8] to search for hash-function collisions.
+This algorithm uses 2n/3 memory, and as before one can object that random
+access to memory is expensive, especially when memory locations are quantum
+superpositions. See [5] for an extended discussion of the analogous objection to
+[8]. We again emphasize that this paper follows the tradition of simply counting
+operations; we do not claim that improved operation counts imply improvements
+in other cost models.
+--- PAGE 6 ---
+6
+Bernstein, Jeﬀery, Lange, Meurer
+3
+Walks
+This section summarizes Ambainis’s unique-collision-ﬁnding algorithm [2] (from
+the edge-walk perspective of [23]); introduces a new way to streamline Ambai-
+nis’s algorithm; and applies the streamlined algorithm to the subset-sum context,
+obtaining cost 2n/3 in a diﬀerent way from Section 2. This section’s subset-sum
+algorithm uses collision ﬁnding as a black box, but the faster algorithms in Sec-
+tion 5 do not.
+Review: Quantum walks for ﬁnding unique collisions. Consider any com-
+putable function f with b-bit inputs such that there is a unique pair of colliding
+inputs, i.e., exactly one pair (x, y) of b-bit strings such that f(x) = f(y). The
+problem tackled in [2] is to ﬁnd this pair (x, y).
+The algorithm has a positive integer parameter r < 2b, normally chosen on
+the scale of 22b/3. At each step the algorithm is in a superposition of states of the
+form (S, f(S), T, f(T)). Here S and T are sets of b-bit strings such that #S = r,
+#T = r, and #(S∩T) = r−1; i.e., S and T are adjacent vertices in the “Johnson
+graph” of r-subsets of the set of b-bit strings, where edges are between sets that
+diﬀer in exactly one element. The notation f(S) means {f(x) : x ∈S}.
+The algorithm begins in a uniform superposition of states; setting up this
+superposition uses O(r) quantum evaluations of f. The algorithm then performs
+a “quantum walk” that alternates two types of steps: diﬀusing each state to a
+new choice of T while keeping S ﬁxed, and diﬀusing each state to a new choice
+of S while keeping T ﬁxed. Only one element of T changes when S is ﬁxed (and
+vice versa), so each step uses only O(1) quantum evaluations of f.
+Periodically (e.g., after every 2⌈√r⌉steps) the algorithm negates the ampli-
+tude of every state in which S contains a colliding pair, i.e., in which #f(S) < r.
+Because f(S) has already been computed, checking whether #f(S) < r does not
+involve any evaluations of f. One can object that this check is nevertheless ex-
+tremely expensive; this objection is discussed in the “data structures” subsection
+below.
+Ambainis’s analysis shows that after roughly 2b/√r steps the algorithm has
+high probability of being in a state in which S contains a colliding pair. Observing
+this state and then sorting the pairs (f(x), x) for x ∈S reveals the colliding pair.
+Overall the algorithm uses only O(22b/3) evaluations of f.
+As in the case of Grover’s algorithm, this algorithm is easily generalized to
+the case that there are p pairs of colliding inputs, and to the case that p is not
+known in advance. The algorithm is also easily generalized to functions of S
+more complicated than “contains a colliding pair”.
+Data structures. The most obvious way to represent a set of b-bit strings
+is as a sorted array. The large overlap between S and T suggests storing the
+union S ∪T, together with a pointer to the element not in S and a pointer to
+the element not in T; similar comments apply to the multisets f(S) and f(T).
+Keeping a running tally of #f(S) allows easily checking whether #f(S) < r.
+To decide whether a b-bit string x is suitable as a new element of T, one
+must check whether x ∈S. Actually, what the diﬀusion steps need is not merely
+--- PAGE 7 ---
+Quantum algorithms for the subset-sum problem
+7
+knowing whether x ∈S, but also knowing the number of elements of S smaller
+than x. (“Smaller” need not be deﬁned lexicographically; the real objective is to
+compute a bijective map from b-bit strings to
+
+1, 2, 3, . . . , 2b	
+that maps S to
+{1, 2, 3, . . . , r}.) The obvious sorted-array data structure allows these questions
+to be eﬃciently answered by binary search.
+The big problem with this data structure is that inserting the new string into
+T requires, in the worst case, moving the other r elements of the array. This
+cost-r operation is performed at every step of the quantum walk, and dominates
+the total cost of the algorithm (unless evaluating f is very slow).
+There is an extensive literature on classical data structures that support these
+operations much more eﬃciently. However, adapting a data structure to the
+quantum context raises three questions:
+• Is the data-structure performance a random variable? Many data structures
+in the literature are randomized and provide good average-case performance
+but not good worst-case performance. The standard conversion of an al-
+gorithm to a quantum circuit requires ﬁrst expressing the algorithm as a
+classical combinatorial circuit; the size of this circuit reﬂects the worst-case
+performance of the original algorithm.
+• Does the performance of the data structure depend on S? For example, a
+standard hash table provides good performance for most sets S but not for
+all sets S.
+• Is the data structure history-dependent? For most data structures, the rep-
+resentation of a set S depends on the order in which elements were added
+to and removed from the set. This spoils the analysis of the quantum walk
+through sets S, and presumably spoils the actual performance of the walk.
+The ﬁrst problem is usually minor: one can simply stop each algorithm after a
+constant time, where the constant is chosen so that the chance of an incorrect
+answer is negligible. The second problem can usually be converted into the ﬁrst
+problem by some extra randomization: for example, one can choose a random
+hash function from a suitable family (as suggested by Wegman and Carter in
+[33]), or encrypt the b-bit strings before storing them. But the third problem
+is much more serious: it rules out balanced trees, red-black trees, most types of
+hash tables, etc.
+Ambainis handles these issues in [2, Section 6] with an ad-hoc “combination
+of a hash table and a skip list”, requiring several pages of analysis. We point out
+a much simpler solution: storing S etc. in a radix tree. Presumably this also saves
+time, although the speedup is not visible at the level of detail of our analysis.
+The simplest type of radix tree is a binary tree in which the left subtree stores
+{x : (0, x) ∈S} and the right subtree stores {x : (1, x) ∈S}; subtrees storing
+empty sets are omitted. To check whether x ∈S one starts from the root of the
+tree and follows pointers according to the bits of x in turn; the worst-case number
+of operations is proportional to the number of bits in x. Counting the number of
+elements of S smaller than x is just as easy if each tree node is augmented by a
+count of the number of elements below that node. A tree storing f(S), with each
+leaf node accompanied by its multiplicity, allows an eﬃcient running tally of the
+--- PAGE 8 ---
+8
+Bernstein, Jeﬀery, Lange, Meurer
+number #f(S) of distinct elements of f(S), and in particular quickly checking
+whether #f(S) < r.
+Randomizing the memory layout of the nodes for the radix tree for S (induc-
+tively, by placing each new node at a uniform random free position) provides
+history-independence for the classical data structure: each possible representa-
+tion of S has equal probability to appear. Similarly, creating a uniform superpo-
+sition over all possible memory layouts of the nodes produces a unique quantum
+data structure representing S.
+Subset-sum solutions via collisions. It is straightforward to recast the subset-
+sum problem as a collision-ﬁnding problem.
+Consider the function f that maps (1, I1) to Σ(I1) for I1 ⊆{1, 2, . . . , n/2}, and
+maps (2, I2) to s −Σ(I2) for I2 ⊆{n/2 + 1, n/2 + 2, . . . , n}. Use the algorithm
+described above to ﬁnd a collision in f. There are only n/2 + 1 bits of input to
+f, so the cost of this algorithm is only 2n/3.
+In the “hard” cases of interest in this paper, there are not likely to be many
+collisions among inputs (1, I1), and there are not likely to be many collisions
+among inputs (2, I2), so the collision found has a good chance of having the
+form Σ(I1) = s −Σ(I2), i.e., Σ(I1 ∪I2) = s. One can, alternatively, tweak the
+algorithm to ignore collisions among (1, I1) and collisions among (2, I2) even if
+such collisions exist.
+4
+Moduli
+This section discusses the use of a “modulus” to partition the spaces being
+searched in Section 2. The traditional view is that this is merely a method
+to reduce memory consumption (which we do not measure in this paper); but
+moduli are also an essential building block for the faster algorithms of Section 5.
+This section reviews the traditional left-right split with a modulus, and then
+states a quantum algorithm with a modulus, as a warmup for the faster quantum
+algorithm of Section 5.
+Schroeppel and Shamir in [29] introduced an algorithm with essentially the
+same reduction of memory consumption, but that algorithm does not use moduli
+and does not seem helpful in Section 5. Three decades later, Howgrave-Graham
+and Joux in [17, eprint version, Section 3.1] described the left-right split with
+a modulus as a “useful practical variant” of the Schroeppel–Shamir algorithm;
+Becker, Coron, and Joux stated in [3] that this was a “simpler but heuristic
+variant of Schroeppel–Shamir”. A more general algorithm (with one minor re-
+striction, namely a prime choice of modulus) had already been stated a few years
+earlier by Elsenhans and Jahnel; see [10, Section 4.2.1] and [11, page 2]. There
+are many earlier papers that used moduli to partition input spaces without stat-
+ing the idea in enough generality to cover subset sums; we have not attempted
+to comprehensively trace the history of the idea.
+--- PAGE 9 ---
+Quantum algorithms for the subset-sum problem
+9
+Review: Left-right split with a modulus. Choose a positive integer M ≈
+2n/4, and choose t ∈{0, 1, 2, . . . , M −1}. Compute
+L1 = {(Σ(I1), I1) : I1 ⊆{1, 2, . . . , n/2},
+Σ(I1) ≡t
+(mod M)}.
+The problem of ﬁnding all I1 here is a size-n/2 subset-sum problem modulo M.
+This problem can, in turn, be solved as a small number of size-n/2 subset-sum
+problems without moduli, namely searching for subsets of x1 mod M, x2 mod
+M, . . . , xn/2 mod M having sum t or t + M or . . . or t + (n/2 −1)M. Note,
+however, that it is important for this size-n/2 subroutine to ﬁnd all solutions
+rather than just one solution.
+A reasonable choice of subroutine here is the original left-right-split algorithm
+(without a modulus). This subroutine costs 2n/4 for a problem of size n/2, and
+is trivially adapted to ﬁnd all solutions. For this adaptation one must add the
+number of solutions to the cost, but in this context one expects only about
+2n/2/M ≈2n/4 subsets I1 to satisfy Σ(I1) ≡t (mod M), for a total cost of
+2n/4. One can also tweak this subroutine to work directly with sums modulo M,
+rather than separately handling t, t + M, etc.
+Similarly compute
+L2 = {(s −Σ(I2), I2) : I2 ⊆{n/2 + 1, . . . , n},
+Σ(I2) ≡s −t
+(mod M)}.
+Store L1 in a sorted table, and for each (s −Σ(I2), I2) ∈L2 check whether
+s −Σ(I2) appears in the table. If there is a collision Σ(I1) = s −Σ(I2), print
+I1 ∪I2 as a root of Σ −s and stop. Otherwise try another value of t, repeating
+until all choices of t ∈{0, 1, 2, . . . , M −1} are exhausted.
+One expects each choice of t to cost 2n/4, as discussed above. There are
+M ≈2n/4 choices of t, for a total cost of 2n/2. If there is a subset-sum solution
+then it will be found for some choice of t.
+Quantum search with a modulus. The algorithm above is a classical search
+for a root of the function that maps t to 0 if there is a collision Σ(I1) = s−Σ(I2)
+satisfying Σ(I1) ≡t (mod M) (and therefore also satisfying Σ(I2) ≡s −t
+(mod M)). One way to take advantage of quantum computers here is to instead
+search for t by Grover’s algorithm, which ﬁnds the root with only
+√
+M ≈2n/8
+quantum evaluations of the same function, for a total cost of 2n/82n/4 = 23n/8.
+Quantum walks with a modulus. A diﬀerent way to take advantage of quan-
+tum computers is as follows.
+Recall that the collision-ﬁnding algorithm of Section 3 walks through adjacent
+pairs of size-r sets S, searching for sets that contain collisions under a function
+f. Each set S is stored in a radix tree, as is the multiset f(S). Each radix tree
+is augmented to record at each node the number of distinct elements below that
+node, allowing fast evaluation of the number of elements of S smaller than a
+speciﬁed input and fast evaluation of whether S contains a collision.
+One can design this collision-ﬁnding algorithm in four steps:
+• Start with a simple classical collision-ﬁnding algorithm that computes f(S)
+where S is the set of all 2b b-bit strings.
+--- PAGE 10 ---
+10
+Bernstein, Jeﬀery, Lange, Meurer
+• Generalize to a lower-probability algorithm that computes f(S) where S is
+a set of only r strings and that checks whether S contains the collision.
+• Build a data structure that expresses the entire computation of the lower-
+probability algorithm. Observe that this data structure allows eﬃciently
+moving from S to an adjacent set: a single element of S has only a small
+impact on the computation.
+• Apply a quantum walk, walking through adjacent pairs of size-r sets S while
+maintaining this data structure for each S. This takes O(√r/√p) steps where
+p is the success probability of the previous algorithm, plus cost r to set up
+the data structure in the ﬁrst place.
+We now imitate the same four-step approach, starting from the classical left-
+right split with a modulus and ending with a new quantum subset-sum algorithm.
+The following description assumes that the correct value of t is already known;
+the overhead of searching for t is discussed after the algorithm.
+First step: Classical algorithm. Recall that the subroutine to ﬁnd all I1 with
+Σ(I1) ≡t computes Σ(I11) mod M for all I11 ⊆{1, 2, . . . , n/4}; computes t −
+Σ(I12) mod M for all I12 ⊆{n/4 + 1, n/4 + 2, . . . , n/2}; and ﬁnds collisions be-
+tween Σ(I11) mod M and t−Σ(I12) mod M. Similarly, the subroutine to ﬁnd all
+I2 ﬁnds collisions between Σ(I21) mod M for I21 ⊆{n/2 + 1, n/2 + 2, . . . , 3n/4}
+and s −t −Σ(I22) mod M for I22 ⊆{3n/4 + 1, 3n/4 + 2, . . . , n}. The high-level
+algorithm ﬁnishes by ﬁnding collisions between Σ(I1) and s −Σ(I2).
+Second step: Generalize to a lower-probability computation by restricting the
+sets that contain collisions. Speciﬁcally, instead of enumerating all subsets I11,
+take a random collection S11 containing exactly r such subsets; here r ≤2n/4
+is an algorithm parameter optimized below. Similarly take a random collection
+S12 of exactly r subsets I12. Find collisions between Σ(I11) mod M and t −
+Σ(I12) mod M; one expects about r2/M collisions, producing r2/M sets I1 =
+I11 ∪I12 satisfying Σ(I1) ≡t (mod M). Similarly take random size-r sets S21
+and S22 consisting of, respectively, subsets I21 and I22; ﬁnd collisions between
+Σ(I21) mod M and s−t−Σ(I22) mod M, obtaining about r2/M sets I2 satisfying
+Σ(I2) ≡s−t (mod M). Finally check for collisions between Σ(I1) and s−Σ(I2).
+One can visualize the construction of I = I1 ∪I2 as a three-level binary tree with
+I as the root, I1 and I2 as its left and right children, and I11, I12, I21, I22 as the
+leaves.
+Recall that we are assuming that the correct value of t is known, i.e., that the
+desired subset-sum solution is expressible as I1 ∪I2 with Σ(I1) ≡t (mod M)
+and Σ(I2) ≡s −t (mod M). Then S11 has probability r/2n/4 of containing the
+set I11 = I1 ∩{1, 2, . . . , n/4}. Similar comments apply to S12, S21, and S22, for
+an overall success probability of (r/2n/4)4.
+The optimal choice of r is discussed later, and is far below the classical extreme
+2n/4. This drop is analogous to the drop in list sizes from a simple left-right split
+(list size 2n/2) to the quantum-walk subset-sum algorithm of Section 3 (list size
+2n/3). This drop has an increasingly large impact on subsequent levels of the
+tree: the number of sets I11, I12, I21, I22 is reduced by a factor of 2n/4/r, and the
+number of sets I1, I2 is reduced by a factor of (2n/4/r)2.
+--- PAGE 11 ---
+Quantum algorithms for the subset-sum problem
+11
+An interesting consequence of this drop is that one can reduce M without
+creating bottlenecks at subsequent levels of the tree. Speciﬁcally, taking M ≈r
+means that one expects about r sets I1 and about r sets I2.
+Third step: Data structure. This lower-probability computation is captured
+by a data structure that contains the following sets in augmented radix trees:
+• The size-r set S11 of subsets I11 ⊆{1, 2, . . . , n/4}.
+• The set {(Σ(I11) mod M, I11) : I11 ∈S11}.
+• The size-r set S12 of subsets I12 ⊆{n/4 + 1, n/4 + 2, . . . , n/2}.
+• The set {(t −Σ(I12) mod M, I12) : I12 ∈S12}.
+• The set S1 of I11 ∪I12 for all pairs (I11, I12) ∈S11 × S12 such that Σ(I11) ≡
+t −Σ(I12) (mod M), subject to the limit discussed below.
+• The size-r set S21 of subsets I21 ⊆{n/2 + 1, n/2 + 2, . . . , 3n/4}.
+• The set {(Σ(I21) mod M, I21) : I21 ∈S21}.
+• The size-r set S22 of subsets I22 ⊆{3n/4 + 1, 3n/4 + 2, . . . , n}.
+• The set {(s −t −Σ(I22) mod M, I22) : I22 ∈S22}.
+• The set S2 of I21 ∪I22 for all pairs (I21, I22) ∈S21 × S22 such that Σ(I21) ≡
+s −t −Σ(I22) (mod M).
+• The set {(Σ(I1), I1) : I1 ∈S1}.
+• The set {(s −Σ(I2), I2) : I2 ∈S2}.
+• The set S of I1∪I2 for all pairs (I1, I2) ∈S1×S2 such that Σ(I1) = s−Σ(I2),
+subject to the limit discussed below.
+Note that this data structure supports, e.g., fast removal of an element I11
+from S11 followed by fast insertion of a replacement element I′
+11. Checking
+for Σ(I11) mod M in the stored set {(t −Σ(I12) mod M, I12)} eﬃciently shows
+which elements have to be removed from S1, and then a similar check shows
+which elements have to be removed from S.
+Each element I11 of S11 aﬀects very few elements of S1; on average one expects
+“very few” to be r/M ≈1. To control the time taken by each step of the
+algorithm we put a polynomial limit on the number of elements of S1 involving
+any particular I11. If this limit is reached then (to ensure history-independence)
+we use a random selection of elements, but this limit has negligible chance of
+aﬀecting the algorithm output. Similar comments apply to I12, I21, and I22.
+Fourth step: Walk through adjacent pairs of 4-tuples (S11, S12, S21, S22) of
+size-r sets, maintaining the data structure above and searching for tuples for
+which the ﬁnal set S is nonempty. Amplifying the (r/2n/4)4 success probability
+mentioned above to a high probability requires a quantum walk consisting of
+O(√r(2n/4/r)2) steps. Setting up the data structure in the ﬁrst place costs O(r).
+For r on the scale of 20.2n these costs are balanced at 20.2n; but recall that
+this assumes that t is already known. A classical search for t means repeating
+this algorithm M ≈r ≈20.2n times, for a total cost of 20.4n. We do better by
+using amplitude ampliﬁcation [7], repeating the quantum walk only 20.1n times,
+for a total cost of 20.3n. We do not describe amplitude ampliﬁcation in detail;
+this subset-sum algorithm is superseded by the approach of Section 5.
+--- PAGE 12 ---
+12
+Bernstein, Jeﬀery, Lange, Meurer
+5
+Representations
+“Representations” are a technique to improve the “left-right split with a modu-
+lus” algorithm of Section 4. Howgrave-Graham and Joux introduced this tech-
+nique in [17] and obtained a subset-sum algorithm that costs just 2(0.337...+o(1))n.
+Beware that [17] incorrectly claimed a cost of 2(0.311...+o(1))n; the underlying ﬂaw
+in the analysis was corrected in [3] with credit to May and Meurer.
+This section reviews the Howgrave-Graham–Joux algorithm, and then presents
+a new quantum subset-sum algorithm with cost only 2(0.241...+o(1))n. The new
+quantum algorithm requires the quantum-walk machinery discussed in Section 3.
+We simplify the algorithm statements in this section by considering only half-
+weight sets I; i.e., we search only for sets I with #I = n/2 and Σ(I) = s.
+We comment, however, that straightforward generalizations of these algorithms,
+still within the same cost bound, handle smaller known weights (adjusting the
+set sizes shown below, at the expense of some complications in notation); also
+handle larger known weights (replacing I and s with their complements); and
+handle arbitrary unknown weights (trying all n + 1 possible weights).
+Review: the basic idea of representations. Recall that the original left-right
+split partitions I as I1 ∪I2 where I1 ⊆{1, . . . , n/2} and I2 ⊆{n/2 + 1, . . . , n}.
+The main idea of representations is to partition I in a diﬀerent, ambiguous way
+as I1 ∪I2 with I1, I2 ⊆{1, 2, . . . , n} and #I1 = #I2 = n/4. Note that there are
+ n/2
+n/4
+
+≈2n/2 such partitions. The key observation is that ﬁnding only one out
+of these exponentially many representations (I1, I2) of I is suﬃcient to solve the
+subset-sum problem.
+Recall also the idea of moduli: pick t ∈{0, 1, 2, . . . , M −1} and hope that
+Σ(I1) ≡t (mod M). In Section 4, there was only one choice of I1, so one expects
+each choice of t to work with probability only about 1/M, forcing a search
+through choices of t. In this section, there are ≈2n/2 choices of I1, so one expects
+a single choice of t to work with high probability for M as large as 2n/2.
+These observations motivate the following strategy. Pick a modulus M ≈2n/2
+and choose a random target value t ∈{0, 1, . . . , M −1}. Compute
+L1 = {(Σ(I1), I1) : I1 ⊆{1, . . . , n}, #I1 = n/4, Σ(I1) ≡t
+(mod M)}
+and
+L2 = {(s −Σ(I2), I2) : I2 ⊆{1, . . . , n}, #I2 = n/4, Σ(I2) ≡s −t
+(mod M)}.
+If there is a collision Σ(I1) = s −Σ(I2) satisfying I1 ∩I2 = {}, print I1 ∪I2 and
+stop. If there are no such collisions, repeat with another choice of t. One expects
+a negligible failure probability after a polynomial number of repetitions.
+(We point out that if t ≡s −t (mod M) then computing L1 immediately
+produces L2. One can arrange for this by choosing a random odd M and taking
+t to be half of s modulo M; one can also choose a random even M if s is even.
+If other speed constraints prevent M from being chosen randomly then one can
+still try these special values of t ﬁrst. Similar comments apply to the next level of
+--- PAGE 13 ---
+Quantum algorithms for the subset-sum problem
+13
+the Howgrave-Graham–Joux algorithm described below. Of course, the resulting
+speedup is not visible at the level of detail of our analysis.)
+One expects #L1 ≈
+  n
+n/4
+
+/2n/2 ≈20.311...n: there are
+  n
+n/4
+
+sets I1 ⊆{1, . . . , n}
+with #I1 = n/4, and one expects each I1 to satisfy Σ(I1) ≡t (mod M) with
+probability 1/M ≈1/2n/2. (The calculation of 0.311 . . . relies on the standard
+approximation
+  n
+αn
+
+≈2H(α)n, where H(α) = −α log2 α −(1 −α) log2(1 −α).)
+The same comment applies to L2. One also expects the number of collisions
+between L1 and L2 to be exponentially large, about #L1#L2/2n/2 ≈20.122...n,
+since each Σ(I1) is already known to match each s −Σ(I2) modulo M; but
+the only collisions satisfying I1 ∩I2 = {} are collisions arising from subset-sum
+solutions.
+The remaining task is to compute L1 and L2 in the ﬁrst place. Howgrave-
+Graham and Joux solve these two weight-n/4 modular subset-sum problems by
+ﬁrst applying another level of representations (using a smaller modulus that
+divides M), obtaining four weight-n/8 modular subset-sum problems; they solve
+each of those problems with a weight-n/16 left-right split. The details appear
+below.
+Review: The complete Howgrave-Graham–Joux algorithm. Choose a
+positive integer M1 ≈2n/4. Choose a positive integer M ≈2n/2 divisible by
+M1. Choose randomly s1 ∈{0, 1, . . . , M −1} and deﬁne s2 = s −s1. Choose
+randomly s11 ∈{0, 1, . . . , M1 −1} and deﬁne s12 = s1 −s11. Choose randomly
+s21 ∈{0, 1, . . . , M1 −1} and deﬁne s22 = s2 −s21. Also choose random subsets
+R111, R121, R211, R221 of {1, 2, . . . , n}, each of size n/2, and deﬁne Rij2 as the
+complement of Rij1.
+The following algorithm searches for a weight-n/2 subset-sum solution I de-
+composed as follows: I = I1 ∪I2 with #Ii = n/4 and Σ(Ii) ≡si (mod M);
+furthermore Ii = Ii1 ∪Ii2 with #Iij = n/8 and Σ(Iij) ≡sij (mod M1); fur-
+thermore Iij = Iij1 ∪Iij2 with #Iijk = n/16 and Iijk ⊆Rijk. These constraints
+are shown as a tree in Figure 5.1. One expects a weight-n/2 subset-sum solution
+to decompose in this way with high probability (inverse polynomial in n), as
+discussed later, and if it does decompose in this way then it is in fact found by
+this algorithm.
+Start with, for each (i, j, k) ∈{1, 2}×{1, 2}×{1, 2}, the set Sijk of all subsets
+Iijk ⊆Rijk with #Iijk = n/16. Compute the sets
+Lij1 = {(Σ(Iij1) mod M1, Iij1) : Iij1 ∈Sij1},
+Lij2 = {(sij −Σ(Iij2) mod M1, Iij2) : Iij2 ∈Sij2}.
+Merge Lij1 and Lij2 to obtain the set Sij of Iij1 ∪Iij2 for all pairs (Iij1, Iij2) ∈
+Sij1 ×Sij2 such that Σ(Iij1) ≡sij −Σ(Iij2) (mod M1). Note that each Iij ∈Sij
+has Σ(Iij) ≡sij (mod M1) and #Iij = n/8. Next compute the sets
+Li1 = {(Σ(Ii1) mod M, Ii1) : Ii1 ∈Si1},
+Li2 = {(si −Σ(Ii2) mod M, Ii2) : Ii2 ∈Si2}.
+Merge Li1 and Li2 to obtain the set Si of Ii1∪Ii2 for all pairs (Ii1, Ii2) ∈Si1×Si2
+such that Σ(Ii1) ≡si−Σ(Ii2) (mod M) and Ii1∩Ii2 = {}. Note that each Ii ∈Si
+--- PAGE 14 ---
+14
+Bernstein, Jeﬀery, Lange, Meurer
+I ⊆{1, . . . , n};
+#I = n/2;
+Σ(I) = s
+I1 ⊆{1, . . . , n};
+#I1 = n/4;
+Σ(I1) ≡s1
+(mod M)
+:t
+t
+t
+t
+t
+t
+t
+t
+t
+t
+t
+t
+t
+t
+I2 ⊆{1, . . . , n};
+#I2 = n/4;
+Σ(I2) ≡s2
+(mod M)
+dJJJJJJJJJJJJJJ
+I11 ⊆{1, . . . , n};
+#I11 = n/8;
+Σ(I11) ≡s11
+(mod M1)
+C
+I12 ⊆{1, . . . , n};
+#I12 = n/8;
+Σ(I12) ≡s12
+(mod M1)
+[777777
+I21 ⊆{1, . . . , n};
+#I21 = n/8;
+Σ(I21) ≡s21
+(mod M1)
+C
+I22 ⊆{1, . . . , n};
+#I22 = n/8;
+Σ(I22) ≡s22
+(mod M1)
+[777777
+I111
+⊆R111;
+#I111
+= n/16
+I
+I112
+⊆R112;
+#I112
+= n/16
+U+++
+I121
+⊆R121;
+#I121
+= n/16
+I
+I122
+⊆R122;
+#I122
+= n/16
+U+++
+I211
+⊆R211;
+#I211
+= n/16
+I
+I212
+⊆R212;
+#I212
+= n/16
+U+++
+I221
+⊆R221;
+#I221
+= n/16
+I
+I222
+⊆R222;
+#I222
+= n/16
+U+++
+Fig. 5.1. Decomposition of a weight-n/2 subset-sum solution I ⊆{1, 2, . . . , n}.
+has Σ(Ii) ≡si (mod M) and #Ii = n/4. Next compute the sets
+L1 = {(Σ(I1), I1) : I1 ∈S1},
+L2 = {(s −Σ(I2), I2) : I2 ∈S2}.
+Merge L1 and L2 to obtain the set S of I1 ∪I2 for all pairs (I1, I2) ∈S1 ×S2 such
+that Σ(I1) = s −Σ(I2) and I1 ∩I2 = {}. Note that each I ∈S has Σ(I) = s
+and #I = n/2. If S is nonempty, print its elements and stop.
+Review: Success probability of the algorithm. Consider any weight-n/2
+subset I ⊆{1, . . . , n} with Σ(I) = s. There are
+ n/2
+n/4
+
+≈2n/2 ≈M ways to
+partition I as I1 ∪I2 with #I1 = n/4 and #I2 = n/4, and as discussed earlier
+one expects that with high probability at least one of these ways will satisfy
+Σ(I1) ≡s1 (mod M), implying Σ(I2) ≡s2 (mod M).
+Similarly, there are
+ n/4
+n/8
+
+≈2n/4 ≈M1 ways to partition I1 as I11 ∪I12 with
+#I11 = n/8 and #I12 = n/8. One expects that with high probability at least
+one of these ways will satisfy Σ(I11) ≡s11 (mod M1), implying Σ(I12) ≡s12
+(mod M1) (since M1 divides M and s11 +s12 = s1). Analogous comments apply
+to I2, I21, I22.
+A uniform random subset of a set of size n/8 has size exactly n/16 with
+probability Θ(1/√n), so with probability Θ(1/n2) each of the four sets Iij1 =
+Iij ∩Rij1 has size exactly n/16, implying that each of the four complementary
+sets Iij2 = Iij ∩Rij2 also has size exactly n/16. (Experiments indicate that the
+probability is somewhat worse, although still inverse polynomial in n, if all Rij1
+--- PAGE 15 ---
+Quantum algorithms for the subset-sum problem
+15
+are chosen to be identical, even if this set is randomized as discussed in [17].
+The idea of choosing independent sets appeared in [4] with credit to Bernstein.)
+Overall the probability of I being decomposed in this way, i.e., of I being
+found by this algorithm, is inverse polynomial in n. As above, one expects a
+negligible failure probability after a polynomial number of repetitions of the
+algorithm.
+Review: Cost of the algorithm. Each set Sijk has size
+  n/2
+n/16
+
+≈20.271...n.
+One expects #Sij1#Sij2/M1 collisions Σ(Iij1) ≡sij −Σ(Iij2) (mod M1), and
+therefore #Sij1#Sij2/M1 ≈20.293...n elements in Sij.
+Each Σ(Ii1) is already known by construction to be the same as each si −
+Σ(Ii2) modulo M1. One expects it to be the same modulo M with probability
+M1/M, for a total of #Si1#Si2M1/M ≈20.337...n collisions modulo M. This
+also dominates the algorithm’s overall running time.
+Relatively few of these collisions modulo M have Ii1 ∩Ii2 = {}. The only
+possible elements of S1 are sets I1 with Σ(I1) ≡s1 (mod M) and #I1 = n/4;
+one expects the number of such sets to be
+  n
+n/4
+
+/2n/2 ≈20.311...n. Furthermore,
+as discussed earlier, each Σ(I1) is already known by construction to be the same
+as each s −Σ(I2) modulo M, so one expects it to be the same integer with
+probability about M/2n, for a total of #S1#S2M/2n ≈20.122...n collisions.
+New: quantum walks with moduli and representations. We now combine
+quantum walks with the idea of representations. The reader is assumed to be
+familiar with the simpler quantum algorithm of Section 4.
+We introduce a parameter r ≤
+  n/2
+n/16
+
+into the Howgrave-Graham–Joux algo-
+rithm, and take each Sijk as a random collection of exactly r weight-n/16 subsets
+Iijk of Rijk. The extreme case r =
+  n/2
+n/16
+
+is the same as the original Howgrave-
+Graham–Joux algorithm: in this case Sijk is the set of all weight-n/16 subsets
+of Rijk. For smaller r this generalized algorithm has lower success probability,
+as discussed below, but is also faster. The resulting computation is captured by
+the following 29 sets, which we store in augmented radix trees:
+• For each i, j, k, a set Sijk consisting of exactly r weight-n/16 subsets of Rijk.
+• For each i, j, the set Lij1 = {(Σ(Iij1) mod M1, Iij1) : Iij1 ∈Sij1}.
+• For each i, j, the set Lij2 = {(sij −Σ(Iij2) mod M1, Iij2) : Iij2 ∈Sij2}.
+• For each i, j, the set Sij of Iij1 ∪Iij2 for all pairs (Iij1, Iij2) ∈Sij1 × Sij2
+such that Σ(Iij1) ≡sij −Σ(Iij2) (mod M1), subject to the limit discussed
+below.
+• For each i, the set Li1 = {(Σ(Ii1) mod M, Ii1) : Ii1 ∈Si1}.
+• For each i, the set Li2 = {(si −Σ(Ii2) mod M, Ii2) : Ii2 ∈Si2}.
+• For each i, the set Si of Ii1 ∪Ii2 for all pairs (Ii1, Ii2) ∈Si1 × Si2 such
+that Σ(Ii1) ≡si −Σ(Ii2) (mod M) and Ii1 ∩Ii2 = {}, subject to the limit
+discussed below.
+• The set L1 = {(Σ(I1), I1) : I1 ∈S1}.
+• The set L2 = {(s −Σ(I2), I2) : I2 ∈S2}.
+• The set S of I1∪I2 for all pairs (I1, I2) ∈S1×S2 such that Σ(I1) = s−Σ(I2)
+and I1 ∩I2 = {}, subject to the limit discussed below.
+--- PAGE 16 ---
+16
+Bernstein, Jeﬀery, Lange, Meurer
+Like the data structure in the quantum walk of Section 4, this data structure
+supports, e.g., fast removal of an element I111 from S111 followed by fast insertion
+of a replacement element I′
+111.
+The optimal choice of r is discussed later; it is far below the starting list size
+  n/2
+n/16
+
+≈20.272n used by Howgrave-Graham and Joux, and is even below 2n/4.
+One expects the number of collisions modulo M1 to be r2/2n/4, which is smaller
+than r, and the list sizes on subsequent levels to be even smaller. Consequently
+this quantum algorithm ends up being bottlenecked at the bottom level of the
+tree, while the original algorithm is bottlenecked at a higher level.
+Furthermore, one expects each element Iijk of Sijk to aﬀect, on average, ap-
+proximately r/2n/4 elements of the set of collisions modulo M, and therefore
+to aﬀect 0 elements of Sij in almost all cases, 1 element of Sij with exponen-
+tially small probability, 2 elements of Sij with far smaller probability, etc. As
+in Section 4, to control the time taken by each step of the algorithm we put a
+polynomial limit on the number of elements of Sij involving any particular Iijk,
+a polynomial limit on the number of elements of Si involving any particular Iij,
+and a polynomial limit on the number of elements of S involving any particular
+Ii. A constant limit of 100 seems ample, and there is no obvious problem with a
+limit of 1.
+Compared to the original Howgrave-Graham–Joux algorithm, the success
+probability of the generalized algorithm drops by a factor of (r/
+  n/2
+n/16
+
+)8, since
+each target Iijk has chance only r/
+  n/2
+n/16
+
+of being in Sijk. Amplifying this to a
+high probability requires a quantum walk consisting of O(√r(
+  n/2
+n/16
+
+/r)4) steps.
+Setting up the data structure in the ﬁrst place costs O(r). For r on the scale of
+  n/2
+n/16
+4/4.5 these costs are balanced at
+  n/2
+n/16
+4/4.5, i.e., at 2(0.241...+o(1))n.
+References
+[1] — (no editor), 20th annual symposium on foundations of computer science, IEEE
+Computer Society, New York, 1979. MR 82a:68004. See [32].
+[2] Andris Ambainis, Quantum walk algorithm for element distinctness, SIAM Jour-
+nal on Computing 37 (2007), 210–239. URL: http://arxiv.org/abs/quant-ph/
+0311001. Citations in this document: §3, §3, §3.
+[3] Anja Becker, Jean-Sebastien Coron, Antoine Joux, Improved generic algorithms
+for hard knapsacks, in Eurocrypt 2011 [27] (2011). URL: http://eprint.iacr.
+org/2011/474. Citations in this document: §1, §1, §1, §4, §5.
+[4] Anja Becker, Antoine Joux, Alexander May, Alexander Meurer, Decoding random
+binary linear codes in 2n/20: how 1 + 1 = 0 improves information set decoding, in
+Eurocrypt 2012 [28] (2012). URL: http://eprint.iacr.org/2012/026. Citations
+in this document: §1, §1, §1, §1, §5.
+[5] Daniel J. Bernstein, Cost analysis of hash collisions: Will quantum computers
+make SHARCS obsolete?, in Workshop Record of SHARCS’09: Special-purpose
+Hardware for Attacking Cryptographic Systems (2009). URL: http://cr.yp.to/
+papers.html#collisioncost. Citations in this document: §2.
+--- PAGE 17 ---
+Quantum algorithms for the subset-sum problem
+17
+[6] Michel Boyer, Gilles Brassard, Peter Høyer, Alain Tapp, Tight bounds on quantum
+searching, Fortschritte Der Physik 46 (1998), 493–505. URL: http://arxiv.org/
+abs/quant-ph/9605034v1. Citations in this document: §2, §2.
+[7] Gilles Brassard, Peter Høyer, Michele Mosca, Alain Tapp, Quantum amplitude
+ampliﬁcation and estimation, in [20] (2002), 53–74. URL: http://arxiv.org/
+abs/quant-ph/0005055. Citations in this document: §4.
+[8] Gilles Brassard, Peter Høyer, Alain Tapp, Quantum cryptanalysis of hash and
+claw-free functions, in LATIN’98 [21] (1998), 163–169. MR 99g:94013. Citations
+in this document: §2, §2.
+[9] Weng-Long Chang, Ting-Ting Ren, Mang Feng, Lai Chin Lu, Kawuu Weicheng
+Lin, Minyi Guo, Quantum algorithms of the subset-sum problem on a quantum
+computer, International Conference on Information Engineering 2 (2009), 54–57.
+Citations in this document: §2.
+[10] Andreas-Stephan Elsenhans, J¨org Jahnel, The diophantine equation x4 + 2y4 =
+z4 + 4w4, Mathematics of Computation 75 (2006), 935–940. URL: http://www.
+uni-math.gwdg.de/jahnel/linkstopaperse.html. Citations in this document:
+§4.
+[11] Andreas-Stephan Elsenhans, J¨org Jahnel, The Diophantine equation x4 + 2y4 =
+z4 +4w4—a number of improvements (2006). URL: http://www.uni-math.gwdg.
+de/jahnel/linkstopaperse.html. Citations in this document: §4.
+[12] Henri Gilbert (editor), Advances in cryptology — EUROCRYPT 2010, 29th an-
+nual international conference on the theory and applications of cryptographic tech-
+niques, French Riviera, May 30–June 3, 2010, proceedings, Lecture Notes in Com-
+puter Science, 6110, Springer, 2010. See [17].
+[13] ShaﬁGoldwasser (editor), 35th annual IEEE symposium on the foundations of
+computer science. Proceedings of the IEEE symposium held in Santa Fe, NM,
+November 20–22, 1994, IEEE, 1994. ISBN 0-8186-6580-7. MR 98h:68008. See
+[30].
+[14] Lov K. Grover, A fast quantum mechanical algorithm for database search, in [26]
+(1996), 212–219. MR 1427516. URL: http://arxiv.org/abs/quant-ph/9605043.
+[15] Lov K. Grover, Quantum mechanics helps in searching for a needle in a haystack,
+Physical Review Letters 79 (1997), 325–328. URL: http://arxiv.org/abs/
+quant-ph/9706033. Citations in this document: §2, §2.
+[16] Ellis Horowitz, Sartaj Sahni, Computing partitions with applications to the knap-
+sack problem, Journal of the ACM 21 (1974), 277–292. Citations in this document:
+§2.
+[17] Nicholas Howgrave-Graham, Antoine Joux, New generic algorithms for hard knap-
+sacks, in Eurocrypt 2010 [12] (2010). URL: http://eprint.iacr.org/2010/189.
+Citations in this document: §1, §1, §1, §1, §4, §5, §5, §5.
+[18] David S. Johnson, Uriel Feige (editors), Proceedings of the 39th annual ACM
+symposium on the theory of computing, San Diego, California, USA, June 11–13,
+2007, Association for Computing Machinery, 2007. ISBN 978-1-59593-631-8. See
+[23].
+[19] Dong Hoon Lee, Xiaoyun Wang (editors), Advances in cryptology — ASIACRYPT
+2011, 17th international conference on the theory and application of cryptology
+and information security, Seoul, South Korea, December 4–8, 2011, proceedings,
+Lecture Notes in Computer Science, 7073, Springer, 2011. ISBN 978-3-642-25384-
+3. See [24].
+[20] Samuel J. Lomonaco, Jr., Howard E. Brandt (editors), Quantum computation
+and information. Papers from the AMS Special Session held in Washington, DC,
+--- PAGE 18 ---
+18
+Bernstein, Jeﬀery, Lange, Meurer
+January 19–21, 2000, Contemporary Mathematics, 305, American Mathematical
+Society, 2002. ISBN 0-8218-2140-7. MR 2003g:81006. See [7].
+[21] Claudio L. Lucchesi, Arnaldo V. Moura (editors), LATIN’98: theoretical informat-
+ics. Proceedings of the 3rd Latin American symposium held in Campinas, April
+20–24, 1998, Lecture Notes in Computer Science, 1380, Springer, 1998. ISBN
+ISBN 3-540-64275-7. MR 99d:68007. See [8].
+[22] Vadim Lyubashevsky, Adriana Palacio, Gil Segev, Public-key cryptographic prim-
+itives provably as secure as subset sum, in TCC 2010 [25] (2010), 382–400. URL:
+http://eprint.iacr.org/2009/576. Citations in this document: §1, §1.
+[23] Fr´ed´eric Magniez, Ashwin Nayak, J´er´emie Roland, Miklos Santha, Search via
+quantum walk, in STOC 2007 [18] (2007), 575–584. URL: http://arxiv.org/
+abs/quant-ph/0608026. Citations in this document: §3.
+[24] Alexander May, Alexander Meurer, Enrico Thomae, Decoding random linear codes
+in ˜O(20.054n), in Asiacrypt 2011 [19] (2011). URL: http://www.cits.rub.de/
+imperia/md/content/may/paper/decoding.pdf. Citations in this document: §1,
+§1, §1.
+[25] Daniele Micciancio (editor), Theory of cryptography, 7th theory of cryptography
+conference, TCC 2010, Zurich, Switzerland, February 9–11, 2010, proceedings,
+Lecture Notes in Computer Science, 5978, Springer, 2010. ISBN 978-3-642-11798-
+5. See [22].
+[26] Gary L. Miller (editor), Proceedings of the twenty-eighth annual ACM symposium
+on the theory of computing, Philadelphia, PA, May 22–24, 1996, Association for
+Computing Machinery, 1996. ISBN 0-89791-785-5. MR 97g:68005. See [14].
+[27] Kenneth G. Paterson (editor), Advances in cryptology — EUROCRYPT 2011,
+30th annual international conference on the theory and applications of crypto-
+graphic techniques, Tallinn, Estonia, May 15–19, 2011, proceedings, Lecture Notes
+in Computer Science, 6632, Springer, 2011. ISBN 978-3-642-20464-7. See [3].
+[28] David Pointcheval, Thomas Johansson (editors), Advances in cryptology —
+EUROCRYPT 2012 — 31st annual international conference on the theory and
+applications of cryptographic techniques, Cambridge, UK, April 15–19, 2012, pro-
+ceedings, Lecture Notes in Computer Science, 7237, Springer, 2012. ISBN 978-3-
+642-29010-7. See [4].
+[29] Richard Schroeppel, Adi Shamir, A T = O(2n/2), S = O(2n/4) algorithm for
+certain NP-complete problems, SIAM Journal on Computing 10 (1981), 456–464.
+Citations in this document: §4.
+[30] Peter W. Shor, Algorithms for quantum computation: discrete logarithms and
+factoring., in [13] (1994), 124–134; see also newer version [31]. MR 1489242.
+[31] Peter W. Shor, Polynomial-time algorithms for prime factorization and discrete
+logarithms on a quantum computer, SIAM Journal on Computing 26 (1997),
+1484–1509; see also older version [30]. MR 98i:11108. URL: http://arxiv.org/
+abs/quant-ph/9508027.
+[32] Mark N. Wegman, J. Lawrence Carter, New classes and applications of hash
+functions, in [1] (1979), 175–182; see also newer version [33].
+[33] Mark N. Wegman, J. Lawrence Carter, New hash functions and their use in au-
+thentication and set equality, Journal of Computer and System Sciences 22 (1981),
+265–279; see also older version [32]. ISSN 0022-0000. MR 82i:68017. Citations in
+this document: §3.

@@ -1,0 +1,1360 @@
+
+--- PAGE 1 ---
+Quantum tree generator improves QAOA
+state-of-the-art for the knapsack problem
+Paul J. Christiansen∗,†, Lennart Binkowski†, Debora Ramacciotti†, S¨oren Wilkening†
+∗d-fine GmbH, Frankfurt, Germany
+Email: paul.christiansen@d-fine.com
+†Institut f¨ur Theoretische Physik
+Leibniz Universit¨at Hannover, Hannover, Germany
+Abstract—This paper introduces a novel approach to the Quan-
+tum Approximate Optimization Algorithm (QAOA), specifically
+tailored to the knapsack problem. We combine the recently
+proposed quantum tree generator as an efficient state prepa-
+ration circuit for all feasible solutions to the knapsack problem
+with the framework of Grover-mixer QAOA to form the first
+representative of Amplitude Amplification-mixer QAOA (AAM-
+QAOA). On hard benchmark sets with up to 20 knapsack
+items, we demonstrate our method’s improved performance over
+the current state-of-the-art Copula-QAOA. However, for larger
+instance sizes, both approaches fail to deliver better outcomes
+than greedily packing items in descending value-to-weight ratio,
+at least for the considered circuit depths. For sufficiently high
+circuit depths, however, we can prove that AAM-QAOA will
+eventually be able to sample the optimal solution.
+Index Terms—knapsack problem, QAOA, Grover’s algorithm,
+quantum computing
+I. INTRODUCTION
+Within the current era of noisy intermediate-scale quantum
+(NISQ) computers [1], variational quantum algorithms [2]
+constitute the most promising family of hybrid algorithms for
+supplying quantum advantage over purely classical methods.
+Especially in the domain of quantum simulation [3] and
+related tasks, classical approaches seem to face fundamen-
+tal difficulties that are believed to be (at least partially)
+overcome by utilizing the promising capabilities of quantum
+computers. Similarly, quantum computers and algorithms have
+also been considered as potential accelerators for NP-hard
+classical problems, such as most combinatorial optimization
+problem formulations (maximize f : {0, 1}n →R subject
+to some constraints). The quantum approximate optimization
+algorithm [4] and its generalization to the quantum alternating
+operator ansatz [5] (QAOA) are arguably the most influential
+variational quantum algorithms for these kinds of tasks. In
+a nutshell, QAOA aims at maximizing the expectation value
+of the Hamiltonian encoding the classical objective function
+f over a parameterized class of quantum states. This class is
+realized by applying parameterized quantum circuits to a given
+fixed initial state. The parameter optimization is outsourced to
+a classical optimizer, while the quantum computer is mainly
+used as a sampling machine, providing fast evaluations/estima-
+tions of the objective function. For constrained problems, there
+are several approaches to address the problems’ feasibility
+structure. One possibility is to augment the objective function
+with soft-constraints, penalizing infeasible states such that
+feasible solutions are favored, i.e. yield a higher expectation
+value. Alternatively, one may actively restrict the parame-
+terized class of states to the feasible subspace (the space
+spanned by all feasible solutions) by selecting a feasible
+initial state and feasibility-preserving quantum circuits, that
+is, circuits that leave the feasible subspace invariant. In this
+case, soft-constraints are redundant, as only feasible states can
+be sampled in the first place. However, this approach usually
+requires additional insights regarding the problem’s feasibility
+structure – knowledge that might not always be available.
+The 0-1 knapsack problem (0-1-KP) is a prototypical com-
+binatorial optimization problem, whose feasibility structure
+is difficult to access: Given a set of items, each having a
+profit and a weight, and a knapsack of certain capacity, the
+task is to maximize the cumulative profit of items placed in
+the knapsack while keeping their cumulative weight below
+or equal to the capacity. Despite the compact description
+of its constraint, there is no apparent symmetry in the 0-
+1-KP’s feasible set. This makes it particularly difficult to
+construct feasibility-preserving quantum circuits. Accordingly,
+most QAOA formulations for the 0-1-KP are based on soft-
+constraints [6], [7], [8]. However, this approach comes with
+some caveats such: Choosing the penalty too high may blanket
+the optimization landscape; choosing it too low may lead to
+significant feasibility violation. With the recently proposed
+Copula-QAOA, van Dam et al. [9] resolve this issue of fine-
+tuning the penalty by simply assigning an objective value of
+zero to all infeasible states. Furthermore, they implement the
+idea of warm-starting QAOA [10] with an efficient classical
+algorithm specifically for the 0-1-KP. Their numerical exper-
+iments on instances up to ten qubits look promising; in this
+work we extend benchmarking their approach for higher circuit
+depths and harder instances with up to 20 qubits as provided
+by [11] et al.’s instance generator. Unfortunately, we observe a
+significant decrease in solution quality, for instance with more
+than ten qubits.
+As an alternative, we propose to embed the recently pro-
+posed Quantum Tree Generator (QTG) [12] into the frame-
+work of Grover-mixer QAOA (GM-QAOA) [13]. Given a state
+preparation circuit that creates a uniform superposition of all
+feasible states, GM-QAOA prescribes using a parameterized
+version of that circuit in order to construct a fully feasible
+© 2025 IEEE. Personal use of this material is permitted. Permission from IEEE must be obtained for all other uses, in any current or future media, including
+reprinting/republishing this material for advertising or promotional purposes, creating new collective works, for resale or redistribution to servers or lists, or
+reuse of any copyrighted component of this work in other works.
+arXiv:2411.00518v2  [quant-ph]  17 Jul 2025
+
+--- PAGE 2 ---
+parameterized class of states. The QTG, in turn, is an efficient
+quantum circuit that creates a generally non-uniform super-
+position of all feasible solutions to the 0-1-KP. Utilizing it
+instead of a uniform state preparation should not have any
+drawback. Indeed, we are able to prove that QAOA with the
+QTG as Grover-like mixer converges towards the optimum as
+the circuit depth increases. Our proof is a direct application
+of the convergence theorem provided in [14]. Furthermore, we
+conduct numerical experiments for our method on the same
+benchmark instances as for the Copula-QAOA and demon-
+strate that our method is able to provide higher approximation
+ratios on a consistent level, that is, without the drop in
+quality for instance sizes above ten. By adapting the high-
+level simulator presented in [12], we are able to extend our
+simulations for the QTG-based QAOA for instances with up
+to 34 items.
+II. PREVIOUS WORK
+On the classical side, there exist several prominent al-
+gorithms, specifically formulated to solve instances of the
+0-1-KP. Already in 1995, Pisinger [15] developed the EX-
+PKNAP algorithm, a 0-1-KP solver based on branch-and-
+bound methods. In 1999, EXPKNAP and subsequent refine-
+ments were superseded by the dynamic-programming-based
+COMBO algorithm [16] which still remains the best perform-
+ing candidate across various benchmark sets. Beside these
+specialized algorithms, also more general frameworks based
+on integer programming and constraint programming such
+as CPLEX [17], GUROBI [18], or CP-SAT [19] may be
+applied to instances of 0-1-KP. For our numerical studies, we
+merely utilize the COMBO method in order to extract crucial
+data of the benchmark instances; our own contributions are
+conceptually disjoint with all the just mentioned algorithms.
+On the quantum-algorithmic side, 0-1-KP is frequently fea-
+tured within the scope of heuristic approaches such as QAOA
+(see e.g. [6], [7], [8]). Most prominently, van Dam et al. [9]
+recently introduced a version of the QAOA specifically tailored
+to 0-1-KP. Further prominent enhancements of the QAOA
+without a direct link to 0-1-KP are the quantum alternating
+operator ansatz [5] and Grover mixer-QAOA [13]. Beside
+expanding on the capabilities of van Dam et al.’s approach,
+we primarily establish that missing link between 0-1-KP and
+the just mentioned QAOA extensions.
+In contrast to near-term heuristics such as the QAOA, sev-
+eral prominent quantum frameworks such as nested quantum
+search [20] and quantum branch-and-bound [21] are suitable
+candidates for far-term quantum methods that could be ap-
+plied to instances of 0-1-KP. A far-term approach specifically
+tailored to 0-1-KP was recently proposed by Wilkening et
+al.
+[12]: the quantum tree generator (QTG)-based search.
+It can be understood as an enhanced version of quantum
+minimum finding [22] in which Grover’s algorithm [23] is
+substituted by amplitude amplification [24] with the QTG as
+state preparation circuit. Our main contribution is to embed
+the QTG into the QAOA framework, provide a theoretical
+convergence proof, and to benchmark the QTG-based QAOA
+against van Dam et al.’s approach on the currently hardest 0-1-
+KP instances provided by Jooken et al. [11] instance generator.
+III. PRELIMINARIES
+A. The knapsack problem
+Consider a knapsack with some capacity c > 0 as well as
+a list of n items. Each item m is characterized by its profit
+value vm > 0 and its weight wm > 0. The objective is to
+select a subset of items of maximum cumulative profit such
+that their cumulative weight does not exceed the knapsack’s
+capacity. By collecting the item profits and weights in lists
+v := (v1, . . . , vn) and w := (w1, . . . , wn), we address the
+instance, defined by these parameters, by KPn(v, w; c). It has
+the following formulation as an Integer Linear Program (ILP):
+maximize
+n
+X
+m=1
+vmxm =: f(x)
+subject to
+n
+X
+m=1
+wmxm ≤c
+and xm ∈{0, 1},
+m = 1, . . . , n.
+(1)
+The binary variable xm encodes the choice of either including
+item m into the knapsack (xm = 1) or omitting it (xm = 0).
+The 0-1-KP defined via (1) is shown to be NP-complete
+[25], making it particularly interesting for potential quantum
+speed-ups.1 Two common classical algorithms, both approx-
+imating the solution to (1) in linear time O(n), are the lazy
+greedy (LG) and the very greedy (VG) method. Both variants
+assume the items to be sorted in descending order of their
+quality rm := vm/wm. Starting from the item of highest
+quality, the LG method includes items as long as the first
+does not fit into the knapsack anymore. For later reference,
+we denote with rstop the quality of the first item which is
+not included by the LG method. Similarly, the VG approach
+includes the items in the prescribed order, but does not stop at
+the first overshoot. Non-fitting items are simply skipped, and
+the next ones are considered. Therefore, VG always returns a
+(not necessarily proper) superset of the items included by LG.
+B. Quantum tree generator
+Since the 0-1-KP is NP-complete [25], methods based
+on Grover’s algorithm [23], and more generally amplitude
+amplification [24], promise an up to quadratic speed-up over
+a variety of classical approaches – at least asymptotically. In
+[12], this asymptotic dominance was recently calculated to
+already strike at instance sizes of a few hundreds of variables
+and thus within a practical domain. The algorithmic procedure
+achieving the practical speed-up is a variant of Quantum Min-
+imum Finding (QMS) [22] with the uniform state preparation
+1Note however that there is a (classical) fully polynomial-time approx-
+imation scheme (FPTAS) for the 0-1-KP [26], approximating the optimal
+solution to a multiplicative factor (1 −ε) in time polynomial in n and
+1/ε. Implementations are usually based on dynamic programming (DP) [27],
+which is a general technique to solve a combinatorial optimization problem
+by reducing it to a recursive relation that can iteratively be computed. For
+0-1-KP, this leads to the optimal solution in pseudo-polynomial time O(nc).
+
+--- PAGE 3 ---
+being replaced by the Quantum Tree Generator (QTG) G,
+operating on three registers: an n-qubit main (system) register
+encoding which items are included into the knapsack, a |cbin|-
+qubit capacity register which stores the remaining capacity of
+the knapsack, and a |Vbin|-qubit profit register recording the
+cumulative profit of all included items.2 Here, V is any upper
+bound on the maximum attainable profit. The state preparation
+consists of n subsequently applied layer unitaries Um, one for
+each item m. Um includes/excludes item m in superposition
+if the remaining capacity covers item m’s weight and then
+updates the remaining capacity as well as the total profit on the
+branch, where the item has been included. After applying all n
+layer unitaries to the initial state |0⟩|c⟩|0⟩, the three registers
+hold a generally non-uniform superposition of all feasible item
+assignments together with their respective cumulative profit
+(see Figure 1 for a simple example for the QTG procedure).
+The inclusion/exclusion of item m is executed via a con-
+trolled Ry-gate on the m-th qubit in the main register. The
+introduced angle represents an adjustable bias towards either
+inclusion or exclusion; they are, however, not treated as
+parameters to optimize over, but are updated according to
+fixed rules throughout the routine. The control is over the
+capacity register and has the logical form “˜c ≥wm”, where ˜c
+is an integer represented by the current quantum state in the
+capacity register. Only if this condition is fulfilled the Ry-gate
+is applied, otherwise the m-th qubit is left in the |0⟩state.
+The updates of remaining capacity and profit are carried out
+via quantum Fourier transform (QFT) subtractors and adders,
+respectively. wm is subtracted from ˜c in the capacity register
+and vm is added to ˜V in the profit register only if the state of
+the m-th qubit in the main register is |1⟩. In alignment with
+[12], we summarize these steps as Um = U 3
+mU 2
+mU 1
+m:
+U 1
+m = C2
+≥wm(RYm(θ))
+U 2
+m = C1
+m(SUBwm)
+U 3
+m = C1
+m(ADDvm)
+(2)
+C. QAOA: general design
+The few hundreds of logical qubits and long coherence
+times required for executing QTG-based search on non-trivial
+practical instances are out of reach for current quantum
+devices. Hybrid algorithms such as the Quantum Approximate
+Optimization Algorithm [4] / Quantum Alternating Operator
+Ansatz [5] (QAOA) are candidates for supplying promising
+runtimes already on noisy quantum hardware. While the
+original proposal is formulated for unconstrained optimization
+problems, subsequent refinements allow the QAOA to be
+applied to the general constrained case.
+The three essential building blocks of the QAOA are a
+suitable initial state |ι⟩and two parametrized quantum circuits:
+the phase separator UP(γ) and the mixer UM(β). Together
+with a prescribed depth q ∈N, they define a parameterized
+class of states:
+|β, γ⟩:= UM(βq)UP(γq) · · · UM(β1)UP(γ1) |ι⟩,
+(3)
+2|abin| = ⌊log2 a⌋+ 1 is the length of a’s binary representation.
+where β = (β1, . . . , βq) and γ = (γ1, . . . , γq) combined
+constitute a set of 2q real parameters. Encoding the classical
+objective function f associated with the optimization problem
+at hand into an objective Hamiltonian Hf via
+Hf :=
+X
+x∈{0,1}n
+f(x) |x⟩⟨x| ,
+(4)
+induces the standard phase separator
+U f
+P (γ) = e−iγHf .
+(5)
+By construction, both Hf and UP are diagonal in the compu-
+tational basis. This is desired for two reasons: First, it means
+that all Pauli strings Pk in the Pauli decomposition Hf =
+P
+k ωkPk mutually commute, which allows to implement (5)
+via
+U f
+P (γ) = e−iγ P
+k ωkPk =
+Y
+k
+e−iγωkPk
+(6)
+without any Trotter error. The second reason will become
+clear later. In contrast, the choice of the mixer UM is less
+straight-forward. As (3) is derived from an approximated
+adiabatic evolution (see [28]), we have the freedom to pick
+any mixing Hamiltonian HM with highest-energy eigenstate
+|ι⟩such that UM(β) = e−iβHM . Coming back to the ob-
+jective Hamiltonian, (4) gives rise to the continuous function
+F(β, γ) := ⟨β, γ|Hf|β, γ⟩. Assuming that the ansatz is ex-
+pressive enough to cover the entire quantum state space, the
+global maxima of F exactly correspond to the (superpositions
+of) maxima of the classical objective function f (compare
+[29]). In any case, however, it is a most natural heuristic to
+maximize F and expect the corresponding state |β∗, γ∗⟩to
+have sufficient overlap with computational basis states |x⟩that
+correspond to high-valued bit strings.
+For constrained optimization problems – such as the 0-1-KP
+– with feasible solution set S ⊂{0, 1}n, the parameterized
+states that maximize F typically lie outside of the feasible
+subspace ⟨S⟩:= span{|x⟩: x ∈S} and would thus return
+infeasible bit strings upon measuring. There are two main
+approaches addressing this issue: soft constraints and hard
+constraints.
+Introducing soft constraints means suitably penalizing the
+objective value of infeasible solutions. Namely, let g
+:
+{0, 1}n →{0, 1} encode the classical constraints, that is
+g(x) = 1 if and only if x ∈S. Introducing a sufficiently
+high penalty α > 0, replacing the objective function f with
+f −α(1 −g), and constructing the corresponding objective
+Hamiltonian guarantees again that its maximum corresponds
+to feasible maxima of the classical objective function f.
+However, choosing the penalty too high results in unfavorable
+optimization landscapes where the fine structure of the feasible
+subspace is entirely dominated by a hard cut-off to infeasible
+regions. For maximization tasks such as 0-1-KP, there is a
+more natural, hyperparameter-free way to deal with solutions
+outside the feasible subspace: exchanging f with fg, i.e.,
+simply assigning the value zero to infeasible solutions.
+
+--- PAGE 4 ---
+|000⟩S|3⟩C
+|000⟩S|3⟩C
+|000⟩S|3⟩C
+|000⟩S|3⟩C
+1
+√
+2
+|001⟩S|2⟩C
+1
+√
+2
+1
+√
+2
+|010⟩S|1⟩C
+|010⟩S|1⟩C
+1
+√
+2
+|011⟩S|0⟩C
+1
+√
+2
+1
+√
+2
+1
+√
+2
+|100⟩S|0⟩C
+|100⟩S|0⟩C
+|100⟩S|0⟩C
+1
+√
+2
+Level 0
+The root represents the initial state having full capacity, since
+none of the three items are included.
+Level 1
+This level splits into two branches: on the left nothing
+changed, while on the right the first item of weight 3 is
+included.
+Level 2
+On the left branch, each node further splits, while on the
+right nothing happens, since it already reached the maximum
+capacity.
+Level 3
+The leaves show the feasible solutions with different ampli-
+tudes: the first four have an amplitude of 3/
+√
+2, while the
+last one of 1/
+√
+2.
+Fig. 1. Example of the quantum tree generator for the KP instance of three items with profits v = (4, 2, 1), weights w = (3, 2, 1) and maximum capacity
+c = 3. The quantum state |x1, x2, x3⟩S |˜c⟩C provides information about the inclusion or exclusion of the items via the system register S (xi = 1 if the
+item i is included, else 0) and indicates the remaining capacity ˜c on capacity register C. The tree branches are equipped with the factors by which the child
+quantum states are rescaled.
+D. QAOA: state of the art for knapsack
+This approach of hyperparameter-free soft-constraints is
+also used in the most recent advancement regarding QAOA
+for 0-1-KP by van Dam et al. [9]. While they alter the
+objective function to be fg, their phase separator remains
+the exponentiated original objective Hamiltonian (5), that is
+U f
+P .3 More specifically, replacing the binary variables xm by
+(sm + 1)/2 with spin values sm = ±1 in (4) yields the
+following simple form for the knapsack objective Hamiltonian:
+Hf =
+n
+X
+m=1
+vm
+2 Zm.
+(7)
+Since all the terms in Hf are single-qubit operations which
+mutually commute, the phase separator is non-entangling and
+can be implemented in depth one as
+UP(γ) =
+n
+O
+m=1
+RZm(2viγ).
+(8)
+Constant terms in (7) could be omitted, as they only lead to
+global phases in (8). Furthermore, since Hf has an integer-
+valued spectrum, the exponential is 2π-periodic in γ which is
+why the parameter space is restricted to γ ∈[0, 2π). For the
+initial state, van Dam et al. propose the product state
+|ι⟩=
+n
+O
+m=1
+|pm⟩with |pm⟩:=
+p
+1 −pm |0⟩+ √pm |1⟩,
+(9)
+where
+pm =
+1
+1 + We−k(rm−rstop) with W =
+n
+X
+m=1
+wm
+c
+−1,
+(10)
+3Note that it would also be possible to use some variation of f in (5), such
+as fg or a threshold function, see [30].
+are classical probabilities determined by a hyperparameter
+k ∈R+. Recall from Subsection III-A that rstop is the quality
+(relative profit) of the first item that is not included anymore
+by LG. The state in (9) can be prepared from the |0⟩state
+via the depth-one circuit Nn
+m=1 RYm(2 sin−1(√pm)). The
+logistic probability distribution produced by (10) approaches
+the one given by LG for k →∞, and a uniform distribution
+for k →0. Furthermore, van Dam et al.introduce a family
+of copula mixers that aim at adjustable correlation patterns
+between different items.4 Since anti-correlating neighboring
+items consistently performed best in their numerical studies,
+we boil down their general construction to the anti-correlating
+case. For two selected qubits m and m′, define the conditional
+probabilities
+pm′|m = pm′(1 −(1 −pm)(1 −pm′)),
+(11)
+pm′|¬m = pm′(1 + pm(1 −pm′)),
+(12)
+based on the individual probabilities pm and pm′ given by (10).
+From these probabilities, construct the two-qubit rotational
+gate
+R(pm, pm′) = Cm
+
+RYm′ 2 sin−1√pm′|¬m
+
+× Cm
+
+RYm′ 2 sin−1√pm′|m
+
+× RYm
+ 2 sin−1√pm
+
+.
+(13)
+The two-qubit copula mixer Hamiltonian is then given by
+Copm,m′ = R(pm, pm′)(Zm + Zm′)R(pm, pm′)
+(14)
+4They also introduce the non-entangling single-qubit hourglass mixer.
+However, they also mention that since the knapsack phase separator is already
+non-entangling, the resulting QAOA variant can be efficiently simulated
+classically and shall therefore not count as a proper quantum algorithm.
+
+--- PAGE 5 ---
+which is exponentiated in order to yield the corresponding
+mixer:
+U Cop
+m,m′(β) = R(pm, pm′)RZm(2β)RZm′(2β)R(pm, pm′)†.
+(15)
+The (approximated) ring-copula mixer is a sequential mixer
+[5], consisting of the product of all two-qubit copula mixers
+applied to neighboring items in a ring:
+U Cop
+M (β) =
+n
+Y
+m=1
+U Cop
+m,m+1(β).
+(16)
+E. QAOA: Grover mixer
+In contrast to soft-constrained approaches like van Dam et
+al.’s, enforcing hard constraints means actively restricting the
+parameterized class of states (3) to the feasible subspace ⟨S⟩.
+This is typically achieved by choosing a feasible initial state
+|ι⟩∈⟨S⟩as well as a feasibility-preserving mixer and phase
+separator. This means that for all values for β and γ, it holds
+that UM(β)(⟨S⟩) ⊆⟨S⟩and UP(γ)(⟨S⟩) ⊆⟨S⟩, respectively.
+In this case, the objective function remains unchanged, as no
+infeasible states appear that would have to be penalized.
+Now we can see the second advantage of choosing Hf in (4)
+diagonal in the computational basis: As exponentiating the cost
+Hamiltonian in (5) preserves the diagonality, U f
+P (γ)(⟨S⟩) ⊆
+⟨S⟩immediately follows.
+In contrast, the design of feasibility-preserving mixers is
+more involved. There is no universal construction rule that
+inputs the classical constraints – e.g. in the form of g – and
+outputs a suitable parameterized mixer UM(β). In practice,
+mixers are often constructed from symmetry structures of the
+underlying classical problems. For example, the feasible set
+of the prominent traveling salesperson problem (TSP) can be
+described as the image of any fixed feasible solution under all
+elements of the symmetric group over T elements, where T
+is the number of cities to be visited (see [31]). The symmetric
+group, in turn, is generated by transpositions which can be
+straightforwardly quantized via swap gates. Exponentiation
+yields one possible TSP mixer choice (compare [5]).
+Employed symmetry aspects usually correspond to classical
+equality constraints. For the 0-1-KP with its inequality con-
+straint, a similar ansatz seems unlikely to exist. However, the
+general design pattern of Grover mixers [13] shifts the effort to
+a uniform, feasible state preparation circuit whose construction
+might not rely on symmetries: Suppose that U Grov
+SP
+creates a
+uniform superposition of all feasible states, that is
+U Grov
+SP
+|0⟩= |S⟩:=
+1
+p
+|S|
+X
+x∈S
+|x⟩.
+(17)
+The corresponding Grover mixer is then defined via
+U Grov
+M
+(β) := e−iβ|S⟩⟨S|
+= U Grov
+SP
+(1 −(1 −e−iβ) |0⟩⟨0|)(U Grov
+SP
+)†,
+(18)
+where the last identity is obtained by writing out the exponen-
+tial and leveraging the idempotence of the projector |S⟩⟨S|. It
+also means that U Grov
+M
+is easy to implement once one has access
+to the state preparation routine U Grov
+SP
+. An instance of Grover
+mixer-QAOA (GM-QAOA) starts from the superposition state
+|S⟩and employs the associated Grover mixer as well as the
+standard phase separator to build its parameterized class of
+states:
+|β, γ⟩Grov =
+
+
+q
+Y
+j=1
+U Grov
+M
+(βj)U f
+P (γj)
+
+U Grov
+SP
+|0⟩.
+(19)
+IV. METHODS
+A. QTG as Grover-like mixer
+We propose employing the quantum tree generator as basis
+for a Grover-like mixer. Note that the superposition created
+by the QTG is typically non-uniform, extending the concept
+of Grover mixers to more general state preparation routines.
+In Subsection V-A, we argue that every superposition over
+feasible states with strictly positive amplitudes gives rise to a
+valid QAOA design. Inspired by how Amplitude Amplifica-
+tion (AA) [24] generalizes Grover’s algorithm to nonuniform
+superpositions, we name our extended QAOA framework
+Amplitude Amplification-Mixer-QAOA (or AAM-QAOA). In
+analogy to (19), the AAM-QAOA is characterized by states
+|β, γ⟩AA =
+
+
+q
+Y
+j=1
+U AA
+M (βj)U f
+P (γj)
+
+U AA
+SP |0⟩.
+(20)
+For the quantum tree generator to be applicable in this context,
+we drop the profit register entirely and calculate the average
+profit during the intermediate measurements classically from
+the sampled bit strings instead. Furthermore, in order to
+produce an equivalent of (18), we slightly adjust the definition
+of the QTG to also start from the |0⟩S |0⟩C state: The capacity
+register is now also initialized in the |0⟩C state and item
+weights are added to the register’s state rather than subtracted.
+Accordingly, we change the control statement from “˜c ≥wm”
+to “˜c ≤c −wm”, i.e. we check whether subtracting the m-
+th item’s weight from the total capacity c still covers the
+accumulated weight ˜c. Therefore, the left-hand side of this
+condition is again a quantum variable (the integer represented
+by the current quantum state of the capacity register) while the
+right-hand side is purely classical and can be precomputed.
+With this, the state preparation unitary U Grov
+SP
+can readily be
+replaced by G. This creates a first representative of our AAM-
+QAOA framework with QTG mixer
+U QTG
+M
+(β) = G
+
+1 −
+ 1 −e−iβ
+|0⟩⟨0|S ⊗|0⟩⟨0|C
+
+G†. (21)
+B. Parameter optimization
+We follow the initialization strategy of van Dam et al. [9],
+selecting initial parameters as the optimal candidates from a
+fine grid search to reduce the likelihood of convergence to lo-
+cal minima. We then employ classical optimization techniques
+to fine-tune the initial parameters, specifically utilizing the
+constrained Powell algorithm as implemented in the nonlinear-
+optimization package (NLopt) [32]. For q = 1 this reproduces
+van Dam et al.’s approach. For higher values of q, a joint
+
+--- PAGE 6 ---
+initialization of all 2q parameters via fine grid search with
+fixed granularity quickly becomes infeasible, as the number
+of points to be evaluated scales exponentially with q. Instead,
+we follow an approach somewhat similar to the layer-wise
+optimization presented in [33]: For all i = 1, . . . , q, initialize
+the parameters βi and γi in a two-dimensional fine grid search
+under fixed values for β1, . . . , βi−1 and γ1, . . . , γi−1 and with
+all values βi+1, . . . , βq and γi+1, . . . , γq set to zero. After
+determining the initial values for βi and γi, jointly optimize the
+parameters β1, . . . , βi and γ1, . . . , γi while again keeping the
+remaining parameters fixed to zero. This layer-wise initializa-
+tion approach avoids the exponential cost of high-dimensional
+fine grid search; yet, the subsequent optimization involves all
+parameters, reducing again the risk of converging to a local
+minimum.
+In practice, the objective function F(β, γ) for the optimizer
+is implemented by sampling a fixed number of bit strings
+from the quantum computer after preparing the state |β, γ⟩.
+The obtained values are then plugged in into the classical
+objective function. Taking the average of these values then
+yields an estimate for F(β, γ). In our case, we additionally
+have to test for feasibility, since we wish to assign the value
+zero to infeasible states. Therefore, each bit string is (again
+classically) tested for feasibility before calculating its objective
+value.
+C. Simulation technique
+There exist several suitable packages for simulating QAOA
+instances, e.g. [34]. They are typically based on a state-vector-
+based simulation: The current state of an n-qubit register
+is represented by a 2n-dimensional complex vector and the
+application of quantum gates is simulated by matrix-vector
+multiplication, usually in a suitable sparse format (such as in
+qHiPSTER [35]). We follow this approach for the simulation
+of van Dam et al.’s version of QAOA. More precisely, the
+probabilities pm (10) can be calculated classically, the ap-
+proximated ring-copula mixer (16) is implemented by sub-
+sequently executing the parameterized R-gates and RZ-gates
+in a qHiPSTER-like implementation. In order to speed up
+the simulation, we employ another common trick: We pre-
+compute the objective values of all 2n bit strings and store
+them in an objective vector. When simulating the application
+of U f
+P (γ) = e−iγHf , we perform a element-wise product of the
+state vector with the element-wisely exponentiated objective
+vector. This is highly parallelizable and therefore usually way
+faster than implementing the phase separator as a product of
+exponentiated Pauli strings.
+For the simulation of the QTG-based AAM-QAOA, we do
+not follow a gate-wise strategy, but rather utilize aspects of
+the high-level simulator introduced in [12]. More specifically,
+Wilkening et al. developed a simulation technique specifically
+tailored to QTG-based search for the 0-1-KP. Herein, they
+calculate the superposition created by the QTG via classically
+propagating the branching probabilities that arise from apply-
+ing the RYm(θ)-gates.5 By adapting this subroutine of their
+simulator, we can therefore easily pre-compute the initial state
+|KP⟩:= G |0⟩S |0⟩C. This further allows simulating the action
+of the QTG-based mixer thanks to the following identity:
+U QTG
+M
+(β) |ψ⟩=
+
+1 −(1 −e−iβ) |KP⟩⟨KP|
+
+|ψ⟩
+= |ψ⟩−(1 −e−iβ) ⟨KP|ψ⟩|KP⟩,
+(22)
+which is an equivalent version of (21) obtained by writing out
+U QTG
+M
+= e−iβ|KP⟩⟨KP|. Evaluating ⟨KP|ψ⟩as well as the subse-
+quent subtraction in (22) are both again highly parallelizable
+and therefore yield a comparatively fast simulation. Since we
+are, by design, guaranteed to stay within the feasible subspace,
+the simulation volume can be restricted. Accordingly, we cut
+all entries from the objective vector which correspond to
+infeasible solutions, and remove all zero entries within |KP⟩,
+which are precisely the amplitudes of the infeasible states.
+Restricting the simulation to the feasible subspace of course
+destroys the tensor product structure which is used in e.g.
+qHiPSTER to speed up the simulation of elementary gates.
+Fortunately, as we have just detailed, we can simulate all
+components of the QTG-QAOA with much faster methods that
+do not rely on exploiting any tensor product structure.
+V. RESULTS
+A. Proof of convergence
+Quantitative performance guarantees of variational methods
+like the QAOA are notoriously difficult to derive. However,
+qualitative reachability questions can often be answered with
+substantially less effort. Concretely: Given an initial state |ι⟩,
+a mixer B, and a phase separator C, do they define a family of
+parameterized quantum circuits that, given a sufficiently large
+depth p, allows for sampling an optimal solution with almost
+certainty? This notion of QAOA convergence is captured in
+[14, Theorem 12]. In the following, we validate that GM-
+QAOA and its generalization to positive non-uniform superpo-
+sitions of all feasible states – AAM-QAOA – indeed fulfill the
+sufficient criteria for convergence. These criteria are phrased
+in terms of the Hamiltonians which are exponentiated in order
+to yield the phase separator and mixer, respectively.
+First, the phase separator Hamiltonian C merely has to be
+diagonal in the computational basis such that the eigenspace
+of the restriction C|⟨S⟩corresponding to its largest eigenvalue
+matches
+⟨Smax⟩:= span{|x⟩: x is an optimal solution},
+(23)
+which is trivially fulfilled for the choice of C = Hf.
+Second, the mixer Hamiltonian B has to be feasibility-
+preserving, i.e. B(⟨S⟩) ⊆⟨S⟩, and B|⟨S⟩, when considered
+as a matrix in the computational basis, has to be irreducible
+with non-negative entries only. A matrix is called irreducible
+if it does not leave any non-trivial coordinate subspace, i.e. a
+5More precisely, they calculate the probability distribution corresponding
+to the superposition created by the QTG. However, since all amplitudes in
+this superposition are guaranteed to be non-negative real numbers, we may
+simply take the respective (real) square root in order to obtain the correct
+amplitudes.
+
+--- PAGE 7 ---
+linear subspace spanned by a proper subset of the basis chosen
+to represent the matrix, invariant.
+Let |ϕ⟩be an arbitrary state with expansion in the compu-
+tational basis
+|ϕ⟩:=
+X
+x∈{0,1}n
+ϕx |x⟩,
+(24)
+and consider the projector |ϕ⟩⟨ϕ| as candidate for a mixer
+Hamiltonian. Furthermore, let |ψ⟩∈⟨S⟩be an arbitrary
+state from the feasible subspace; then the application of |ϕ⟩⟨ϕ|
+yields
+|ϕ⟩⟨ϕ|ψ⟩=
+X
+x∈{0,1}n
+X
+y∈{0,1}n
+X
+z∈S
+ϕxϕyψz |x⟩⟨y|z⟩
+=
+X
+x∈{0,1}n
+ϕx
+ X
+z∈S
+ϕzψz
+!
+|x⟩.
+(25)
+The result is again in ⟨S⟩if and only if either the summation
+of ϕzψz over z ∈S yields zero or all the coefficients ϕx for
+x /∈S are zero. The first case can only hold for a generic |ψ⟩∈
+⟨S⟩if all the coefficients ϕz for z ∈S are zero. Therefore,
+we conclude that
+|ϕ⟩⟨ϕ|(⟨S⟩) ⊆⟨S⟩⇐⇒|ϕ⟩∈⟨S⟩or |ϕ⟩∈⟨S⟩⊥.
+(26)
+However, the second option is not of interest for us since it
+implies that |ϕ⟩⟨ϕ| |⟨S⟩= 0 which fails to be irreducible (as it
+leaves every subspace invariant). Therefore, we are left with
+superpositions of feasible computational basis states.
+Furthermore,
+the
+matrix
+elements
+of
+the
+restriction
+|ϕ⟩⟨ϕ| |⟨S⟩are given by
+⟨x |ϕ⟩⟨ϕ| y⟩= ϕxϕy,
+x, y ∈S.
+(27)
+These are collectively non-negative if and only if all the
+amplitudes ϕx, x ∈S, are non-negative.
+Lastly, we consider the irreducibility of the matrix repre-
+sentation of |ϕ⟩⟨ϕ| |⟨S⟩. First, assume that all amplitudes ϕx
+are non-zero. Let {0} ⊊⟨R⟩⊊⟨S⟩be an arbitrary non-trivial
+coordinate subspace of ⟨S⟩with ∅̸= R ⊊S being a proper,
+non-empty subset of all feasible solutions. By assumption,
+there exist y ∈R and z ∈S \ R such that both ϕy ̸= 0 and
+ϕz ̸= 0. From (25) we infer that |ϕ⟩⟨ϕ|z⟩has a component
+of ϕyϕz ̸= 0 in direction of |z⟩/∈⟨R⟩, i.e. the coordinate
+subspace ⟨R⟩is not invariant under |ϕ⟩⟨ϕ|. Since R was chosen
+arbitrarily, this establishes irreducibility. Conversely, if there
+exists a z ∈S with ϕz = 0, the non-trivial coordinate
+subspace span{|z⟩} would be left invariant by |ϕ⟩⟨ϕ| as all
+of its elements are collinear with z which is being mapped
+to zero according to (25). In summary, the projection |ϕ⟩⟨ϕ|
+fulfills all the mixer criteria if and only if all the amplitudes ϕx
+in (24) vanish for x /∈S and are strictly positive for x ∈S.
+Third, the initial state |ι⟩has to be the largest energy state of
+the restricted mixer Hamiltonian B|⟨S⟩. Choosing B = |ϕ⟩⟨ϕ|,
+AAM-QAOA prescribes to take |ι⟩= |ϕ⟩. As a projection,
+|ϕ⟩⟨ϕ| |⟨S⟩only has the eigenvalues zero and one, with |ϕ⟩
+being an eigenstate to the (highest) eigenvalue one.
+We summarize that AAM-QAOA fulfills all requirements
+listed in [14, Theorem 12] which thereby implies that, given
+a sufficiently large depth p and suitable parameter values β
+and γ, the state |β, γ⟩will be arbitrarily close to the optimal
+solution space ⟨Smax⟩and with this yield an optimal solution
+with almost certainty.
+B. Numerical experiments
+We benchmark the QTG-based QAOA as representative of
+the AAM-QAOA family against the state-of-the-art Copula
+approach by van Dam et al. [9] on the hardest 0-1-KP instances
+that can currently be found, created by the instance generator
+of Jooken et al. [11]. In particular, they are more complex to
+solve than the classes of instances constructed by Pisinger [36],
+on which the numerical studies in [9] are based. The high-level
+technique described in Subsection IV-C allows simulating of
+our algorithm on instances with up to n = 34 items. The
+standard gate-based simulation, in contrast, limits the tractable
+problem size to n = 20 when running the Copula-QAOA.
+On the other hand, this upper bound results from a trade-off
+between the number of items and the depth q, i.e., number of
+angles to be optimized. While the number of elapsed cycles
+is independent of the problem size in van Dam et al.’s ansatz
+(and the gate count only shows a moderate scaling), this is not
+the case for our approach. The resources required by the QTG-
+QAOA are mainly driven by the demands of the quantum tree
+generator. In [12], Wilkening et al. conducted an extensive
+analysis, showing how their method scales in terms of qubits,
+gates and cycles. Provided gate execution times on the specific
+hardware at hand, the latter can be used as a proxy for the
+algorithm’s runtime. This is based on the assumption of all-to-
+all qubit connectivity and suitable parallelization capabilities,
+meaning that disjoint gates, acting on different qubits, may
+be executed in parallel, constituting a single cycle on a QPU.
+Irrespective of the chosen configuration of phase separator,
+mixer and initial state, (3) implies an upper bound
+CQAOA = q(CP + CM) + CSP
+(28)
+on the QAOA cycle demand, where CP and CM denote the
+cycle counts of phase separator and mixer, respectively, and
+CSP accounts for the initial preparation of |ι⟩. For our algo-
+rithm with |ι⟩= |KP⟩, this means one additional application
+of G. On the other hand, the initial state (9) proposed by
+van Dam et al. gives CCop
+SP
+= 1 for the Copula-QAOA (see
+Subsection III-D). Using the standard phase separator U f
+P from
+(5), Cf
+P = 1 as argued in (8) for 0-1-KP. The cycle cost of
+the QTG mixer (21) is given by
+cyclecQTG
+M
+= 2CG + CMC-P
+(29)
+where the number of cycles CMC-P, required to implement the
+multi-controlled phase gate sandwiched by the QTG in (21),
+depends on the chosen decomposition method; here a standard
+Toffoli cascade (see, e.g., [37, Fig. 4.10])
+CMC-P = CTOF + 1 = 2|(Qcontrol −1)bin| + 1
+= 2|(n + |cbin| −2)bin| + 1
+(30)
+
+--- PAGE 8 ---
+5
+10
+15
+20
+25
+30
+35
+n
+10
+2
+10
+3
+Cycle count
+QTG q=1
+Copula q=1
+Copula q=2
+Copula q=3
+Copula q=4
+Copula q=5
+Copula q=6
+Copula q=7
+Copula q=8
+Copula q=9
+Copula q=10
+Fig. 2.
+Cycle counts for the QTG-QAOA and Copula-QAOA implementa-
+tions. Due to the more expensive QTG state preparation, larger depths q are
+allowed for the Copula-based approach. The number of elapsed QPU cycles is
+calculated under the assumption of all-to-all qubit connectivity and that gates
+acting on disjoint qubits may be executed in parallel. For a fixed value q, the
+cycle count of the Copula-QAOA does not depend on the concrete problem
+size n, but alternates between even and odd values for n. In contrast, the
+QTG-approach’s cycle demands overall increase with the number of items.
+Irregular dips result from lower item weights and profits which, in turn, allow
+for shorter addition circuits within the QTG. For a fixed value of n, the
+required resources grow linearly with q, independent of the QAOA type, but
+only observable for the Copula-based method.
+where the number of control qubits Qcontrol is given by the
+combined length of the system and the capacity register minus
+one. In line with [9], the Copula mixer (16) can be imple-
+mented within a constant amount of cycles, only alternating
+between even and odd problem sizes:
+CCop
+M
+= CCop
+2
+·
+(
+2
+if n is even
+3
+if n is odd
+(31)
+where
+CCop
+2
+= 2CR + 1 = 7,
+(32)
+with CCop
+2
+and CR referring to (15) and (13), respectively.
+Figure 2 shows how (28) evaluates on the generated in-
+stances for both approaches. Due to the more expensive QTG
+state preparation, we can afford more layers of phase separator
+and mixer applications in the Copula-QAOA. A viable assess-
+ment of our algorithm’s performance would ideally necessitate
+equal resource demands. Comparing the respective cycle costs
+on the generated instances, we find that a q value between
+101 and 102 would at worst be needed in the Copula-based
+approach to catch up with our algorithm’s implementation at
+lowest possible q = 1 (for n = 18). However, since Figure 3
+shows good convergence for depth values iterated between
+q = 1 and q = 10, especially for larger problem instances,
+such prohibitive orders of magnitude can be safely dismissed.
+We numerically demonstrate the superiority of our approach
+over the state-of-the-art Copula-QAOA by investigating the
+global approximation ratio achieved by both algorithms (see
+Figure 3); this is, the final expectation value returned by the
+5
+10
+15
+20
+25
+30
+35
+n
+0.4
+0.5
+0.6
+0.7
+0.8
+0.9
+1.0
+f /fOPT
+QTG q=1
+Copula q=1
+Copula q=2
+Copula q=3
+Copula q=4
+Copula q=5
+Copula q=6
+Copula q=7
+Copula q=8
+Copula q=9
+Copula q=10
+Fig. 3. Approximation ratios of the QTG-QAOA and Copula-QAOA imple-
+mentations. Due to the more expensive QTG state preparation, larger depths
+q are allowed for the Copula implementation. For increasing values up to the
+maximum investigated q = 10, convergence among the Copula curves can be
+observed, especially for larger problem sizes n. Only for tiny instances could
+Copula outperform the QTG-based implementation, which stabilizes at about
+0.9 approximation ratio for large problem sizes. The former settles at values
+around 0.4 after a rapid decline with small intermediate peaks.
+QAOA in proportion to the objective function value of the
+optimal solution found by COMBO. All subroutines – of both
+QTG and Copula – are devoid of any kind of randomization,
+avoiding the need for expensive averaging corrections. We
+observe that, while results of the QTG-QAOA are confined
+in a vertical interval between 0.75 and 0.97 approximation
+ratio, the Copula-QAOA experiences a rapid decline from
+QTG-like values at n = 5 to ratios ranging from 0.54 to
+0.73 for eight items. At these problem sizes, a clear Copula-
+specific improvement can be identified for growing depths,
+with q = 1 performing particularly worse than the others.
+The Copula results merge to an intermediate peak for all q
+values at n = 10, confirming the behavior found in [9]. After
+that, they collectively drop to values below 0.53 – and settle
+around 0.4 approximation ratio. The QTG curve, on the other
+hand, rises again after fluctuating heavily until instance sizes
+of about 18 items. More specifically, the approximation ratios
+achieved by our implementation seem to stabilize around a
+value of approximately 0.9. Only for tiny 0-1-KP instances
+was the Copula ansatz able to beat our algorithm.
+Figure 4 illustrates the probability of both approaches to
+outperform the VG heuristic (see Subsection III-A), which is
+obtained by summing up the individual probabilities of all
+(feasible) solution states inside the final state-vector, whose
+profits are larger than the VG solution. While we observe
+reasonable outcomes for small instances consisting of up to
+11 items, the probability nearly vanishes completely for larger
+problem sizes. The last bit of a chance of beating VG fades out
+after n = 16, where QTG rears up considerably to a 0.1-sized
+peak for the final time. Here, the slight resurrection of the
+Copula-QAOA is rather negligible, even for larger numbers
+
+--- PAGE 9 ---
+5
+10
+15
+20
+25
+30
+35
+n
+0.0
+0.2
+0.4
+0.6
+0.8
+P(f>fVG)
+QTG q=1
+Copula q=1
+Copula q=2
+Copula q=3
+Copula q=4
+Copula q=5
+Copula q=6
+Copula q=7
+Copula q=8
+Copula q=9
+Copula q=10
+Fig. 4. Probability of finding a feasible solution x with objective value f(x)
+greater than the very greedy (VG) solution value fVG. Both implementations
+feature a reasonable probability for small instances, which drops significantly
+for increasing problem size. For instances with n ≥15, large overlap among
+all Copula curves can be observed. Increasing the depth beyond q = 5 appears
+to have no effect at all. The Copula-QAOA performs better initially, but shows
+a quicker decline, even for larger numbers of angles. Instances where the VG
+heuristic found the optimal solution have been excluded.
+of mixer/phase-separator layers and angles, sealing the faster
+Copula shortfall compared to our approach. It should be
+noted, however, that it achieves significantly better probability
+values between five and ten items compared to the QTG-
+based AAM-QAOA, with the global maxima being around
+0.9 and 0.55, respectively. These Copula results again confirm
+the findings reported in [9]. Remarkably, increasing the depth
+beyond q = 5 in van Dam et al.’s ansatz appears to have no
+measurable effect on the probability of beating VG. Instances
+where the VG heuristic found the optimal solution have been
+excluded from Figure 4 to circumvent ambiguity as, in this
+case, the probability of ending up better than VG vanishes
+independently of the respective QAOA outcomes.
+VI. CONCLUSION
+In this work, we have introduced a QAOA method for the 0-
+1 knapsack problem that incorporates hard-constraints through
+the use of the Quantum Tree Generator (QTG) [12] as basis
+for a Grover-like mixer [13]. The QTG-based QAOA may
+be seen as a representative of the more general family of
+Amplitude Amplification-Mixer-QAOA (AAM-QAOA) where
+the necessity of a uniform state preparation is dropped. We
+benchmarked our algorithm against the state-of-the-art Copula
+approach developed by van Dam et al. [9], utilizing the
+most challenging 0-1 knapsack problem instances generated
+by Jooken et al. [11].
+Our numerical results demonstrate that our method consis-
+tently outperforms the Copula-based ansatz in terms of the
+approximation ratio as independent measure. Specifically, only
+in very small instances does the Copula-QAOA show better
+performance compared to our QTG-based implementation. We
+also evaluate the probability of both methods outperforming
+the classical (very) greedy approach and observed that, for
+larger problem sizes, this probability nearly vanishes. Al-
+though the Copula-QAOA exhibits superior performance for
+smaller instances compared to the QTG-QAOA, it rapidly
+declines in efficacy as problem size increases, even when
+massively extending the circuit depth and, thereby, the number
+of variational parameters.
+At least for arbitrarily large circuit depths and the right
+parameters, we can prove that AAM-QAOA, and thus the
+QTG-based QAOA as a special case, will find the global
+optimal solution. Our proof utilizes the conditions for QAOA
+convergence as being phrased in [14]. This purely theoretical
+result may be of independent interest. At the same time, it
+gives very little implications for the practical performance of
+QAOA at finite depth.
+Despite achieving a better QAOA method with improved
+approximation ratios compared to Copula-QAOA, our findings
+suggest that the classical greedy approach remains more effec-
+tive overall for large and complex problem instances. Further
+research may explore enhancements to quantum algorithms
+that can rival classical heuristics in a broader range of problem
+sizes.
+ACKNOWLEDGMENT
+This work was supported by the Quantum Valley Lower
+Saxony and the BMBF projects ProvideQ and QuBRA. We
+thank Jan Rasmus Holst, Tobias J. Osborne and Timo Ziegler
+for helpful discussions.
+Data and code availability statement. The depicted data
+and the used code can be found at https://github.com/Damuna/
+QAOA-with-Grover-mixer.
+REFERENCES
+[1] J. Preskill, “Quantum Computing in the NISQ era and beyond,”
+Quantum, vol. 2, p. 79, 2018. [Online]. Available: https://doi.org/10.
+22331/q-2018-08-06-79
+[2] M. Cerezo, A. Arrasmith, R. Babbush, S. C. Benjamin, S. Endo,
+K.
+Fujii,
+J.
+R.
+McClean,
+K.
+Mitarai,
+X.
+Yuan,
+L.
+Cincio,
+and
+P.
+J.
+Coles,
+“Variational
+Quantum
+Algorithms,”
+Nat.
+Rev.
+Phys.,
+vol.
+3,
+no.
+9,
+pp.
+625–644,
+2021.
+[Online].
+Available:
+https://doi.org/10.1038/s42254-021-00348-9
+[3] I. M. Georgescu, S. Ashhab, and F. Nori, “Quantum simulation,” Rev.
+Mod. Phys., vol. 86, no. 1, pp. 153–185, 2014. [Online]. Available:
+https://link.aps.org/doi/10.1103/RevModPhys.86.153
+[4] E. Farhi, J. Goldstone, and S. Gutmann, “A Quantum Approximate
+Optimization Algorithm,” 2014, [arXiv preprint arXiv:1411.4028].
+[5] S. Hadfield, Z. Wang, B. O'Gorman, E. Rieffel, D. Venturelli, and
+R. Biswas, “From the Quantum Approximate Optimization Algorithm
+to a Quantum Alternating Operator Ansatz,” Algorithms, vol. 12, no. 2,
+p. 34, 2019. [Online]. Available: https://doi.org/10.3390%2Fa12020034
+[6] A. Lucas, “Ising formulations of many NP problems,” Front. Phys.,
+vol. 2, p. 5, 2014. [Online]. Available: https://doi.org/10.3389/fphy.
+2014.00005
+[7] P. D. de la Grand’rive and J.-F. Hullo, “Knapsack Problem variants
+of QAOA for battery revenue optimisation,” 2019, [arXiv preprint
+arXiv:1908.02210].
+[8] C. Roch, A. Impertro, and C. Linnhoff-Popien, “Cross entropy
+optimization
+of
+constrained
+problem
+Hamiltonians
+for
+quantum
+annealing,” in International Conference on Computational Science.
+Springer, 2021, pp. 60–73. [Online]. Available: https://doi.org/10.1007/
+978-3-030-77980-1 5
+
+--- PAGE 10 ---
+[9] W. van Dam, K. Eldefrawy, N. Genise, and N. Parham, “Quantum
+optimization heuristics with an application to knapsack problems,”
+in 2021 IEEE International Conference on Quantum Computing and
+Engineering (QCE).
+IEEE, 2021, pp. 160–170. [Online]. Available:
+https://doi.org/10.1109/QCE52317.2021.00033
+[10] D. J. Egger, J. Mareˇcek, and S. Woerner, “Warm-starting quantum
+optimization,” Quantum, vol. 5, p. 479, 2021. [Online]. Available:
+http://dx.doi.org/10.22331/q-2021-06-17-479
+[11] J. Jooken, P. Leyman, and P. De Causmaecker, “A new class of
+hard problem instances for the 0–1 knapsack problem,” Eur. J.
+Oper. Res., vol. 301, no. 3, pp. 841–854, 2022. [Online]. Available:
+https://doi.org/10.1016/j.ejor.2021.12.009
+[12] S. Wilkening, A.-I. Lefterovici, L. Binkowski, M. Perk, S. Fekete,
+and T. J. Osborne, “A quantum algorithm for the solution of the 0-1
+Knapsack problem,” 2023, [arXiv preprint arXiv:2310.06623].
+[13] A. B¨artschi and S. Eidenbenz, “Grover mixers for QAOA: Shifting
+complexity from mixer design to state preparation,” in 2020 IEEE
+International Conference on Quantum Computing and Engineering
+(QCE).
+IEEE, 2020, pp. 72–82. [Online]. Available: https://doi.org/
+10.1109/QCE49297.2020.00020
+[14] L. Binkowski, G. Koßmann, T. Ziegler, and R. Schwonnek, “Elementary
+proof of QAOA convergence,” New J. Phys., vol. 26, no. 7, p. 073001,
+2024. [Online]. Available: http://dx.doi.org/10.1088/1367-2630/ad59bb
+[15] D. Pisinger, “An expanding-core algorithm for the exact 0–1 knapsack
+problem,” Eur. J. Oper. Res., vol. 87, no. 1, pp. 175–187, 1995.
+[Online]. Available: https://www.sciencedirect.com/science/article/pii/
+0377221794000133
+[16] S.
+Martello,
+D.
+Pisinger,
+and
+P.
+Toth,
+“Dynamic
+Programming
+and
+Strong
+Bounds
+for
+the
+0-1
+Knapsack
+Problem,”
+Manage.
+Sci.,
+vol.
+45,
+no.
+3,
+pp.
+414–424,
+1999.
+[Online].
+Available:
+https://doi.org/10.1287/mnsc.45.3.414
+[17] IBM, “IBM ILOG CPLEX Optimization Studio,” https://www.ibm.com/
+products/ilog-cplex-optimization-studio, 2022.
+[18] Gurobi Optimization, LLC, “Gurobi Optimizer Reference Manual,”
+https://www.gurobi.com, 2023.
+[19] Google
+OR-Tools,
+“Google
+OR-Tools
+Documentation,”
+https://developers.google.com/optimization/cp, 2024.
+[20] N. J. Cerf, L. K. Grover, and C. P. Williams, “Nested quantum search
+and structured problems,” Phys. Rev. A, vol. 61, no. 3, p. 032303,
+2000. [Online]. Available: https://link.aps.org/doi/10.1103/PhysRevA.
+61.032303
+[21] A. Montanaro, “Quantum speedup of branch-and-bound algorithms,”
+Phys. Rev. Res., vol. 2, no. 1, p. 013056, 2020. [Online]. Available:
+https://link.aps.org/doi/10.1103/PhysRevResearch.2.013056
+[22] C. Durr and P. Høyer, “A Quantum Algorithm for Finding the Mini-
+mum,” 1996, [arXiv preprint arXiv:quant-ph/9607014].
+[23] L. K. Grover, “A fast quantum mechanical algorithm for database
+search,” 1996, [arXiv preprint arXiv:quant-ph/9605043].
+[24] G. Brassard, P. Høyer, M. Mosca, and A. Tapp, “Quantum amplitude
+amplification and estimation,” Contemp. Math., pp. 53–74, 2002.
+[Online]. Available: https://doi.org/10.1090%2Fconm%2F305%2F05215
+[25] R. M. Karp, Reducibility among Combinatorial Problems.
+Boston,
+MA: Springer US, 1972. [Online]. Available: https://doi.org/10.1007/
+978-1-4684-2001-2 9
+[26] O. H. Ibarra and C. E. Kim, “Fast approximation algorithms for the
+knapsack and sum of subset problems,” J. ACM, vol. 22, no. 4,
+p. 463–468, Oct. 1975. [Online]. Available: https://doi.org/10.1145/
+321906.321909
+[27] R. Bellman, Dynamic Programming, 1st ed.
+Princeton, NJ, USA:
+Princeton University Press, 1957.
+[28] E. Farhi, J. Goldstone, S. Gutmann, and M. Sipser, “Quantum Com-
+putation by Adiabatic Evolution,” 2000, [arXiv preprint arXiv:quant-
+ph/0001106].
+[29] G. Koßmann, L. Binkowski, L. van Lujik, T. Ziegler, and R. Schwonnek,
+“Deep-Circuit QAOA,” 2022, [arXiv preprint arXiv:2210.12406].
+[30] J. Golden, A. B¨artschi, D. O’Malley, and S. Eidenbenz, “Threshold-
+Based Quantum Optimization,” in 2021 IEEE International Conference
+on Quantum Computing and Engineering (QCE). IEEE, 2021, pp. 137–
+147. [Online]. Available: https://doi.org/10.1109/QCE52317.2021.00030
+[31] G. Koßmann, L. Binkowski, C. Tutschku, and R. Schwonnek, “Open-
+Shop Scheduling With Hard Constraints,” 2023, [arXiv preprint
+arXiv:2211.05822].
+[32] S. G. Johnson, “The NLopt nonlinear-optimization package,” https://
+github.com/stevengj/nlopt, 2007.
+[33] X. Lee, X. Yan, N. Xie, D. Cai, Y. Saito, and N. Asai, “Iterative
+layerwise training for the quantum approximate optimization algorithm,”
+Phys. Rev. A, vol. 109, no. 5, p. 052406, 2024. [Online]. Available:
+https://link.aps.org/doi/10.1103/PhysRevA.109.052406
+[34] J. Golden, A. Baertschi, D. O’Malley, E. Pelofske, and S. Eidenbenz,
+“JuliQAOA: Fast, Flexible QAOA Simulation,” in Proceedings of
+the SC ’23 Workshops of The International Conference on High
+Performance Computing, Network, Storage, and Analysis.
+ACM, 2023,
+p. 1454–1459. [Online]. Available: http://dx.doi.org/10.1145/3624062.
+3624220
+[35] M. Smelyanskiy, N. P. D. Sawaya, and A. Aspuru-Guzik, “qHiPSTER:
+The Quantum High Performance Software Testing Environment,” 2016,
+[arXiv preprint arXiv:1601.07195].
+[36] D. Pisinger, “Where are the hard knapsack problems?” Comput.
+Oper. Res., vol. 32, no. 9, pp. 2271–2284, 2005. [Online]. Available:
+https://www.sciencedirect.com/science/article/pii/S030505480400036X
+[37] M. A. Nielsen and I. L. Chuang, Quantum Computation and Quantum
+Information: 10th Anniversary Edition.
+Cambridge University Press,
+2010.

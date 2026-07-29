@@ -1,0 +1,1085 @@
+
+--- PAGE 1 ---
+arXiv:quant-ph/0002066v1  24 Feb 2000
+Quantum lower bounds by quantum arguments
+Andris Ambainis
+Computer Science Division
+University of California
+Berkeley, CA 94720
+e-mail: ambainis@cs.berkeley.edu∗
+Abstract
+We propose a new method for proving lower bounds on quantum query algorithms. Instead of a
+classical adversary that runs the algorithm with one input and then modiﬁes the input, we use a quantum
+adversary that runs the algorithm with a superposition of inputs. If the algorithm works correctly, its
+state becomes entangled with the superposition over inputs. We bound the number of queries needed
+to achieve a suﬃcient entanglement and this implies a lower bound on the number of queries for the
+computation.
+Using this method, we prove two new Ω(
+√
+N) lower bounds on computing AND of ORs and inverting
+a permutation and also provide more uniform proofs for several known lower bounds which have been
+previously proven via variety of diﬀerent techniques.
+1
+Introduction
+In the query model, algorithms access the input only by querying input items and the complexity of the
+algorithm is measured by the number of queries that it makes. Many quantum algorithms can be naturally
+expressed in this model. The most famous examples are Grover’s algorithm[9] for searching an N-element
+list with O(
+√
+N) quantum queries and period-ﬁnding which is the basis of Shor’s factoring algorithm[11, 17].
+In the query setting, one can not only construct eﬃcient quantum algorithms but also prove lower
+bounds on the number of queries that any quantum algorithm needs. For example, it can be shown that
+any algorithm solving the unordered search problem needs Ω(
+√
+N) queries[4]. (This implies that Grover’s
+algorithm is optimal.)
+The lower bounds in quantum query model provide insights into the limitations of quantum computing.
+For example, the unordered search problem provides an abstract model for NP-complete problems and
+the Ω(
+√
+N) lower bound of [4] provided evidence of the diﬃculty of solving these problems on a quantum
+computer.
+For two related problems - inverting a permutation (often used to model one-way permutation) and AND
+of ORs only weaker lower bounds have been known. Both of these problems can be solved using Grover’s
+algorithm with O(
+√
+N) queries for inverting a permutation and O(
+√
+N log N) queries for AND of ORs[7].
+However, the best lower bounds have been Ω(
+3√
+N)[4] and Ω(
+4√
+N), respectively.
+We present a new method for proving lower bounds on quantum query algorithms and use it to prove
+Ω(
+√
+N) lower bounds for inverting a permutation and AND of ORs. It also provides a uniﬁed proof for
+several other results that have been previously proven via variety of diﬀerent techniques.
+∗Supported by Berkeley Fellowship for Graduate Studies and, in part, by NSF grant CCR-9800024. This research was done
+while visiting Microsoft Research.
+1
+
+--- PAGE 2 ---
+In contrast to [4, 18] that use a classical adversary argument (an adversary runs the algorithm with one
+input and, after that, changes the input slightly so that the correct answer changes but the algorithm does
+not notice that), we use a quantum adversary. In other words, instead of running the algorithm with one
+input, we run it with a superposition of inputs. This gives stronger bounds and can also simplify the proofs.
+More formally, we consider a bipartite quantum system consisting of the algorithm and an oracle an-
+swering algorithm’s queries. At the beginning, the algorithm part is in its starting state (normally |0⟩), the
+oracle part is in a uniform superposition over some set of inputs and the two parts are not entangled.
+In the query model, the algorithm can either perform a unitary transformation that does not depend
+on the input or a query transformation that accesses the input. The unitary transformations of the ﬁrst
+type become unitary transformations over the algorithm part of the superposition. The queries become
+transformations entangling the algorithm part with the oracle part.
+If the algorithm works correctly, the algorithm part becomes entangled with the oracle part because the
+algorithm part must contain diﬀerent answers for diﬀerent inputs. We obtain lower bounds on quantum
+algorithms by bounding the number of query transformations needed to achieve such entanglement.
+Previously, two main lower bound methods were classical adversary[4] (called ’hybrid argument’ in [18])
+and polynomials methods. The classical adversary/hybrid method of [4, 18] starts with running the algorithm
+on one input. Then the input is modiﬁed so that the behavior of algorithm does not change much but the
+correct answer does change. That implies that the problem cannot be solved with a small number of queries.
+Polynomials method[3] uses the fact that any function computable with a small number of queries can
+be approximated by a polynomial of a small degree and then applies results about inapproximability by
+polynomials.
+Our “quantum adversary” method can be used to give more uniﬁed proofs for many (but not all) results
+that were previously shown using diﬀerent variants of hybrid and/or polynomials method.
+There is also a new proof of the Ω(
+√
+N) lower bound on unordered search by Grover[10]. This proof is
+based on considering the sum of distances between superpositions on diﬀerent inputs. While the motivation
+for Grover’s proof (sum of distances) is fairly diﬀerent from ours (quantum adversary), these two methods
+are, in fact, closely related. We discuss this relation in section 7.
+2
+The model
+We consider computing a Boolean function f(x1, . . . , xN) : {0, 1}N →{0, 1} in the quantum query model[3].
+In this model, the input bits can be accessed by queries to an oracle X and the complexity of f is the number
+of queries needed to compute f.
+A quantum computation with T queries is just a sequence of unitary transformations
+U0 →O →U1 →O →. . . →UT −1 →O →UT .
+Uj’s can be arbitrary unitary transformations that do not depend on the input bits x1, . . . , xN. O are
+query (oracle) transformations. To deﬁne O, we represent basis states as |i, b, z⟩where i consists of ⌈log N⌉
+bits, b is one bit and z consists of all other bits. Then, O maps |i, b, z⟩maps to |i, b ⊕xi, z⟩. (i.e., the ﬁrst
+⌈log N⌉bits are interpreted as an index i for an input bit xi and this input bit is XORed on the next qubit.)
+We use Ox to denote the query transformation corresponding to an input x = (x1, . . . , xn).
+Also, we can deﬁne that O maps |i, b, z⟩to (−1)b·xi|i, b, z⟩(i.e., instead of XORing xi on an extra qubit
+we change phase depending on xi). It is well known that both deﬁnitions are equivalent up to a constant
+factor: one query of the 1st type can be simulated with a one query of the 2nd type and one query of the 2nd
+type can be simulated with 2 queries of the 1st type. For technical convenience, we use the 2nd deﬁnition in
+most of this paper.
+The computation starts with a state |0⟩. Then, we apply U0, O, . . ., O, UT and measure the ﬁnal state.
+The result of the computation is the rightmost bit of the state obtained by the measurement.
+2
+
+--- PAGE 3 ---
+The quantum computation computes f with bounded error if, for every x = (x1, . . . , xN), the probability
+that the rightmost bit of UT OxUT −1 . . . OxU0|0⟩equals f(x1, . . . , xN) is at least 1 −ǫ for some ﬁxed ǫ < 1/2.
+This model can be easily extended to functions deﬁned on a larger set (for example, {1, . . ., N}) or
+functions having more than 2 values. In the ﬁrst case, we replace one bit b with several bits (⌈log N⌉bits in
+the case of {1, . . . , N}). In the second case, we measure several rightmost bits to obtain the answer.
+3
+The main idea
+Let S be a subset of the set of possible inputs {0, 1}N. We run the algorithm on a superposition of inputs in
+S. More formally, let HA be the workspace of the algorithm. We consider a bipartite system H = HA ⊗HI
+where HI is an “input subspace” spanned by basis vectors |x⟩corresponding to inputs x ∈S.
+Let UT OUT −1 . . . U0 be the sequence of unitary transformations on HA performed by the algorithm
+A (with U0, . . . , UT being the transformations that do not depend on the input and O being the query
+transformations). We transform it into a sequence of unitary transformations on H. A unitary transformation
+Ui on HA corresponds to the transformation U ′
+i = Ui ⊗I on the whole H. The query transformation O
+corresponds to a transformation O′ that is equal to Ox on subspace HA ⊗|x⟩.
+We perform the sequence of transformations U ′
+T O′U ′
+T −1 . . . U ′
+0 on the starting state
+|ψstart⟩= |0⟩⊗
+X
+x∈S
+αx|x⟩.
+Then, the ﬁnal state is
+|ψend⟩=
+X
+x∈S
+αx|ψx⟩⊗|x⟩
+where |ψx⟩is the ﬁnal state of A = UT OUT −1 . . . U0 on the input x.
+This follows from the fact that
+the restrictions of U ′
+T , O′, U ′
+T −1, . . . , U ′
+0 to HA ⊗|x⟩are UT , Ox, UT −1, . . ., U0 and these are exactly the
+transformations of the algorithm A on the input x.
+In the starting state, the HA and HI parts of the superposition are unentangled. In the ﬁnal state,
+however, they must be entangled (if the algorithm works correctly). To see that, consider a simple example
+where the algorithm has to recover the whole input.
+Let αx = 1/√m (where m = |S|) for all x ∈S. In the exact model (the algorithm is not allowed to
+give the wrong answer even with a small probability), |ψx⟩must be |x⟩|ϕx⟩where |x⟩is the answer of the
+algorithm and |ϕx⟩are algorithm’s workbits. This means that the ﬁnal state is
+1
+√m
+X
+x∈S
+|x⟩|ϕx⟩⊗|x⟩,
+i.e., it is fully entangled state. In the bounded error model (the algorithm can give a wrong answer with a
+probability at most ǫ), |ψx⟩must be (1 −ǫ)|x⟩|ϕx⟩+ |ψ′
+x⟩and the ﬁnal state must be
+1
+√m
+X
+x∈S
+((1 −ǫ)|x⟩|ϕx⟩+ |ψ′
+x⟩) ⊗|x⟩
+which is also quite highly entangled.
+In the general case (we have to compute some function f instead of learning the whole input x), the parts
+of HI corresponding to inputs with f(x) = z must become entangled with parts of HA corresponding to the
+answer z.
+Thus, we can show a lower bound on quantum query algorithms by showing that, given an unentan-
+gled start state, we cannot achieve a highly entangled end state with less than a certain number of query
+transformations.
+3
+
+--- PAGE 4 ---
+Next, we describe more formally how we bound this entanglement. If we trace out HA from the states
+|ψstart⟩and |ψend⟩, we obtain mixed states over HI. Let ρstart and ρend be the density matrices describing
+these states.
+ρstart is a m × m matrix corresponding to the pure state P
+x∈S αx|x⟩.
+Entries of this matrix are
+(ρstart)xy = α∗
+xαy. In particular, if the start state is
+1
+√m
+P
+x∈S |x⟩, all entries of the ρstart are 1/m.
+For ρend we have
+Lemma 1 Let A be an algorithm that computes f with probability at least 1 −ǫ. Let x, y be such that
+f(x) ̸= f(y). Then,
+|(ρend)xy| ≤2
+p
+ǫ(1 −ǫ)|αx||αy|.
+Proof: Let |ψx⟩, |ψy⟩be the ﬁnal superpositions of the algorithm A on inputs x, y. We take a basis for
+HA consisting of the vectors of the form |z⟩|v⟩where |z⟩is a basis for the answer part (the part which is
+measured at the end of algorithm to obtain the answer) and |v⟩is a basis for the rest of HA (workbits). We
+express |ψx⟩and |ψy⟩in this basis. Let
+|ψx⟩=
+X
+z,v
+az,v|z⟩|v⟩, |ψy⟩=
+X
+z,v
+bz,v|z⟩|v⟩.
+The ﬁnal state of the algorithm is P
+x∈S αx|ψx⟩⊗|x⟩. By tracing out HA in the |z⟩|v⟩basis, we get
+(ρend)xy = αxαy
+X
+z,v
+a∗
+z,vbz,v.
+Deﬁne ǫ1 = P
+z,v:z̸=f(x) |az,v|2 and ǫ2 = P
+z,v:z=f(x) |bz,v|2. Then, ǫ1 ≤ǫ and ǫ2 ≤ǫ (because these are
+the probabilities that the measurement at the end of algorithm gives us a wrong answer: not f(x) for the
+input x and f(x) for the input y). We have
+|
+X
+z,v
+a∗
+z,vbz,v| ≤
+X
+z,v
+|az,v||bz,v| =
+X
+z,v:z=f(x)
+|az,v||bz,v| +
+X
+z,v:z̸=f(x)
+|az,v||bz,v|
+≤
+s
+X
+z,v:z=f(x)
+|az,v|2
+s
+X
+z,v:z=f(x)
+|bz,v|2 +
+s
+X
+z,v:z̸=f(x)
+|az,v|2
+s
+X
+z,v:z̸=f(x)
+|bz,v|2 =
+p
+(1 −ǫ1)ǫ2 +
+p
+ǫ1(1 −ǫ2).
+This expression is maximized by ǫ1 = ǫ2 = ǫ, giving us 2
+p
+ǫ(1 −ǫ). Therefore,
+|(ρend)xy| = |αx||αy||
+X
+z,v
+a∗
+z,vbz,v| ≤2
+p
+ǫ(1 −ǫ)|αx||αy|.
+✷
+In particular, if |ψstart⟩is the uniform
+1
+√m
+P
+x∈S |x⟩, we have (ρend)xy ≤2
+p
+ǫ(1 −ǫ)/m. Note that, for
+any ǫ < 1/2, 2
+p
+ǫ(1 −ǫ) < 1. Thus, if the algorithm A works correctly, the absolute value of every entry
+of ρend that corresponds to inputs x, y with f(x) ̸= f(y) must be smaller than the corresponding entry of
+ρstart by a constant fraction.
+To prove a lower bound on the number of queries, we bound the change in ρxy caused by one query.
+Together with Lemma 1, this implies a lower bound on the number of queries.
+4
+
+--- PAGE 5 ---
+4
+Lower bound on search
+Next, we apply this technique to several problems. We start with the simplest case: the lower bound on
+unordered search problem (Theorem 1). Then, we show two general lower bound theorems (Theorems 2 and
+6).
+Each of these theorems is a special case of the next one: Theorem 2 implies Theorem 1 and Theorem 6
+implies Theorem 2. However, more general theorems have more complicated proofs and it is easier to see the
+main idea in the simple case of unordered search. Therefore, we show this case ﬁrst, before general theorems
+2 and 6.
+Problem: We are given x1, . . . , xN ∈{0, 1} and we have to ﬁnd i such that xi = 1.
+Theorem 1 [4] Any quantum algorithm that ﬁnds i with probability 1 −ǫ uses Ω(
+√
+N) queries.
+Proof: Let S be the set of inputs with one xi equal to 1 and the rest 0. Then, |S| = N and HI is an
+N-dimensional space. To simplify the notation, we use |i⟩to denote the basis state of HI corresponding to
+the input (x1, . . . , xN) with xi = 1.
+Let ρk be the density matrix of HI after k queries. Note that ρ0 = ρstart and ρT = ρend. We consider
+the sum of absolute values of all its oﬀ-diagonal entries Sk = P
+x,y,x̸=y |(ρk)xy|. We will show that
+1. S0 = N −1,
+2. ST ≤2
+p
+ǫ(1 −ǫ)(N −1)
+3. Sk−1 −Sk ≤2√N −1 for all k ∈{1, . . . , T }.
+This implies that the number of queries T is at least (1 −2
+p
+ǫ(1 −ǫ))√N −1/2.
+The ﬁrst two properties follow straightforwardly from the results at the end of section 3. N ×N matrices
+ρi have N(N −1) non-diagonal entries and each of these entries is 1/N in ρstart and at most 2
+p
+ǫ(1 −ǫ)/N
+in ρend (Lemma 1 together with the fact that each of these entries corresponds to two inputs with diﬀerent
+answers).
+It remains to prove the third part. First, notice that
+Sk−1 −Sk =
+X
+x,y:x̸=y
+|(ρk−1)xy| −
+X
+x,y:x̸=y
+|(ρk)xy| ≤
+X
+x,y:x̸=y
+|(ρk−1)xy −(ρk)xy|.
+Therefore, it suﬃces to bound the sum of |(ρk−1)xy −(ρk)xy|.
+A query corresponds to representing the pure state before the query as
+|ψk−1⟩=
+X
+i,z
+√pi,z|i, z⟩⊗|ψi,z⟩,
+|ψi,z⟩=
+n
+X
+j=1
+αi,z,j|j⟩
+and changing the phase on the |i⟩component of |ψi,z⟩. If we consider just the HI part, the density matrix
+ρk−1 before the query is P
+i,z pi,z|ψi,z⟩⟨ψi,z|. The density matrix ρk after the query is P
+i,z pi,z|ψ′
+i,z⟩⟨ψ′
+i,z|
+where
+|ψ′
+i,z⟩=
+X
+j̸=i
+αi,z,j|j⟩−αi,z,i|i⟩.
+Consider ρi,z = |ψi,z⟩⟨ψi,z| and ρ′
+i,z = |ψ′
+i,z⟩⟨ψ′
+i,z|. Then, ρk−1 = P
+i,z pi,zρi,z and ρk = P
+i,z pi,zρ′
+i,z.
+5
+
+--- PAGE 6 ---
+The only entries where ρi,z and ρ′
+i,z diﬀer are the entries in the ith column and the ith row. These entries
+are α∗
+i,z,jαi,z,i in ρi,z and -α∗
+i,z,jαi,z,i in ρ′
+i,z. The sum of absolute values of the diﬀerences of all entries in
+the ith row is
+X
+j̸=i
+2|α∗
+i,z,jαi,z,i| ≤2|αi,z,i|
+X
+j̸=i
+|αi,z,j|.
+Similarly, the sum of absolute values of the diﬀerences of all entries in the ith column is at most 2|αi,z,i| P
+j̸=i |αi,z,j|
+as well. So, the sum of absolute values of all diﬀerences is at most 4|αi,z,i| P
+j̸=i |αi,z,j|.
+By Cauchy-Schwartz inequality,
+X
+j̸=i
+|αi,z,j| ≤
+√
+N −1
+sX
+j̸=i
+|αi,z,j|2 =
+√
+N −1
+q
+1 −|αi,z,i|2.
+Therefore,
+X
+j̸=i
+4|α∗
+i,z,jαi,z,i| ≤4
+√
+N −1|αi,z,i|
+q
+1 −|αi,z,i|2 ≤2
+√
+N −1.
+Deﬁne Si,z = P
+x,y:x̸=y |(ρi,z)xy −(ρ′
+i,z)xy|. Then, we have just shown Si,z ≤2
+√
+N −1. This implies a
+bound on the sum P
+x,y:x̸=y |(ρk−1)xy −(ρk)xy|.
+X
+x,y:x̸=y
+|(ρk−1)xy −(ρk)xy| =
+X
+x,y:x̸=y
+|
+X
+i,z
+pi,z(ρi,z)xy −
+X
+i,z
+pi,z(ρ′
+i,z)xy|
+≤
+X
+i,z
+pi,z
+X
+x,y:x̸=y
+|(ρi,z)xy −(ρ′
+i,z)xy| ≤
+X
+i,z
+pi,z2
+√
+N −1 = 2
+√
+N −1.
+This completes the proof. ✷
+5
+The general lower bound
+5.1
+The result
+Next, we obtain a general lower bound theorem.
+Theorem 2 Let f(x1, . . . , xN) be a function of n {0, 1}-valued variables and X, Y be two sets of inputs such
+that f(x) ̸= f(y) if x ∈X and y ∈Y . Let R ⊂X × Y be such that
+1. For every x ∈X, there exist at least m diﬀerent y ∈Y such that (x, y) ∈R.
+2. For every y ∈Y , there exist at least m′ diﬀerent x ∈X such that (x, y) ∈R.
+3. For every x ∈X and i ∈{1, . . ., n}, there are at most l diﬀerent y ∈Y such that (x, y) ∈R and
+xi ̸= yi.
+4. For every y ∈Y and i ∈{1, . . . , n}, there are at most l′ diﬀerent x ∈X such that (x, y) ∈R and
+xi ̸= yi.
+Then, any quantum algorithm computing f uses Ω(
+q
+mm′
+ll′ ) queries.
+Proof: Consider the set of inputs S = X ∪Y and the superposition
+1
+p
+2|X|
+X
+x∈X
+|x⟩+
+1
+p
+2|Y |
+X
+y∈Y
+|y⟩
+over this set of inputs. Let Si be the sum of |(ρi)xy| over all x, y such that (x, y) ∈R. Then, the theorem
+follows from
+6
+
+--- PAGE 7 ---
+1. S0 −ST ≥(1 −2
+p
+ǫ(1 −ǫ))
+√
+mm′
+2. Sk−1 −Sk ≤
+√
+ll′
+To show the ﬁrst part, let (x, y) ∈R. Then, (ρ0)xy =
+1
+√
+|X||Y | and |(ρT )xy| ≤
+2√
+ǫ(1−ǫ)
+√
+|X||Y | (Lemma 1).
+Therefore,
+|(ρ0)xy| −|(ρT )xy| ≥1 −2
+p
+ǫ(1 −ǫ)
+p
+|X||Y |
+.
+The number of (x, y) ∈R is at least max(|X|m, |Y |m′) because for every x ∈X, there are at least m possible
+y ∈Y and, for every y ∈Y , there are at least m′ possible x ∈X. We have
+max(|X|m, |Y |m′) ≥|X|m + |Y |m′
+2
+≥
+p
+|X||Y |mm′,
+S0 −ST ≥
+p
+|X||Y |mm′ 1 −2
+p
+ǫ(1 −ǫ)
+p
+|X||Y |
+= (1 −2
+p
+ǫ(1 −ǫ))
+√
+mm′.
+Next, we prove the second part. Similarly to the previous proof, we represent
+|ψk−1⟩=
+X
+i,z
+√pi,z|i, z⟩⊗|ψi,z⟩,
+|ψi,z⟩=
+X
+x∈S
+αi,z,x|x⟩.
+A query corresponds to changing the sign on all components with xi = 1. It transforms |ψi,z⟩to
+|ψ′
+i,z⟩=
+X
+x∈S:xi=0
+αi,z,x|x⟩−
+X
+x∈S:xi=1
+αi,z,x|x⟩.
+Let ρi,z = |ψi,z⟩⟨ψi,z| and ρ′
+i,z = |ψ′
+i,z⟩⟨ψ′
+i,z|. We deﬁne Si,z = P
+(x,y)∈R |(ρi,z)xy −(ρ′
+i,z)xy|.
+If xi = yi, then (ρi,z)xy and (ρ′
+i,z)xy are the same. If one of xi, yi is 0 and the other is 1, (ρi,z)xy =
+−(ρ′
+i,z)xy and |(ρi,z)xy −(ρ′
+i,z)xy| = 2|(ρi,z)xy| = 2|αi,z,x||αi,z,y|. Therefore,
+Si,z =
+X
+(x,y)∈R:xi̸=yi
+2|αi,z,x||αi,z,y| ≤
+X
+(x,y)∈R:xi̸=yi
+r
+l′
+l |αi,z,x|2 +
+r
+l
+l′ |αi,z,y|2
+≤
+X
+x∈X
+l
+r
+l′
+l |αi,z,x|2 +
+X
+y∈Y
+l′
+r
+l
+l′ |αi,z,y|2 =
+√
+ll′
+X
+x∈X∪Y
+|αi,z,x|2 =
+√
+ll′.
+Similarly to the previous proof, this implies the same bound on Sk−1 −Sk. ✷
+5.2
+Relation to block sensitivity bound
+Our Theorem 2 generalizes the block sensitivity bound of [3, 18].
+Let f be a Boolean function and x = (x1, . . . , xn) an input to f. For a set S ⊆{1, . . . , n}, x(S) denotes
+the input obtained from x by ﬂipping all variables xi, i ∈S. f is sensitive to S on input x if f(x) ̸= f(x(S)).
+The block sensitivity of f on input x is the maximal number t such that there exist t pairwise disjoint
+sets S1, S2, . . ., St such that, for all i ∈{1, . . ., t}, f is sensitive to Si on x. We denote it by bsx(f). The
+block sensitivity of f, bs(f) is just the maximum of bsx(f) over all inputs x[14].
+7
+
+--- PAGE 8 ---
+Theorem 3 [3, 18] Let f be any Boolean function. Then, any quantum query algorithm computing f uses
+Ω(
+p
+bs(f)) queries.
+To see that this is a particular case of Theorem 2, let x be the input on which f achieves bs(f) block
+sensitivity. Then, we can take X = {x} and Y = {x(S1), . . . , x(Sbs(f))}.
+Let R = {(x, x(S1)), (x, x(S2)), . . . , (x, x(Sbs(f)))}. Then, m = bs(f), m′ = 1. Also, l = 1 (because, by the
+deﬁnition of the block sensitivity, m blocks of input variables have to be disjoint) and l′ = 1. Therefore, we
+get mm′
+ll′
+= bs(f) and Theorem 2 gives the Ω(
+p
+bs(f)) lower bound for any Boolean function f.
+In the next subsection we show some problems for which our method gives a better bound than the
+block-sensitivity method.
+5.3
+Applications
+For a ﬁrst application, consider AND of ORs:
+f(x1, . . . , xN) = (x1ORx2 . . . ORx√
+N)AND
+(x√
+N+1 . . . x2
+√
+N)AND . . . AND(xN−
+√
+N+1OR . . . ORxN)
+where x1, . . . , xN ∈{0, 1}.
+f can be computed with O(
+√
+N log N) queries by a two-level version of Grover’s algorithm (see [7]).
+However, a straightforward application of lower bound methods from [4, 3] only gives an Ω(
+4√
+N) bound
+because the block sensitivity of f is Θ(
+√
+N) and the lower bound on the number of queries given by hybrid
+or polynomials method is the square root of block sensitivity[3, 18]. Our method gives
+Theorem 4 Any quantum algorithm computing AND of ORs uses Ω(
+√
+N) queries.
+Proof: For this problem, let X be the set of all x = (x1, . . . , xn) such that, for every i ∈{1, . . . ,
+√
+N},
+there is exactly one j ∈{1, . . ., √n} with x(i−1)
+√
+N+j = 1. Y is the set of all y = (y1, . . . , yn) such that
+y(i−1)
+√
+N+1 = . . . = yi
+√
+N = 0 for some i and, for every i′ ̸= i, there is a unique j ∈{1, . . . ,
+√
+N} with
+y(i−1)
+√
+N+j = 1. R consists of all pairs (x, y), x ∈X, y ∈Y such that there is exactly one i with xi ̸= yi.
+Then, m = m′ = √n because, given x ∈X, there are √n 1s that can be replaced by 0 and replacing
+any one of them gives some y ∈Y . Conversely, if y ∈Y , there are √n ways to add one more 1 so that we
+get x ∈X. On the other hand, l = l′ = 1 because, given x ∈X (or y ∈Y ) and i ∈{1, . . ., n}, there is only
+one input that diﬀers from x only in the ith position. Therefore,
+q
+mm′
+ll′
+= √n and the result follows from
+Theorem 2. ✷
+Our theorem can be also used to give another proof for the following theorem of Nayak and Wu[13].
+Theorem 5 [13] Let f : {0, 1, . . ., n −1} →{0, 1} be a Boolean function that is equal to 1 either at exactly
+n/2 points of the domain or at exactly (1 + ǫ)n/2 points. Then, any quantum algorithm that determines
+whether the number of points where f(x) = 1 is n/2 or (1 + ǫ)n/2 uses Ω( 1
+ǫ) queries.
+This result implies lower bounds on the number of quantum queries needed to compute (or to approx-
+imate) the median of n numbers[13]. It was shown in [13] using polynomials method. No proof that uses
+adversary arguments similar to [4, 18] is known.
+With our “quantum adversary” method, Theorem 5 can be proven in similarly to other theorems in this
+paper.
+Proof: Let X be the set of all f that are 1 at exactly n/2 points, Y be the set of all f that are 1 at (1+ǫ)n/2
+points and R be the set of all (f, f ′) such that f ∈X, f ′ ∈Y and they diﬀer in exactly ǫn/2 points.
+8
+
+--- PAGE 9 ---
+Then, m =
+  n/2
+ǫn/2
+
+and m′ =
+ (1+ǫ)n/2
+ǫn/2
+
+. On the other hand, l =
+  n/2−1
+ǫn/2−1
+
+and l′ =
+ (1+ǫ)n/2−1
+ǫn/2−1
+
+. Therefore,
+mm′
+ll′
+=
+  n/2
+ǫn/2
+ (1+ǫ)n/2
+ǫn/2
+
+  n/2−1
+ǫn/2−1
+ (1+ǫ)n/2−1
+ǫn/2−1
+ =
+n
+2
+(1+ǫ)n
+2
+ǫn
+2
+ǫn
+2
+= 1 + ǫ
+ǫ2
+> 1
+ǫ2 .
+By Theorem 2, the number of queries is Ω(
+q
+mm′
+ll′ ) = Ω(1/ǫ).
+✷
+There are several other known lower bounds that also follow from Theorem 2. In particular, Theorem 2
+implies Ω(N) lower bounds for MAJORITY and PARITY of [3].
+6
+Inverting a permutation
+6.1
+Extension of Theorem 2
+For some lower bounds (like inverting a permutation), we need a following extension of Theorem 2. This is
+our most general result.
+Theorem 6 Let f(x1, . . . , xN) be a function of n variables with values from some ﬁnite set and X, Y be two
+sets of inputs such that f(x) ̸= f(y) if x ∈X and y ∈Y . Let R ⊂X × Y be such that
+1. For every x ∈X, there exist at least m diﬀerent y ∈Y such that (x, y) ∈R.
+2. For every y ∈Y , there exist at least m′ diﬀerent x ∈X such that (x, y) ∈R.
+Let lx,i be the number of y ∈Y such that (x, y) ∈R and xi ̸= yi and ly,i be the number of x ∈X such that
+(x, y) ∈R and xi ̸= yi. Let lmax be the maximum of lx,ily,i over all (x, y) ∈R and i ∈{1, . . . , N} such that
+xi ̸= yi. Then, any quantum algorithm computing f uses Ω(
+q
+mm′
+lmax ) queries.
+The parameters l and l′ of Theorem 2 are just maxx∈X,i lx,i and maxy∈Y,i ly,i. It is easy to see that
+max
+(x,y)∈R,xi̸=yi lx,ily,i ≤max
+x,i lx,i max
+y,i ly,i.
+Therefore, the lower bound given by Theorem 6 is always greater than or equal to the lower bound of
+Theorem 2. However, Theorem 6 gives a better bound if, for every (x, y) ∈R and i, at least one of lx,i or
+ly,i is less than its maximal value (which happens for inverting a permutation).
+Also, Theorem 6 allows {1, . . . , N}-valued variables instead of only {0, 1}-valued in Theorem 2.
+Proof: Similarly to Theorem 6, we consider the set of inputs S = X ∪Y and the superposition
+1
+p
+2|X|
+X
+x∈X
+|x⟩+
+1
+p
+2|Y |
+X
+y∈Y
+|y⟩
+over this set of inputs. Let Sk be the sum of |(ρk)xy| over all x, y such that (x, y) ∈R. The theorem follows
+from
+1. ST −S0 ≥(1 −2
+p
+ǫ(1 −ǫ))
+√
+mm′
+2. Sk−1 −Sk ≤√lmax
+9
+
+--- PAGE 10 ---
+The ﬁrst part is shown in the same way as in the proof of Theorem 2. For the second part, express the
+state before the kth query as
+|ψk−1⟩=
+X
+i,a,z,x
+αi,a,z,x|i, a, z⟩⊗|x⟩
+where i is the index of the input variable xi being queried, a are log N bits for the answer, z is the part of
+HA that does not participate in the query (extra workbits) and x is HI part of the superposition. A query
+changes this to
+|ψk⟩=
+X
+i,a,z,x
+αi,a,z,x|i, a ⊕xi, z⟩⊗|x⟩=
+X
+i,a,z,x
+αi,a⊕xi,z,x|i, a, z⟩⊗|x⟩.
+Denote
+|ψi,a,z⟩=
+X
+x
+αi,a,z,x|x⟩, |ψ′
+i,a,z⟩=
+X
+x
+αi,a⊕xi,z,x|x⟩.
+ρk−1,i = P
+a,z |ψi,a,z⟩⟨ψi,a,z| and ρk,i = P
+a,z |ψ′
+i,a,z⟩⟨ψ′
+i,a,z| are the parts of ρk−1 and ρk corresponding to
+querying i. We have ρk−1 = Pn
+i=1 ρk−1,i and ρk = Pn
+i=1 ρk,i.
+Let Sk,i be sum of absolute values of diﬀerences |(ρk−1,i)xy −(ρk,i)xy| over all (x, y) ∈R. Then, for every
+x, y,
+|(ρk−1)xy| −|(ρk)xy| ≤|(ρk−1)xy −(ρk)xy| = |
+X
+i
+(ρk−1,i)xy −
+X
+i
+(ρk,i)xy| ≤
+X
+i
+|(ρk−1,i)xy −(ρk,i)xy|.
+Therefore (by summing over all such x and y), Sk−1−Sk ≤P
+i Sk,i and we can bound Sk−1−Sk by bounding
+Sk,i.
+Let x, y be two inputs such that xi = yi. Then, it is easy to see that
+(ρk−1,i)xy =
+X
+a,z
+α∗
+i,a,z,xαi,a,z,y =
+X
+a,z
+α∗
+i,a⊕xi,z,xαi,a⊕yi,z,y = (ρk,i)xy.
+Therefore, the only non-zero entries in Sk,i are the entries corresponding to (x, y) ∈R with xi ̸= yi. The
+sum of their diﬀerences |(ρk−1,i)xy −(ρk,i)xy| is at most the sum of absolute values of such entries in ρk−1,i
+plus the sum of absolute values of them in ρk,i. We bound these two sums.
+First, any density matrix is semipositive deﬁnite. This implies that
+|(ρk−1,i)xy| ≤1
+2
+ s
+ly,i
+lx,i
+|(ρk−1,i)xx| +
+s
+lx,i
+ly,i
+|(ρk−1,i)yy|
+!
+.
+for any x and y. Therefore,
+X
+x,y:(x,y)∈R
+xi̸=yi
+|(ρk−1,i)xy| ≤1
+2
+X
+x,y:(x,y)∈R
+xi̸=yi
+s
+ly,i
+lx,i
+|(ρk−1,i)xx| +
+s
+lx,i
+ly,i
+|(ρk−1,i)yy| = 1
+2
+X
+x∈X∪Y
+lx,i
+s
+ly,i
+lx,i
+|(ρk−1,i)xx|
+= 1
+2
+X
+x∈X∪Y
+p
+lx,ily,i|(ρk−1,i)xx| ≤1
+2
+p
+lmax
+X
+x∈X∪Y
+|(ρk−1,i)xx| =
+√lmax
+2
+T rρk−1,i.
+The same argument shows that a similar sum is at most
+√lmax
+2
+T rρk,i for the matrix ρk,i. Therefore,
+Sk−1 −Sk ≤
+X
+i
+Sk,i ≤
+X
+i
+√lmax
+2
+(T rρk−1,i + T rρk,i) =
+√lmax
+2
+(T rρk−1 + T rρk) =
+p
+lmax.
+This completes the proof. ✷
+10
+
+--- PAGE 11 ---
+6.2
+Application
+We use Theorem 6 to prove a lower bound for inverting a permutation[4].
+Problem: We are given x1, . . . , xN ∈{1, . . ., N} such that (x1, . . . , xN) is a permutation of {1, . . ., N}. We
+have to ﬁnd the i such that xi = 1.
+This problem was used in [4] to show NP A ∩co −NP A ̸⊆BQP A for an oracle A. It is easy to see that
+it can be solved by Grover’s algorithm (search for i with xi = 1). This takes O(
+√
+N) queries.
+However, the Ω(
+√
+N) lower bound proof for search problem from [4] does not work for this problem. [4]
+showed a weaker Ω(
+3√
+N) bound with a more complicated proof.
+Theorem 7 Any quantum query algorithm that inverts a permutation with probability 1 −ǫ uses Ω(
+√
+N)
+queries.
+Proof: Let X be the set of all permutations x with xi = 1 for an even i and Y be the set of all permutations
+y with yi = 1 for an odd i. (x, y) ∈R if x = (x1, . . . , xN), y = (y1, . . . , yN) and there are i, j, i ̸= j such
+that xi = yj = 1, xj = yi and all other elements of x and y are the same.
+For every x ∈X, there are m = n/2 y with (x, y) ∈R. Similarly, for every y ∈Y , there are m′ = n/2 x
+such that (x, y) ∈R.
+Finally, if we take a pair (x, y) ∈R and a location i such that xi ̸= yi, then one of xi, yi is 1. We assume
+that xi = 1. (The other case is similar.) Then, there are n/2 y′ such that (x, y′) ∈R and xi ̸= y′
+i. However,
+the only x′ such that (x′, y) ∈R and x′
+i ̸= yi is x′ = x. (Any x′ such that (x′, y) ∈R and x′
+i ̸= y′
+i must also
+have x′
+j ̸= yj where j is the variable for which yj = 1 and x is the only permutation that diﬀers from y only
+in these two places.)
+Therefore, lx,i = n/2, ly,i = 1 and lmax = n/2. By Theorem 6, this implies that any quantum algorithm
+needs Ω(
+q
+n2
+n ) = Ω(√n) queries. ✷
+7
+Relation to Grover’s proof
+Grover[10] presents a proof of the Ω(√n) lower bound on the search problem based on considering the sum
+of distances
+∆(t) =
+X
+i,j∈{1,...,n},i̸=j
+∥φt
+i −φt
+0∥2
+where φt
+i is the state of the algorithm after t queries on the input x1 = . . . = xi−1 = 0, xi = 1, xi+1 = . . . =
+xn = 1 and φt
+0 is the state of the algorithm after t queries on the input x1 = . . . = xn = 0.
+Grover shows that, after t queries, ∆(t) ≤4t2. If the algorithm outputs the correct answer with proba-
+bility 1, the ﬁnal vectors φt
+1, . . ., φt
+n have to be orthogonal, implying that ∆(t) ≥2N −2
+√
+N (cf. [10]). This
+implies that the number of queries must be Ω(
+√
+N).
+A similar idea (bounding a certain sum of distances) has been also used by Shi[16] to prove lower bounds
+on the number of quantum queries in terms of average sensitivity.
+These “distance-based” ideas can be generalized to obtain another proof of our Theorems 2 and 6.
+Namely, for Theorem 2, one can take
+∆(t) =
+X
+(x,y)∈R
+∥φt
+x −φt
+y∥2
+where φt
+x, φt
+y are the states of the algorithm after t steps on the inputs x and y. Then,
+∥φt
+x −φt
+y∥2 = 1 −⟨φt
+x|φt
+y⟩2.
+11
+
+--- PAGE 12 ---
+Let ρt be the density matrix of HI after t steps. By writing out the expressions for ⟨φt
+x|φt
+y⟩and (ρt)xy, we
+can see that
+(ρt)xy =
+1
+4|X||Y |⟨φt
+x|φt
+y⟩.
+This shows that the two quantities (the sum of entries in the density matrix and the sum of distances) are
+quite similar. Indeed, we can give proofs for Theorems 2 and 6 in terms of distances and their sums ∆(t).
+(Namely, ∆(0) = 0 before the ﬁrst query, ∆(T ) should be large if the algorithm solves the problem with
+T queries and we can bound the diﬀerence ∆(t) −∆(t −1). This gives the same bounds as bounding the
+entries of density matrices.)
+Thus, Theorems 2 and 6 have two proofs that are quite similar algebraically but come from two completely
+diﬀerent sources: running a quantum algorithm with a superposition of inputs (our “quantum adversary”)
+and looking at it from a geometric viewpoint (sum of distances).
+The “quantum adversary” approach may be more general because one could bound other quantities
+(besides the sum of entries in the density matrix) which have no simple geometric interpretation.
+8
+Conclusion and open problems
+We introduced a new method for proving lower bounds on quantum algorithms and used it to prove tight
+(up to a multiplicative or logarithmic factor) lower bounds on Grover’s search and 3 other related problems.
+Two of these bounds (Grover’s search and distinguishing between an input with 1/2 of values equal to 1 and
+1/2 + ǫ values equal to 1) were known before. For two other problems (inverting a permutation and AND of
+ORs), only weaker bounds were known. One advantage of our method is that it allows to prove all 4 bounds
+in a similar way. (Previous methods were quite diﬀerent for diﬀerent problems.)
+Some open problems:
+1. Collision problem[5].
+We are given a function f : {1, . . . , n} →{1, . . . , n/2} and have to ﬁnd i, j such that f(i) = f(j).
+Classically, this can be done by querying f(x) for O(√n) random values of x and it is easy to see
+that this is optimal. There is a quantum algorithm that solves this problem with O( 3√n) queries[5].
+However, there is no quantum lower bound at all for this problem (except the trivial bound of Ω(1)).
+The collision problem is an abstraction for collision-resistant hash functions. If it can be solved with
+O(log n) queries, there no hash function is collision-resistant against quantum algorithms.
+The exact argument that we gave in this paper (with bounding a subset of the entries in the density
+matrix) does not carry over to the collision problem. However, it may be possible to use our idea of
+running the algorithm with a superposition of oracles together with some other way of measuring the
+entanglement between the algorithm and the oracle.
+2. Simpler/better lower bound for binary search.
+It may be possible to simplify other lower bounds proven previously by diﬀerent methods. In some
+cases, it is quite easy to reprove the result by our method (like Theorem 5) but there are two cases in
+which we could not do that. The ﬁrst is the bound of [6] on the number of queries needed to achieve
+very small probability of error in database search problem. The second is the lower bound on the
+ordered search[1]. It seems unlikely that our technique can be useful in the ﬁrst case but there is a
+chance that some variant of our idea may work for ordered search (achieving both simpler proof and
+better constant under big-Ω).
+3. Communication complexity of disjointness.
+12
+
+--- PAGE 13 ---
+Quantum communication complexity is often related to query complexity[7]. Can one use our method
+(either “quantum adversary” or distance-based formulation) to prove lower bounds on quantum com-
+munication complexity?
+A particularly interesting open problem in quantum communication complexity is set disjointness.
+The classical (both deterministic and probabilistic) communication complexity of set disjointness is
+Ω(n)[12, 15]. There is a quantum protocol (based on Grover’s search algorithm) that computes set
+disjointness with an O(√n log n) communication[7] but the best lower bound is only Ω(log n)[8, 2].
+Acknowledgements. I would like to thank Dorit Aharonov, Daniel Gottesman, Ashwin Nayak, Umesh
+Vazirani and Ronald de Wolf for useful comments.
+References
+[1] A. Ambainis. A better lower bound for quantum algorithms searching an ordered list. Proceedings of
+FOCS’99, pages 352-357. Also1 quant-ph/9902053.
+[2] A. Ambainis, L. Schulman, A. Ta-Shma, U. Vazirani, A. Wigderson. Quantum communication com-
+plexity of sampling. Proceedings of FOCS’98, pages 342-351.
+[3] R. Beals, H. Buhrman, R. Cleve, M. Mosca, R. de Wolf. Quantum lower bounds by polynomials.
+Proceedings of FOCS’98, pages 352-361. Also quant-ph/9802049.
+[4] C. Bennett, E. Bernstein, G. Brassard, U. Vazirani. Strengths and weaknesses of quantum computing.
+SIAM Journal on Computing, 26(3):1510-1523, 1997, quant-ph/9701001.
+[5] G. Brassard, P. Høyer, and A. Tapp. Quantum algorithm for the collision problem. ACM SIGACT
+News (Cryptology Column), 28:14–19, 1997. quant-ph/9705002.
+[6] H. Buhrman, R. Cleve, R. de Wolf, C. Zalka. Bounds for small-error and zero-error quantum algorithms.
+Proceedings of FOCS’99, pages 358-368. Also cs.CC/9904019.
+[7] H. Buhrman, R. Cleve, A. Wigderson. Quantum vs. classical communication and computation. Proceed-
+ings of STOC’98, pages 63-68. Also quant-ph/9802046.
+[8] H. Buhrman, R. de Wolf. Communication complexity lower bounds by polynomials. cs.CC/9910010.
+[9] L. Grover. A fast quantum mechanical algorithm for database search, Proceedings of the 28th ACM
+Symposium on Theory of Computing, pp. 212-219, 1996, quant-ph/9605043.
+[10] L. Grover. How fast can a quantum computer search? quant-ph/9809029.
+[11] A. Yu. Kitaev. Quantum measurements and the Abelian stabilizer problem. quant-ph/9511026.
+[12] B. Kalyanasundaram, G. Schnitger. The probabilistic communication complexity of set intersection.
+Proceedings of Structures’87, pages 41-49, 1987.
+[13] A. Nayak and F. Wu. The quantum query complexity of approximating the median and related statistics.
+In Proceedings of 31th STOC, pages 384–393, 1999. Also quant-ph/9804066.
+[14] N. Nisan. CREW PRAMs and decision trees. SIAM Journal on Computing, 20:999-1007, 1991. Also
+STOC’89.
+1quant-ph preprints are available at http://www.arxiv.org/archive/quant-ph
+13
+
+--- PAGE 14 ---
+[15] A. Razborov. On the distributional complexity of disjointness. Theoretical Computer Science, 106:385-
+90, 1992. Also ICALP’90.
+[16] Y. Shi. Lower bounds of quantum black-box complexity and degree of approximation polynomials by
+inﬂuence of Boolean variables. quant-ph/9904107.
+[17] P. Shor. Polynomial time algorithms for prime factorization and discrete logarithms on a quantum
+computer. SIAM Journal on Computing. 26:1484-1509, 1997. Also FOCS’94.
+[18] U. Vazirani. On the power of quantum computation. Philosophical Transactions of the Royal Society of
+London, Series A: Mathematical and Physical Sciences, 356:1759-1768, August 1998.
+14

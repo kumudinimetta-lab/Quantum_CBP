@@ -1,0 +1,401 @@
+
+--- PAGE 1 ---
+arXiv:quant-ph/0106071v1  13 Jun 2001
+Grover Algorithm with zero theoretical failure rate
+G. L. Long1,2,3,4
+1Department of Physics, Tsinghua University, Beijing 100084, P.R.China
+2Key Laboratory for Quantum Information and Measurements, Ministry of Education, Beijing 100084, P.R. China
+3Institute of Theoretical Physics, Chinese Academy of Sciences, Beijing, 100080, P. R. China
+4Center of Atomic, Molecular and Nanosciences, Tsinghua University, Beijing 100084, P. R. China
+(October 24, 2018)
+In standard Grover’s algorithm for quantum searching, the probability of ﬁnding the marked
+item is not exactly 1.
+In this Letter we present a modiﬁed version of Grover’s algorithm that
+searches a marked state with full successful rate. The modiﬁcation is done by replacing the phase
+inversion by two phase rotation through angle φ. The rotation angle is given analytically to be
+φ = 2 arcsin
+ sin
+π
+(4J+6)
+sin β
+
+, where sin β =
+1
+√
+N , N the number of items in the database, and J an
+integer equal to or greater than the integer part of ( π
+2 −β)/(2β). Upon measurement at (J + 1)-th
+iteration, the marked state is obtained with certainty.
+PACS numbers: 03.67.Lx, 89.70.+c, 89.80.+h
+Grover’s quantum search algorithm [1] is an important development in quantum computation. It achieves square-
+root speedup over classical algorithms in unsorted database searching. It has extensive applications, because many
+problems, for instance deciphering the DES encryption scheme, can be reduced to this problem [2]. Starting from an
+evenly distributed state, Grover algorithm searches the database with
+jop = [(π/2 −β)/(2β)],
+(1)
+or jop + 1 number of times, whichever of (2(jop + 1) + 1)β and (2jop + 1)β is closest to π
+2 . Here β = arcsin
+1
+√
+N and
+[] means taking the integer part. N is the number of items in the database. Maximum probability is achieved when
+measurement is made at the optimal iteration step, and it is
+Pmax = sin2((2jop + 1)β) ∼= 1.
+(2)
+It equals to 1 if (2jop + 1)β = π
+2 . This condition is usually approximately satisﬁed. This can be seen from table
+I where values of jop, (2jop + 1)β for N are given. The deviation (2jop + 1)β from π
+2 is in the order of
+1
+√
+N . This
+small deviation becomes negligible when the dimension of the quantum database becomes very large, for instance in
+deciphering the DES code where N = 256 the deviation is only 3 × 10−9. Standard Grover algorithm has already
+achieved high probability, and in most potential applications it is suﬃcient.
+However, in problems where certainty is vital, especially when the dimension is not so big, using a searching
+algorithm with certainty becomes important. Meanwhile constructing such a quantum search algorithm itself is an
+interesting issue. In this Letter we present such a modiﬁed Grover algorithm.
+In fact, two such algorithms already exist. One is given by Brassard et al [3] where the generalized algorithm
+searches the database jop iterations with the standard Grover algorithm, and then run one more iteration with a
+modiﬁed algorithm whose step is smaller.
+Høyer gave another generalization [4], where certainty is achieved by
+modifying the Grover algorithm and making change to the initial distribution. Our algorithm here complements with
+these algorithms. In addition, the present algorithm materializes one earlier anticipation [5]. It was pointed out that
+when the phase inversions are replaced by arbitrary rotations in Grover’s algorithm [6], a quantum search algorithm
+with a smaller iteration can be constructed. Zalka anticipated that this could be used to achive certainty in quantum
+searching [5] by running a quantum searching algorithm with a smaller step so that at an integer number of iteration,
+the quantum computer state vector is exactly the marked state. Our algorithm here is just such an algorithm.
+The generalized Grover algorithm here starts from the evenly distributed state
+|ψi⟩=
+1
+√
+N
+X
+i
+|j⟩=
+1
+√
+N
+(|0⟩+ |1⟩+ ... + |τ⟩+ ... + |N −1⟩) = sin β|1⟩+ cos β|2⟩,
+(3)
+and the searching operator is
+Q = −W I0 W Iτ =
+ −eiφ(1 + (eiφ −1) sin2 β)
+−(eiφ −1) sin β cos β
+−eiφ(eiφ −1) sin β cos β
+−eiφ + (eiφ −1) sin2 β
+
+,
+(4)
+1
+
+--- PAGE 2 ---
+where the matrix expression is written in the following basis
+|1⟩= |τ⟩,
+|2⟩=
+1
+√
+N −1
+X
+i̸=τ
+|i⟩,
+(5)
+and
+Iτ = I + (eiφ −1)|τ⟩⟨τ|,
+I0 = I + (eiφ −1)|0⟩⟨0|,
+(6)
+where
+φ = 2 arcsin
+
+
+sin
+
+π
+4J+6
+
+sin β
+
+,
+J ≥Jop.
+(7)
+Here the two phase rotations are equal which is required by the phase matching condition [7,8]. Certainty in quantum
+searching is achieved by measuring the quantum computer at J + 1 iteration. In standard Grover algorithm, φ = π.
+In table II, we gave the angle φ for some values of N. It is seen that in general the phase rotations are very close to
+π. We see that at small N, the deviation of φ to π is big, and it decreases when N becomes large. The certainty of
+the algorithm can be examined by direct computation. We will give the detailed derivation of this result in the SO(3)
+picture of quantum searching algorithm [9].
+Equation (7) has a real solutions for J ≥jop, otherwise the solution will be complex. An integer J ≥jop ﬁxes
+an phase rotation that searches the marked state with certainty in J + 1 steps. The lower bound jop tells us that it
+can not be faster than the standard Grover algorithm. J can be chosen to be jop, or an integer larger than jop for
+convenience.
+In the following part, we show the above result and give the expression for the probability during the searching
+process. We do this in the SO(3) picture introduced recently [9]. In this picture, the quantum search operator (4)
+corresponds to a rotation in space
+RQ =
+
+
+R11 R12 R13
+R21 R22 R23
+R31 R32 R33
+
+,
+(8)
+where
+R11 = cos φ(cos2 2β cos φ + sin2 2β) + cos 2β sin2 φ),
+R12 = cos φ sin φ(cos 2β −1),
+R13 = −cosφ sin 4β sin2 φ
+2 + sin 2β sin2 φ,
+R21 = −cos2β cos φ sin φ +
+
+cos2 φ
+2 −cos 4β sin2 φ
+2
+
+sin φ,
+R22 = cosφ + cos2β sin2 φ,
+R23 = −cosφ sin 2β sin φ −sin 4β sin2 φ
+2 sin φ,
+R31 = −sin 4β sin2 θ
+2,
+R32 = sin 2β sin φ,
+R33 = cos2 2β + cos φ sin2 2β.
+The above rotation is a rotation about the following axis
+⃗l =
+
+
+cos φ
+2
+sin φ
+2
+cos φ
+2 tan β
+
+,
+(9)
+2
+
+--- PAGE 3 ---
+through an angle α
+α = 4 arcsin(sin(φ
+2 ) sin β).
+(10)
+State vector |ψ⟩= (a + bi)|1⟩+ (c + di)|2⟩is represented by the polarization vector
+⃗rψ = ⟨ψ|⃗σ|ψ⟩=
+
+
+2(ac + bd)
+2(−bc + ad)
+a2 + b2 −c2 −d2
+
+,
+(11)
+where ⃗σ = σx⃗i + σy⃗j + σz⃗k, and ⃗i, ⃗j and ⃗k are the unit vectors along the x-, y-, and z-axis. The initial state |ψi⟩and
+the marked state |τ⟩are represented by
+⃗ri =
+
+
+sin(2β)
+0
+−cos(2β)
+
+,⃗rf =
+
+
+0
+0
+1
+
+.
+(12)
+Now we want to ﬁnd out the angle that we must rotate to shift ⃗ri to ⃗rf. The equation for a line passing through the
+origin and parallel to the rotational axis is
+x
+cos φ
+2
+=
+y
+sin φ
+2
+=
+z
+cos φ
+2 tan β
+,
+(13)
+and the equation for the plane passing through (0, 0, 1)T and normal to the rotational axis is
+x cos φ
+2 + y sin φ
+2 + (z −1) cos φ
+2 tan β = 0.
+(14)
+The intersecting point of (13) with (14) is
+⃗ro =
+
+
+c cos2( φ
+2 ) tan β
+c sin( φ
+2 ) cos( φ
+2 ) tan β
+c cos2( φ
+2 ) tan2 β
+
+,
+(15)
+where c =
+1
+1+cos2 φ
+2 tan2 β . The angle ω between ⃗ri −⃗r0 and ⃗rf −⃗r0 is the angle we have to rotate in a given number
+of iterations. Using
+(⃗ri −⃗ro) · (⃗rf −⃗ro) = |⃗ri −⃗r0||⃗rf −⃗r0| cos ω,
+(16)
+we ﬁnd that
+cos ω = −cos2 β −cos φ sin2 β = cos(2 arccosx),
+(17)
+where
+x = sin(φ
+2 ) sin β.
+(18)
+Certainty in ﬁnding the marked state is achieved if angle ω is J + 1 times of the basic rotation angle α:
+ω = 2 arccos(x) = (J + 1)α = 4(J + 1) arcsin(x).
+(19)
+Using the trigonometric relation arcsin x + arccosx = π
+2 , we obtain
+ω = 2(π
+2 −arcsin x) = 4(J + 1) arcsin(x).
+This gives the result of equation (7). Equation (7) has real solutions for J ≥jop. J = jop is the minimum in most
+cases. In the cases of N = 4 and N = 1, J = jop −1 itself is a solution.
+The probability for ﬁnding the marked state during the searching can be obtained easily. In the SO(3) picture, the
+polarization vector at a given iteration is obtained by a simple geometric argument,
+3
+
+--- PAGE 4 ---
+⃗rj = ⃗ri cos ω +⃗ln(⃗ln · ⃗ri)(1 −cos ω) + (⃗ln ⊗⃗ri) sin ω,
+(20)
+where ⃗ln is the rotational axis (9) normalized to unity. Using the equation (11), the state vector can be determined
+easily. The probability for ﬁnding the marked state is (z + 1)/2.
+We can also write out the expressions in the U(2) formalism. After diagonalization, the Q operator can be written
+as,
+Q = T Λ T †,
+where
+T =
+1
+√NT
+ 
+e−i φ
+2 (cos( φ
+2 ) sin β + cos β′)
+−cosβ
+cos β
+ei φ
+2 (cos( φ
+2 ) sin β + cos β′)
+!
+,
+Λ =
+ −ei(φ+2β′)
+0
+0
+−ei(φ−2β′)
+
+,
+β′ = α/4 = arcsin(sin(φ
+2 ) sin β),
+NT = cos2 β + (cos(φ
+2 ) sin β + cos β′)2.
+Successive operations of Q can be written analytically through
+Qn = T Λn T †.
+In summary, a Grover algorithm with certainty is present. Together with the algorithms in Ref. [3] and Ref. [4],
+there are 3 choices of quantum searching algorithm for ﬁnding the marked state with certainty. Our algorithm may
+be appreciated in cases where the dimension is not big and certainty is important, and in cases where preparation of
+initial state and the change of the experimental setting during the computation process are diﬃcult.
+This work is supported by the Major State Basic Research Developed Program Grant No. G200077400, the China
+National Natural Science Foundation Grant No.
+60073009, the Fok Ying Tung Education Foundation, and the
+Excellent Young University Teachers’ Fund of Education Ministry of China.
+[1] L.K. Grover, Phys. Rev. Lett. 79, 325 (1997).
+[2] Brassard G., Science 275, 627 - 628 (1997).
+[3] Brassard G., Høyer P., Mosca M. and Tapp A., Quantum Amplitude Ampliﬁcation and Estimation, quant-ph/0005055.
+[4] Høyer P., Phys. Rev. A62, 052304 (2001)
+[5] Zalka G., quant-ph/9902049
+[6] Grover L. K.,Phys. Rev. Lett.,80 4329 (1998)
+[7] G.L. Long, Y.S. Li, W.L. Zhang and L. Niu, Phys. Lett. A262, 27 (1999).
+[8] Note that the phase condition in Ref. [4] is diﬀerent from this one, because his initial state is diﬀerent.
+[9] Long G. L. et al, J. Phys. A34, 867 (2001). Also in quant-ph/9911004
+TABLE I. Examples of jop and (2jop + 1)β
+N
+2
+4
+8
+100
+1000
+104
+106
+108
+1010
+256
+jop
+0
+1
+1
+7
+24
+78
+784
+7853
+78539
+210828713
+(2jop+1)β
+π
+2
+1
+2
+1
+0.69016
+0.956528
+0.986617
+0.99951
+0.998857
+0.999939
+0.999996
+0.999999997
+4
+
+--- PAGE 5 ---
+TABLE II. Examples of jop + 1 and φ
+N
+2
+4
+8
+16
+100
+1000
+104
+106
+108
+1010
+jop+1
+1
+1
+2
+3
+8
+25
+79
+785
+7854
+78540
+φ
+π
+1
+2
+1
+0.677007
+0.698709
+0.748018
+0.854022
+0.90089
+0.989752
+0.992688
+0.9973
+5

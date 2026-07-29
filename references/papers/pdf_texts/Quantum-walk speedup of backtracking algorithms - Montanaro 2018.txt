@@ -1,0 +1,1378 @@
+
+--- PAGE 1 ---
+Quantum walk speedup of backtracking algorithms
+Ashley Montanaro∗
+January 5, 2016
+Abstract
+We describe a general method to obtain quantum speedups of classical algorithms which are
+based on the technique of backtracking, a standard approach for solving constraint satisfaction
+problems (CSPs). Backtracking algorithms explore a tree whose vertices are partial solutions
+to a CSP in an attempt to ﬁnd a complete solution. Assume there is a classical backtracking
+algorithm which ﬁnds a solution to a CSP on n variables, or outputs that none exists, and
+whose corresponding tree contains T vertices, each vertex corresponding to a test of a partial
+solution. Then we show that there is a bounded-error quantum algorithm which completes the
+same task using O(
+√
+Tn3/2 log n) tests. In particular, this quantum algorithm can be used to
+speed up the DPLL algorithm, which is the basis of many of the most eﬃcient SAT solvers used
+in practice. The quantum algorithm is based on the use of a quantum walk algorithm of Belovs
+to search in the backtracking tree. We also discuss how, for certain distributions on the inputs,
+the algorithm can lead to an exponential reduction in expected runtime.
+1
+Introduction
+Grover’s quantum search algorithm [34] is one of the great success stories of quantum computation.
+One important domain to which the algorithm can be applied is the solution of constraint satisfac-
+tion problems (CSPs). Consider a constraint satisfaction problem (CSP) expressed as a predicate
+P : [d]n →{true, false}, where [d] = {0, . . . , d −1}. We would like to ﬁnd an assignment x to
+the n variables such that P(x) is true, or output “not found” if no such x exists. This framework
+encompasses many important problems such as boolean satisﬁability and graph colouring. Grover’s
+algorithm solves such a CSP using O(
+√
+dn) evaluations of P, whereas with no further information
+about P, ﬁnding an x such that P(x) is true requires Ω(dn) evaluations classically in the worst
+case. However, when we are faced with an instance of a CSP in practice, we usually have some
+additional information about its structure. For example, P may be deﬁned as the conjunction of
+smaller constraints of a particular type, as in the case of graph colouring. This information often
+allows classical algorithms to solve the CSP signiﬁcantly more eﬃciently than the above bound
+would suggest, throwing some doubt on whether straightforward use of Grover’s algorithm will
+really be used to solve CSPs in practice.
+One of the most important and most general classical tools to take advantage of problem
+structure, both in theory and in practice, is backtracking [7]. This technique can be used when
+we have the ability to recognise whether partial solutions to a problem can be extended to full
+solutions. We assume that the predicate P allows us to pass it a partial assignment x of the form
+x : S →[d], where S ⊆{1, . . . , n}, which speciﬁes the values assigned to the variables in the set
+∗School of Mathematics, University of Bristol, UK; ashley.montanaro@bristol.ac.uk.
+1
+arXiv:1509.02374v2  [quant-ph]  4 Jan 2016
+
+--- PAGE 2 ---
+Assume that we are given access to a predicate P : D →{true, false, indeterminate}, and a
+heuristic h : D →{1, . . . , n} which returns the next index to branch on from a given partial
+assignment.
+Return bt(∗n), where bt is the following recursive procedure:
+bt(x):
+1. If P(x) is true, output x and return.
+2. If P(x) is false, or x is a complete assignment, return.
+3. Set j = h(x).
+4. For each w ∈[d]:
+(a) Set y to x with the j’th entry replaced with w.
+(b) Call bt(y).
+Algorithm 1: General classical backtracking algorithm
+S. We can equivalently think of x as an element of D := ([d] ∪{∗})n, where the ∗’s represent the
+positions which are as yet unassigned values. We say that x is complete if it contains no ∗’s. Then
+P returns “true” if x is a solution to P, “false” if it is clear that x cannot be extended to a solution
+to P, and “indeterminate” otherwise. We say that a partial assignment x is valid if P(x) is true or
+indeterminate, and invalid if P(x) is false.
+Algorithm 1 above describes a generic way to use this information classically. The algorithm
+assumes access to P and a heuristic h(x) which determines how to extend a given partial assignment
+x. We think of P and h as black boxes (“oracles”). The basic idea is to fail early: if we know that a
+partial assignment cannot be extended to a solution, we should give up on it and try a diﬀerent one.
+We can think of the algorithm as exploring a tree, whose internal vertices are partial solutions to
+P, and whose leaves are solutions to P or certiﬁcates that the partial solution cannot be extended
+to a complete solution. This tree is of size at most O(dn), but for some problem instances could be
+substantially smaller.
+A canonical example of a powerful backtracking algorithm which ﬁts into the framework of
+Algorithm 1 is the DPLL (Davis-Putnam-Logemann-Loveland) algorithm [24, 23] for k-SAT. This
+algorithm forms the basis of many of the most successful SAT solvers used in practice [25, 41, 32].
+For many practically relevant problem instances, the algorithm runs more quickly than worst-case
+upper bounds would suggest. Another appealing aspect of this algorithm is that, unlike “local
+search” methods based on random walks or similar ideas, it can sometimes produce eﬃcient proofs
+of unsatisﬁability, corresponding to small backtracking trees.
+Algorithm 1 outputs all solutions x such that P(x) is true. While in practice the algorithm
+might be modiﬁed to terminate when the ﬁrst solution is found, here we will assume throughout
+that the entire tree is explored. We assume that P and h can both be evaluated in time poly(n), so
+the most important contribution to the complexity of Algorithm 1 is usually the number of vertices
+in the tree, which can often be exponential in n. To simplify the complexity bounds, we also assume
+throughout that d = O(1); this is eﬀectively without loss of generality as any predicate with local
+domain size d can be replaced with one which uses O(log d) bits to encode each variable.
+2
+
+--- PAGE 3 ---
+1.1
+Results
+We show here that there is a quantum equivalent of Algorithm 1 which can be substantially faster:
+Theorem 1. Let T be an upper bound on the number of vertices in the tree explored by Algorithm
+1. Then for any 0 < δ < 1 there is a quantum algorithm which, given T, evaluates P and h
+O(
+√
+Tn log(1/δ)) times each, outputs true if there exists x such that P(x) is true, and outputs false
+otherwise. The algorithm uses poly(n) space, O(1) auxiliary operations per use of P and h, and
+fails with probability at most δ.
+We usually think of T as being exponential in n; in this regime this complexity is a near-
+quadratic speedup over the classical algorithm. The algorithm can be modiﬁed to ﬁnd a solution,
+rather than just detect the existence of one, with a small runtime penalty:
+Theorem 2. Let T be the number of vertices in the tree explored by Algorithm 1. Then for any
+0 < δ < 1 there is a quantum algorithm which evaluates P and h O(
+√
+Tn3/2 log n log(1/δ)) times
+each, and outputs x such that P(x) is true, or “not found” if no such x exists. If we are promised
+that there exists a unique x0 such that P(x0) is true, there is a quantum algorithm which outputs x0
+using P and h O(
+√
+Tn log3 n log(1/δ)) times each. In both cases the algorithm uses poly(n) space,
+O(1) auxiliary operations per use of P and h, and fails with probability at most δ.
+We stress that these results can be applied to any backtracking algorithm which ﬁts into the
+framework of Algorithm 1, whatever the predicate P or the choice of the heuristic h. In particular,
+they can be applied to the DPLL algorithm with the commonly used “unit clause” heuristic.
+Theorems 1 and 2 can also be applied to backtracking algorithms which make use of randomness
+in the heuristic h, by interpreting these algorithms as ﬁrst ﬁxing a random seed, then using this
+seed as input to a deterministic heuristic h. Observe that the runtime bound of Theorem 2 is
+instance-dependent and, to use it, we do not need to know an upper bound on the runtime T of the
+underlying classical backtracking algorithm. For instances on which the classical algorithm runs
+quickly, the quantum algorithm also runs quickly.
+These algorithms can be leveraged to obtain an exponential separation between average quantum
+and classical runtimes. The speedup for any given instance is approximately quadratic. However,
+given the right distribution on the input instances, this can be ampliﬁed to an exponential separa-
+tion. This is discussed further in Section 4.
+1.2
+Techniques
+The algorithms which achieve the bounds of Theorems 1 and 2 are based on the use of a discrete-
+time quantum walk to ﬁnd a marked vertex within the tree produced by the classical backtracking
+algorithm, corresponding to a partial solution x such that P(x) is true.
+Quantum walks have
+become a basic tool in quantum algorithm design [16, 2, 51, 43]. In particular, they have been
+applied in several contexts to solve search problems on graphs [49, 51, 43, 39], sometimes achieving
+up to a quadratic speedup over classical algorithms. However, in prior work it is usually assumed
+that the input graph is known in advance, and moreover that the initial state of the quantum
+walk is the stationary distribution of the corresponding random walk. Aaronson and Ambainis [1]
+described a diﬀerent approach to spatial search on graphs; this does not use a quantum walk, but
+also assumes the input graph is known in advance.
+Here we would like to use quantum walks in a context where the input graph is deﬁned implicitly
+by the backtracking algorithm and hence is not known in advance, and where the walk starts at
+3
+
+--- PAGE 4 ---
+the root of the tree. One of the few cases where such walks have been studied is beautiful work
+of Belovs [8, 9]. The main result of that work relates the complexity of detecting a marked vertex
+by quantum walk on a graph to the eﬀective resistance of the graph. Informally, this quantity is
+determined by thinking of the graph as an electrical circuit and calculating the resistance between
+the initial vertex and the set of marked vertices. Belovs’ result can be seen as a quantum variant of
+previous classical work characterising properties of random walks on graphs (such as the commute
+time and cover time) in terms of eﬀective resistance [15].
+The main quantum subroutine used here is just the special case of Belovs’ result where the
+underlying graph is a tree, for which we include a slightly more concise correctness proof. We are
+also able to extend Belovs’ work to give an algorithm for ﬁnding a marked vertex in a tree, rather
+than just detecting one. This can easily be achieved using binary search; in the case where there
+is promised to be a unique marked element, we give a more eﬃcient algorithm based on analysing
+eigenvectors of the quantum walk.
+Once we have the quantum search algorithm, all that remains is to check the claim that the P
+and h functions can indeed be used to implement the required quantum walk operations, namely
+mixing across the neighbours of a vertex in the tree, dependent on whether the vertex is marked.
+To do this one has to be careful to ensure that the quantum walk steps are implemented eﬃciently.
+1.3
+Other prior work
+Backtracking is a fundamental technique in computer science and has been studied since at least
+the 1960s. The classical literature on this topic is too vast to summarise here; see [38, 29, 7] for
+introductions to the topic and historical overviews. Cerf, Grover and Williams attempted to ﬁnd
+a direct quantum speedup of backtracking algorithms [14]. The algorithm of [14] is based on a
+nested version of Grover search. The complete tree of partial assignments is expanded to a certain
+depth, then quantum search is performed within the subspace of partial assignments which have
+not yet been ruled out. The complexity of the algorithm depends on the number of valid partial
+assignments at this depth. It is argued in [14] that, for some reasonable distributions on random
+CSPs, the average complexity of the quantum algorithm (over the distribution on instances) will
+be smaller than would be obtained from Grover search. By contrast, the bounds of Theorems 1
+and 2 hold in the worst case and are applicable to arbitrary backtracking algorithms: if a faster
+backtracking algorithm is found, we immediately obtain a faster quantum algorithm.
+The algorithm used here can be seen as an extreme version of the nested search strategy of [14].
+The diﬀusion operation used in the quantum walk can be viewed as applying Grover search within a
+subspace spanned by a vertex in the tree and its children. The algorithm repeatedly performs these
+searches across many vertices and levels simultaneously. On the other hand, the algorithm of [14]
+can be seen as accelerating a restricted classical backtracking algorithm which uses a predicate P
+which is only capable of detecting whether partial assignments at a particular level are false.
+Similarly to the present work, Farhi and Gutmann [28] have studied the use of quantum walks
+to speed up classical backtracking algorithms by searching within the backtracking tree. These
+authors showed that there are some trees for which continuous-time quantum walks can be used
+to ﬁnd a marked vertex exponentially faster than a classical random walk. The special structure
+of these trees leads to interference eﬀects which enable the quantum walk to penetrate the tree
+more quickly than the random walk. However, for the examples presented in [28] where there is an
+exponential speedup of this form, the structure of the tree enables an alternative classical algorithm
+to also ﬁnd a marked vertex eﬃciently. Here, we seek to accelerate classical search in arbitrary
+trees, with no prior assumptions about the structure of the tree.
+4
+
+--- PAGE 5 ---
+A related, but diﬀerent, approach towards quantum speedup of recursive classical algorithms
+was proposed by F¨urer [30]. Imagine we have a constraint satisfaction problem for which we can
+put a non-trivial upper bound L on the number of leaves in the computation tree of a recursive
+classical algorithm for solving the problem. The idea of [30] was to apply Grover search over the
+leaves of the computation tree to ﬁnd a solution in time O(
+√
+L poly(n)). This approach relies on
+knowing, in advance, an eﬃciently computable mapping associating each integer between 1 and L
+with a leaf. For many more complicated recursive algorithms we may not know such a mapping.
+Indeed, there is some evidence that it may not be possible to compute such a mapping for general
+backtracking algorithms in polynomial time [50]. The quantum algorithm presented here, on the
+other hand, can be applied to any classical backtracking algorithm, even if we do not know a bound
+on L in advance.
+A somewhat similar idea to F¨urer’s was previously used by Angelsmark, Dahll¨of and Jonsson [5]
+to obtain quantum speedups for CSPs. These authors observed that, for certain CSPs, one can
+construct a set of dcn easily checked certiﬁcates, for some c < 1, such that the existence of a
+solution to the CSP is certiﬁed by at least one certiﬁcate. Then Grover search can be used to ﬁnd
+a certiﬁcate, if one exists, in time O(dcn/2 poly(n)).
+An alternative, and simpler, approach to ﬁnd quantum speedups of classical algorithms for
+CSPs is the use of amplitude ampliﬁcation [12]. This can be applied to any classical algorithm
+which can be expressed as repeatedly running a randomised subroutine which runs in time poly(n)
+and ﬁnds a solution with probability p. The corresponding quantum algorithm has a runtime of
+O((1/√p) poly(n)), a near-quadratic improvement on the classical O((1/p) poly(n)) if p is small.
+For example, it was observed by Ambainis [2] that Sch¨oning’s eﬃcient randomised algorithm for
+k-SAT [47] can be accelerated in this way; Dantsin, Kreinovich and Wolpert [22] gave several other
+examples. Deterministic backtracking algorithms are, of course, not amenable to this approach.
+Finally, a completely diﬀerent technique for solving CSPs is the quantum adiabatic algo-
+rithm [27]. Although there is some numerical evidence that this algorithm may outperform classical
+algorithms for CSPs [26], the adiabatic algorithm’s runtime is hard to analyse for large input sizes
+and there is as yet no analytical proof of its superiority over classical algorithms.
+Quantum walks on trees have been used previously in a quite diﬀerent context, to obtain a
+near-quadratic speedup for evaluation of AND-OR formulae [3]. In that algorithm the structure
+of the formula (which is known in advance) deﬁnes the tree on which the walk takes place. It is
+interesting to note that the quantum walk used in [3] is similar to the quantum walk used here, but
+has apparently quite diﬀerent properties. Another case in which the concept of eﬀective resistance
+was used in quantum computing is work by Wang, which gave an eﬃcient quantum algorithm for
+approximating eﬀective resistances [53]. This uses some similar ideas to the present work but does
+not seem directly applicable.
+1.4
+Organisation
+We begin in Section 2 by describing the main underlying quantum ingredient, the use of a quantum
+walk to detect a marked vertex in a tree. This algorithm is a special case of an algorithm described
+by Belovs [8]. We then go on in Sections 2.1 and 2.2 to describe extensions to this algorithm to allow
+ﬁnding a marked vertex, and a faster runtime in the case where we know there is a unique marked
+vertex. Section 3 shows that the algorithm can be applied to accelerate backtracking algorithms for
+CSPs. Section 4 discusses how to use the algorithm to obtain exponential reductions in expected
+runtime, while Section 5 concludes with a discussion of some ways in which the algorithm could be
+improved, and barriers to doing so.
+5
+
+--- PAGE 6 ---
+1.5
+Preliminaries
+We will need the following tools, which have been used many times elsewhere in quantum algorithm
+design:
+Lemma 3 (Eﬀective spectral gap lemma [40]). Let ΠA and ΠB be projectors on the same Hilbert
+space, and set RA = 2ΠA −I, RB = 2ΠB −I.
+Let Pχ be the projector onto the span of the
+eigenvectors of RBRA with eigenvalues e2iθ such that |θ| ≤χ. Then, for any vector |ψ⟩such that
+ΠA|ψ⟩= 0, we have
+∥PχΠB|ψ⟩∥≤χ∥|ψ⟩∥.
+Theorem 4 (Phase estimation [17, 37]). For every integer s ≥1, and every unitary U on m qubits,
+there exists a uniformly generated quantum circuit C such that C acts on m + s qubits and:
+1. C uses the controlled-U operator O(2s) times, and contains O(s2) other gates.
+2. For every eigenvector |ψ⟩of U with eigenvalue 1, C|ψ⟩|0s⟩= |ψ⟩|0s⟩.
+3. If U|ψ⟩= e2iθ|ψ⟩, where θ ∈(0, π), then C|ψ⟩|0s⟩= |ψ⟩|ω⟩, where |ω⟩satisﬁes |⟨ω|0s⟩|2 =
+sin2(2sθ)/(22s sin2 θ).
+4. For any |φ⟩∈(C2)⊗m, expanded as |φ⟩= P
+k λk|ψk⟩, where |ψk⟩is an eigenvector of U with
+eigenvalue e2iθk, then
+C|φ⟩|0s⟩=
+X
+k
+λk|ψk⟩|ωk⟩,
+where P
+k:θk≥ϵ |⟨ωk|0s⟩|2 = O(1/(2sϵ)).
+Call 2−s the precision of the circuit.
+Phase estimation is normally used to estimate eigenvalues of U (hence its name); here, however,
+similarly to [43] we will only need to apply it to distinguish the eigenvalue 1 from other eigenvalues.
+If the smallest nonzero phase is ϵ, this can be done with O(1/ϵ) uses of controlled-U.
+Fact 5 (Close states and measurement outcomes, e.g. [11]). Let |ψ1⟩, |ψ2⟩be quantum states
+satisfying ∥|ψ1⟩−|ψ2⟩∥= ϵ. Then the total variation distance between the two distributions on
+measurement outcomes obtained by measuring each state in the computational basis is at most ϵ.
+(This fact is usually presented with ϵ replaced with 4ϵ [11]; the tighter constant stated here can
+easily be obtained by relating the ﬁdelity of |ψ1⟩and |ψ2⟩to their trace distance, for example.)
+2
+Quantum walks on trees
+We now describe a quantum algorithm for detecting a marked vertex in a tree. The algorithm
+is a special case of a beautiful connection between quantum walks and electrical circuits due to
+Belovs [8] (see also [9]), which is a quantum analogue of a similar connection between random
+walks and electrical circuits [15]. This is conceptually elegant and leads to a very concise proof of
+a previous result of Szegedy [51] on detecting marked elements using a quantum walk. Here we
+only use these ideas for the special case of trees and a quantum walk starting at the root. This will
+enable us to simplify some notation and, hopefully, make the algorithm more intuitive.
+6
+
+--- PAGE 7 ---
+Input: Operators RA, RB, a failure probability δ, upper bounds on the depth n and the
+number of vertices T. Let β, γ > 0 be universal constants to be determined.
+1. Repeat the following subroutine K = ⌈γ log(1/δ)⌉times:
+(a) Apply phase estimation to the operator RBRA with precision β/
+√
+Tn.
+(b) If the eigenvalue is 1, accept; otherwise, reject.
+2. If the number of acceptances is at least 3K/8, return “marked vertex exists”; otherwise,
+return “no marked vertex”.
+Algorithm 2: Detecting a marked vertex
+Consider a rooted tree with T vertices, labelled r, 1, . . . , T −1, with vertex r being the root,
+where the distance from the root to any leaf is at most n. Assume for simplicity in what follows
+that the root is promised not to be marked. For each vertex x, let ℓ(x) be the distance of x from
+the root. We assume throughout that, although we do not necessarily know the structure of T in
+advance, we can determine ℓ(x) for any x. Let A be the set of vertices an even distance from the
+root (including the root itself), and let B be the set of vertices at an odd distance from the root.
+We write x →y to mean that y is a child of x in the tree. For each x, let dx be the degree of x as a
+vertex in an undirected graph. Thus, for all x ̸= r, dx = |{y : x →y}| + 1; and dr = |{y : r →y}|.
+The quantum walk operates on the Hilbert space H spanned by {|r⟩}∪{|x⟩: x ∈{1, . . . , T −1}},
+and starts in the state |r⟩. Unlike many discrete-time quantum walk algorithms, it does not use a
+separate “coin” space. The walk is based on a set of diﬀusion operators Dx, where Dx acts on the
+subspace Hx spanned by {|x⟩} ∪{|y⟩: x →y}. The diﬀusion operators are deﬁned as follows:
+• If x is marked, then Dx is the identity.
+• If x is not marked, and x ̸= r, then Dx = I −2|ψx⟩⟨ψx|, where
+|ψx⟩=
+1
+√dx
+ 
+|x⟩+
+X
+y,x→y
+|y⟩
+!
+.
+• Dr = I −2|ψr⟩⟨ψr|, where
+|ψr⟩=
+1
+√1 + drn
+ 
+|r⟩+ √n
+X
+y,r→y
+|y⟩
+!
+.
+Observe that Dx can be implemented with only local knowledge, i.e. based only on whether x is
+marked and the neighbourhood structure of x. A step of the walk consists of applying the operator
+RBRA, where RA = L
+x∈A Dx and RB = |r⟩⟨r| + L
+x∈B Dx. An alternative way of viewing this
+process is as a quantum walk on the graph given by the edges of the tree, where we identify each
+vertex with the edge from its parent in the tree, and add an additional “input” edge into the root.
+The algorithm for detecting a marked vertex is presented as Algorithm 2.
+Lemma 6 (Special case of Belovs [8]). Algorithm 2 uses RA and RB O(
+√
+Tn log(1/δ)) times. There
+exist universal constants β, γ such that it fails with probability at most δ.
+7
+
+--- PAGE 8 ---
+Proof. The complexity bound is immediate from Theorem 4. For the correctness proof, we ﬁrst
+show that, if there is a marked vertex, then |r⟩is quite close to (a normalised version of) an
+eigenvector |φ⟩of RBRA with eigenvalue 1. Let x0 be a marked vertex and set
+|φ⟩= √n|r⟩+
+X
+x̸=r,x⇝x0
+(−1)ℓ(x)|x⟩.
+(1)
+Here x ⇝x0 denotes the vertices x on the unique path from the root to x0, including x0 itself.
+To see that |φ⟩is invariant under RBRA, ﬁrst note that |φ⟩is orthogonal to all states |ψx⟩, where
+x ̸= r and x is not marked. Indeed, any such state |ψx⟩either has uniform support on exactly 2
+consecutive vertices v in the path from r to x0, or is not supported on any vertices in this path.
+|φ⟩is also orthogonal to |ψr⟩by direct calculation. We have
+∥|φ⟩∥2 = n + ℓ(x0) ≤2n.
+Thus
+⟨r|φ⟩
+∥|φ⟩∥≥
+1
+√
+2.
+Therefore, phase estimation returns the eigenvalue 1 with probability at least 1/2. On the other
+hand, if there are no marked vertices, we consider the vector
+|η⟩= |r⟩+ √n
+X
+x̸=r
+|x⟩.
+Let ΠA and ΠB be projectors onto the invariant subspaces of RA and RB. These spaces are spanned
+by vectors of the form |ψ⊥
+x ⟩for x ∈A, x ∈B respectively, where |ψ⊥
+x ⟩is orthogonal to |ψx⟩and has
+support only on {|x⟩} ∪{|y⟩: x →y}; in addition to |r⟩in the case of RB. On each subspace Hx,
+x ∈A, |η⟩is proportional to |ψx⟩, so ΠA|η⟩= 0. Similarly ΠB|η⟩= |r⟩. By the eﬀective spectral gap
+lemma (Lemma 3), ∥Pχ|r⟩∥= ∥PχΠB|η⟩∥≤χ∥|η⟩∥≤χ
+√
+Tn. For small enough χ = Ω(1/
+√
+Tn),
+this is upper-bounded by 1/2. By Theorem 4, there exists β such that applying phase estimation
+to RBRA with precision β/
+√
+Tn returns the eigenvalue 1 with probability at most 1/4.
+Using a Chernoﬀbound, by repeating the subroutine O(log 1/δ) times and returning “marked
+vertex exists” if the fraction of acceptances is greater than 3/8, and “no marked vertex” otherwise,
+we obtain that the overall algorithm fails with probability at most δ.
+2.1
+Finding a marked vertex
+From now on, we assume that the degree of every vertex in the tree is O(1); this is not a signiﬁcant
+restriction for the application to backtracking. For trees obeying this restriction we can use the
+detection algorithm as a subroutine to ﬁnd a marked vertex eﬃciently, via binary search.
+To ﬁnd a marked vertex, we start by applying Algorithm 2 to the entire tree. If it outputs
+“marked vertex exists”, we apply the algorithm to the subtrees rooted at each child of the root
+in turn, to detect marked vertices within each subtree. Assuming the algorithm did not fail at
+any point, there must be a marked vertex in at least one subtree. We pick the root of one such
+subtree and check whether it is marked. If it is marked, we output its label and terminate; if it is
+not marked, we apply Algorithm 2 to each of its children and repeat. This process continues until
+we have found a marked vertex. As there are at most O(n) repetitions to reach a leaf and O(1)
+subtrees are checked at each repetition, the time complexity of the algorithm is multiplied by a
+factor of O(n). Note that, when we apply the algorithm to subtrees, we must leave the parameter
+8
+
+--- PAGE 9 ---
+T unchanged; this is because the tree could be quite unbalanced, and a given subtree could contain
+many vertices.
+We have thus far assumed that we know an upper bound on T in advance. If we do not, we
+can repeat the whole search algorithm O(log T) = O(n) times, doubling a guess for T each time
+(starting with T = 1) until we either ﬁnd a marked vertex, or the algorithm returns “no marked
+vertex”. This exponential doubling does not aﬀect the asymptotic runtime. If our guess for T is
+too low, the correctness proof of Algorithm 2 no longer holds, so the detection algorithm may claim
+that there is a marked vertex in a situation where there is actually no marked vertex. This may
+lead to the above binary search procedure returning an incorrect result. But we can deal with this
+situation by checking the ﬁnal vertex returned by the search algorithm, and only terminating if it
+is marked; if it is not, we know that the search has failed, and continue doubling our guess for T.
+On the other hand, one can see from inspecting the proof of Lemma 6 that, if there is a marked
+vertex, the phase estimation subroutine in Algorithm 2 will accept with probability at least 1/2
+whether or not our guess for T is large enough. Therefore, if there is a marked vertex, Algorithm
+2 will output that a marked vertex exists with probability at least 1 −δ, for δ of our choice.
+Using this procedure the total number of uses of Algorithm 2 (with diﬀering values of T) is
+O(n2), so in order for the whole algorithm to succeed with probability, say, 2/3, it is suﬃcient to
+reduce the failure probability of each use of Algorithm 2 to O(1/n2). This costs an additional time
+factor of O(log n) per use of the algorithm, giving a total runtime of O(
+√
+Tn3/2 log n). This can in
+turn be improved to an arbitrary failure probability δ > 0 by taking O(log 1/δ) repetitions, leading
+to an overall bound of time O(
+√
+Tn3/2 log n log(1/δ)).
+Finally, we can ﬁnd all marked vertices by simply repeating the algorithm, modifying the
+underlying oracle operator to strike out previously seen marked elements. If there are k marked
+elements, the overall runtime is O(k
+√
+Tn3/2 log n log(k/δ)).
+2.2
+Search with a unique marked element
+If we are promised that there exists a unique marked element in the tree, we can improve the above
+bounds by a factor of almost n. In general this improvement is not particularly large, as we usually
+have T ≫n; however, for some “tall and thin” trees it can be relatively signiﬁcant. In particular,
+following this improvement we see that the complexity of the quantum algorithm for the search
+problem is never worse than the classical complexity O(T), up to logarithmic factors.
+We assume that there is a unique marked vertex x0 and that ℓ(x0) = n. This second assumption
+is without loss of generality. We can determine ℓ(x0) at the start of the algorithm by applying
+Algorithm 2 to the subtree rooted at r and of depth i, for diﬀering values of i. That is, we only
+expand the tree up to depth i, and use binary search on i ∈{1, . . . , n} to ﬁnd the minimal i such
+that the tree of depth i contains x0. This needs O(log n) repetitions, so the complexity of this
+part is O(
+√
+Tn log n log log n), where the log log term comes from reducing the failure probability
+of Algorithm 2 to O(1/(log n)). Once ℓ(x0) is determined, we henceforth only search within the
+tree of depth ℓ(x0).
+Let |φ′⟩= |φ⟩/∥|φ⟩∥, where the eigenvector |φ⟩is deﬁned in (1), i.e.
+|φ′⟩=
+1
+√
+2|r⟩+
+1
+√
+2n
+X
+x̸=r,x⇝x0
+(−1)ℓ(x)|x⟩.
+The starting point for the search algorithm is the observation1 that |φ′⟩encodes the entire path
+1A similar observation was used in [53] to approximate eﬀective resistances.
+9
+
+--- PAGE 10 ---
+from r to x0. If we measure |φ′⟩, and do not receive outcome r, we receive a measurement outcome
+y which is uniformly distributed on the path from r to x0. We can then repeat the algorithm on
+the subtree rooted at y, obtaining a new state of the form of |φ′⟩for a smaller value of n. The
+expected number of measurements we would need to make to ﬁnd x0 is logarithmic in n (rather
+than the bound of O(n) which follows from the previous binary search algorithm).
+We ﬁrst bound the total number of quantum walk steps used to ﬁnd x0, given access to states
+of the form of |φ′⟩for various subtrees. Let C = O(1/ log n) be chosen such that Algorithm 2 fails
+with probability at most 1/(4n) and uses at most C
+√
+Tn steps. Given that ℓ(x0) = n, measuring
+a copy of |φ′⟩will give a “good” outcome (which is not r) with probability 1/2. The distance from
+the root of such an outcome is uniformly distributed. Considering only the good outcomes, the
+expected total number of steps Sn to ﬁnd x0, given that ℓ(x0) = n, therefore satisﬁes
+Sn ≤1
+n
+n−1
+X
+i=0
+Si + C
+√
+Tn.
+We claim that Sn = O(C
+√
+Tn). The proof is by induction. First, S0 = 0 as no quantum walk steps
+are made. Assume Si ≤4C
+√
+Ti for all i < n. Then
+Sn ≤4C
+n
+n−1
+X
+i=0
+√
+Ti + C
+√
+Tn ≤4C
+v
+u
+u
+t 1
+n
+n−1
+X
+i=0
+Ti + C
+√
+Tn = 4C
+√
+2
+√
+T
+√
+n −1 + C
+√
+Tn ≤4C
+√
+Tn,
+where the second inequality is Jensen’s inequality. As on average half the outcomes are good, the
+expected total number of steps is thus O(
+√
+Tn log n).
+We can approximately produce |φ′⟩by applying phase estimation to the operator RBRA, with
+input state |r⟩. If we write
+|r⟩=
+1
+√
+2|φ′⟩+ 1
+√
+2|φ⊥⟩,
+where |φ⊥⟩is normalised and orthogonal to |φ⟩, the result of applying phase estimation on |r⟩with
+s ancilla qubits is a state of the form
+1
+√
+2|φ′⟩|0s⟩+ 1
+√
+2
+X
+k,θk>0
+λk|ψk⟩|ωk⟩,
+where |ψk⟩is an eigenvector of RBRA with eigenvalue e2iθk. Write each |ωk⟩as |ωk⟩= µk|0s⟩+|ω′
+k⟩
+for some subnormalised vectors |ω′
+k⟩orthogonal to |0s⟩. If we obtain outcome |0s⟩when we measure
+the second register, the ﬁrst register collapses to
+|eφ′⟩=
+1
+q
+1 + P
+k,θk>0 |λkµk|2
+
+|φ′⟩+
+X
+k,θk>0
+λkµk|ψk⟩
+
+.
+To bound the distance between |eφ′⟩and the desired state |φ′⟩, we split the sum into two parts. For
+any ϵ > 0, via Theorem 4 we have
+X
+k,θk≥ϵ
+|λkµk|2 ≤
+X
+k,θk≥ϵ
+|µk|2 = O(1/(2sϵ)).
+On the other hand, we prove the following technical claim in Appendix A. Recall that Pϵ is the
+projector onto the span of the eigenvectors of RBRA with eigenvalues e2iθ such that |θ| ≤ϵ.
+10
+
+--- PAGE 11 ---
+Lemma 7. ∥Pϵ|φ⊥⟩∥= O(ϵ
+√
+Tn).
+Given Lemma 7, we have
+X
+k,0<θk≤ϵ
+|λkµk|2 ≤
+X
+k,0<θk≤ϵ
+|λk|2 = ∥Pϵ|φ⊥⟩∥2 = O(ϵ2Tn).
+Fixing an accuracy δ and taking ϵ = Θ(δ/
+√
+Tn), 2s = O(
+√
+Tn/δ3), we have ∥|eφ′⟩−|φ′⟩∥= O(δ). By
+Fact 5, measuring |eφ′⟩in the computational basis is indistinguishable from measuring |φ′⟩, except
+with probability O(δ). If we take δ = O(1/ log n), the algorithm does not notice the diﬀerence on
+any of the O(log n) states used, with probability Ω(1). The overall complexity of the algorithm
+is therefore O(
+√
+Tn log3 n)2. As before, the failure probability can be made arbitrarily small via
+repetition.
+In Section 5 we discuss some barriers to improving the complexity and applicability of these
+algorithms.
+3
+From quantum walks on trees to accelerating backtracking
+To complete the proofs of Theorems 1 and 2, we now verify that Algorithm 2 can be applied to
+search in the tree deﬁned by a backtracking algorithm. In order to do this, it is suﬃcient to deﬁne
+a suitable eﬃcient mapping between partial assignments and vertices in a tree, and to implement
+the operators RA and RB appropriately and eﬃciently. As the quantum walk subroutines assume
+that the root of the tree is not marked, the ﬁrst step of the algorithm is to check whether P(∗n)
+is true. If so, the algorithm immediately returns “true”; if not, it runs Algorithm 2 on a graph
+deﬁned as follows.
+The current state of the backtracking algorithm is represented by a vertex in a rooted tree
+labelled with a sequence of the form (i1, v1), . . . , (iℓ, vℓ), for 1 ≤ℓ≤n. The sequence corresponds to
+a partial assignment x ∈D where we assign xik = vk for k = 1, . . . , ℓ, and xj = ∗for all other indices
+j. The tree only contains vertices corresponding to valid partial assignments. Each vertex except for
+the root (which is labelled with the empty sequence) is connected to its parent, the vertex labelled
+with (i1, v1), . . . , (iℓ−1, vℓ−1). It is also connected to all vertices of the form (i1, v1), . . . , (iℓ, vℓ), (j, w),
+where j = h((i1, v1), . . . , (iℓ, vℓ)), w ∈[d], and P((i1, v1), . . . , (iℓ, vℓ), (j, w)) is not false. That is,
+all vertices corresponding to valid partial assignments which extend the current partial assigment
+by assigning a value to the variable whose index is given by h. It is convenient to assume that
+the predicate P and the heuristic h take as input a string of (index, value) pairs which describe
+value assignments to variables, rather than an element of D; if not, converting between these
+representations can be done in time O(n). We will also assume that, for all complete assignments,
+the predicate returns either true or false (as it should do).
+The algorithm takes place within the Hilbert space H(n) = Cn+1 ⊗(Cn+1 ⊗Cd+1)⊗n together
+with an ancilla space. Each basis vector within H(n) represents a partial assignment described by
+a sequence as above. The ﬁrst register stores a level ℓbetween 0 and n, representing the length
+of the sequence (the number of non-∗’s in the assignment). Each of the next ℓregisters stores a
+pair (ik, vk) giving the index of a variable (an integer between 1 and n) and the assignment to that
+variable (an integer between 0 and d −1). Except during updates to the state, the remaining n −ℓ
+registers all contain the pair (0, ∗). The algorithm can easily be modiﬁed to use qubits if desired,
+2One way to improve the polylogarithmic factors in this complexity could be to reweight the tree such that the
+eigenvector of RBRA with eigenvalue 1 has more weight on x0 (Alexander Belov, personal communication).
+11
+
+--- PAGE 12 ---
+Input: A basis state |ℓ⟩|(i1, v1)⟩. . . |(in, vn)⟩∈H(n) corresponding to a partial assignment
+xi1 = v1, . . . , xiℓ= vℓ. Ancilla registers Hanc, Hnext, Hchildren, storing a tuple (a, j, S), where
+a ∈{∗} ∪[d], j ∈{0, . . . , n}, S ⊆[d], initialised to a = ∗, j = 0, S = ∅.
+1. If P(x) is true, return.
+2. If ℓis odd, subtract h((i1, v1), . . . , (iℓ−1, vℓ−1)) from iℓand swap a with vℓ.
+3. If a ̸= ∗, subtract 1 from ℓ. (Now ℓis even and (iℓ+1, vℓ+1) = (0, ∗).)
+4. Add h((i1, v1), . . . , (iℓ, vℓ)) to j.
+5. For each w ∈[d]:
+(a) If P((i1, v1), . . . , (iℓ, vℓ), (j, w)) is not false, set S = S ∪{w}.
+6. If ℓ= 0, perform the operation I −2|φn,S⟩⟨φn,S| on Hanc.
+Otherwise, perform the
+operation I −2|φ1,S⟩⟨φ1,S| on Hanc.
+7. Uncompute S and j by reversing steps 5 and 4.
+8. If a ̸= ∗, add 1 to ℓ. If ℓis now odd, add h((i1, v1), . . . , (iℓ−1, vℓ−1)) to iℓand swap vℓ
+with a. (Now a = ∗again.)
+Algorithm 3: Implementation of the operator RA
+rather than systems with dimension n+1 and d+1, by encoding each subsystem in O(log n+log d)
+qubits.
+Let Uα,S, for S ⊆[d] and α ∈R, act on Cd+1 with basis {|∗⟩, |0⟩, . . . , |d −1⟩} by mapping
+|∗⟩7→|φα,S⟩, where
+|φα,S⟩:=
+1
+p
+α|S| + 1
+ 
+|∗⟩+ √α
+X
+i∈S
+|i⟩
+!
+.
+We assume that, for any subset S ⊆[d] and any ﬁxed α ∈R, we can perform Uα,S and its inverse
+in time O(1) each. (Dependent on the gate set being used, we may not be able to implement Uα,S
+exactly. However, for any universal gate set we can implement it up to accuracy 1 −ϵ in time
+poly log(1/ϵ); this will multiply the runtime of the overall algorithm by at most a polylogarithmic
+factor.) By applying Uα,S and its inverse we can perform the operation I −2|φα,S⟩⟨φα,S|.
+In order to use Algorithm 2, we need to implement the operators RA and RB. The implemen-
+tation of RA using I −2|φα,S⟩⟨φα,S|, P and h is described in Algorithm 3 above. RB is similar,
+except that: step 1 is replaced with the check “If P(x) is true or ℓ= 0, return”; “odd” is replaced
+with “even” in steps 2 and 8; and the check “If ℓ= 0” is removed from step 6. The ﬁrst of these
+changes is because RB should leave the root of the tree invariant; and the last is because ℓis always
+odd at that point in the modiﬁed algorithm, so the check is unnecessary.
+We now argue that Algorithm 3 correctly implements RA. Write x = (i1, v1), . . . , (iℓ, vℓ) for the
+partial assignment passed to the algorithm, and write x′ = (i1, v1), . . . , (iℓ−1, vℓ−1) for the parent
+partial assignment in the tree. The goal of the algorithm is to implement the operator L
+x∈A Dx
+deﬁned in Section 2.
+For each x ∈A, Dx only acts on the subspace corresponding to x and
+its children. To implement Dx, it is therefore suﬃcient to map the basis state corresponding to
+12
+
+--- PAGE 13 ---
+(i1, v1), . . . , (iℓ, vℓ), and all the basis states corresponding to (i1, v1), . . . , (iℓ, vℓ), (j, w) for w ∈[d],
+where j = h((i1, v1), . . . , (iℓ, vℓ)) and ℓis even, to a (d + 1)-dimensional subspace on which the
+children of x can be mixed over using Uα,S, and then returning to the original subspace. This is
+precisely what Algorithm 3 does.
+In more detail, the algorithm performs the following steps. First, it does nothing when x is
+marked, corresponding to the deﬁnition of Dx.
+If x is not marked, the behaviour depends on
+whether ℓis even (corresponding to x ∈A) or ℓis odd (corresponding to x ∈B). Deﬁne y by
+setting y = x if x ∈A, and y = x′ if x ∈B. Then the algorithm implements an inversion about
+|ψy⟩, which is split into three subparts:
+• Steps 2-3: Perform a map of the form |x⟩7→|y⟩|∗⟩for x ∈A, and |x⟩7→|y⟩|w⟩for x ∈B,
+where w is the value of x at the h(x′)’th position, i.e. the most recent variable assignment
+that was made by the backtracking algorithm.
+• Steps 4-5: Determine the children of y.
+• Step 6: Perform the operation I −2|ψy⟩⟨ψy| using the knowledge of the children of y.
+• Steps 7-8: Uncompute junk and reverse the ﬁrst map.
+It can be veriﬁed that the algorithm implements the desired behaviour for all basis state inputs
+|ℓ⟩|(i1, v1)⟩. . . |(in, vn)⟩such that (i1, v1), . . . , (iℓ, vℓ) is a valid path in the backtracking tree; we
+omit the routine details. As the algorithm implements the operation RA = L
+x∈A Dx unitarily for
+all basis states |x⟩, it also implements RA correctly for all superpositions of basis states. Together
+with the similar implementation of RB, this is enough to implement Algorithm 2. For each use of
+RA and RB the algorithm uses O(1) auxiliary operations as claimed.
+4
+From quadratic speedups to exponential speedups
+In this section we show that it is possible to leverage the speedup achieved by the quantum back-
+tracking algorithm to obtain much more signiﬁcant speedups over classical algorithms – but in a
+non-standard, average-case setting.
+For any (classical or quantum) algorithm A, let TA(X) denote the expected runtime of A on
+input X. Let P be a distribution on inputs X. Imagine we have a quantum algorithm Q and
+a classical algorithm C such that TQ(X) ≈
+p
+TC(X) for all X. This is the case for the quantum
+algorithms presented here, where for CSPs on n variables we have TQ(X) ≤
+p
+TC(X) poly(n).
+Then, by Jensen’s inequality, we have
+EX∼P[TQ(X)] ≤
+p
+EX∼P[TQ(X)2] ≲
+p
+EX∼P[TC(X)].
+However, dependent on the distribution P, taking the average in this way can sometimes amplify
+the separation to become much greater than quadratic, and even sometimes exponential or super-
+exponential. This point was noted in the context of quantum query complexity by Ambainis and
+de Wolf [4], who gave several examples of super-polynomial average-case quantum speedups for the
+computation of total functions, and later by Montanaro [44], who showed that even the unstructured
+search problem with a unique marked element, with power-law distributions on the position of this
+marked element, can display this behaviour.
+One very simple example of this phenomenon is the following separation. Let C be a classical
+algorithm for Circuit SAT. Assume that, for each integer n, there exists an instance of Circuit SAT
+13
+
+--- PAGE 14 ---
+on n variables such that C has runtime Ω(2n) (this is the case for the best classical algorithms at
+present [54]). Also let Q be a quantum algorithm which solves Circuit SAT using Grover’s algorithm,
+using time O(2n/2 poly(n)) on an input of size n. Finally, let Pn be the following distribution on
+instances with n variables: with probability p, return a hard instance of size n; with probability
+1 −p, return a trivial instance. Then
+EX∼Pn[TC(X)] = Ω(p2n),
+EX∼Pn[TQ(X)] = O(p2n/2 poly(n)).
+If we take p = 2−n/2, the separation between these two quantities is exponential.
+However, this is clearly a rather contrived distribution on the inputs. One might hope to ﬁnd
+some problem, together with a more natural distribution on the inputs, which allows a similar
+exponential separation to be proven.
+The quantum backtracking algorithm allows one to ﬁnd
+separations of this form, given a backtracking algorithm with a suitable distribution of runtimes.
+Indeed, imagine we have a family of CSPs and a distribution Pn on problems of size n such that
+with high probability the problem has O(1) solutions. Further imagine that we have a deterministic
+classical backtracking algorithm whose backtracking tree contains T(X) vertices on input X, such
+that PrPn[T(X) = t] ≤Ctβ for all t and some constants C and β.
+In addition, assume that
+PrPn[T(X) = t] ≥Dtβ, for some constant D, for M diﬀerent values t. Here M is some large integer
+which we think of as being exponentially large in n. Then
+EX∼Pn[T(X)] ≥
+M
+X
+t=1
+Dtβ · t = Ω(Mβ+2).
+For β > −2, this quantity is exponentially large.
+However, if −2 < β < −3/2, the quantum
+backtracking algorithm described above uses an average of
+EX∼Pn[O(
+p
+T(X) poly(n))] ≤
+X
+t≥1
+O(
+√
+t · tβ poly(n)) = poly(n)
+quantum walk steps.
+If each step requires time poly(n) (to evaluate the predicate P and the
+heuristic h) we have obtained an exponential reduction in expected runtime.
+We therefore see that a “power law” tail of the distribution Pn of the form pt = PrPn[T(X) =
+t] ∼tβ, for a suitable value of β, gives us an exponential separation. There is substantial empirical
+evidence, and some analytical evidence, that such power law, or “heavy”, tails can occur in both
+random and real-world instances of CSPs; for a survey, see [33]. For example, consider the case of
+graph k-colouring on random graphs with n vertices, where each edge is present with probability
+Θ(1/n). Hogg and Williams [35] observed that a natural backtracking algorithm seemed to have a
+power-law distribution of its runtimes. Later work by Jia and Moore [36] provided some analytical
+justiﬁcation for this, and additional experiments, which together suggest that for 3-colouring the
+distribution is of the form pt ∼t−1.
+However, there are several reasons why it is unclear that this phenomenon could lead to expo-
+nential separations between quantum and classical expected runtimes. First, there is some evidence
+that some apparently heavy-tailed behaviour may in fact be due to ﬁnite-size eﬀects [20, 21]. Sec-
+ond, one reason for a skewed runtime distribution could be that, on satisﬁable instances, the
+backtracking algorithm sometimes gets lucky and happens to ﬁnd a satisfying assignment early on,
+after which it terminates. The runtime of the quantum algorithm described here depends on the
+size of the whole tree and hence will not correspond to the square root of the classical runtime in
+this case. Indeed, runtime distributions on unsatisﬁable instances do not seem to display the same
+heavy-tailed behaviour [46, 31].
+14
+
+--- PAGE 15 ---
+Third, in many cases power-law behaviour is observed when a randomised backtracking algo-
+rithm is run on a single instance. That is, when the choices of branching variables made by the
+algorithm are random and we consider the distribution of the runtimes T(r) over the choice of
+random seed r. Algorithmic randomness of this form (as opposed to picking the input instance at
+random) is not suitable for obtaining an exponential quantum-classical separation using the quan-
+tum backtracking algorithm. This is because, if the quantum backtracking algorithm’s expected
+runtime over r is at most R, for some R, we have R = Ω(Er[
+p
+T(r)]). So, by Markov’s inequality,
+T(r) = O(R2) with, say, 99% probability. Therefore, if we stop the classical algorithm after time
+O(R2), it will succeed with probability Ω(1).
+For these reasons, we consider random instances of CSPs produced not just by using a ﬁxed
+density of constraints, but by taking a distribution over diﬀerent constraint densities. This enables
+us to ﬁnd relatively natural input distributions under which the expected runtime of the quantum
+backtracking algorithm is exponentially faster.
+4.1
+Expected runtime bounds
+There is now a substantial body of work proving bounds on the expected runtime of DPLL-type
+algorithms for random k-SAT. For example, consider k = 3 and instances consisting of m = αn
+uniformly random clauses. For α ≳4.3, there is strong evidence that such instances very rarely
+have a solution [48], so the task of the algorithm is usually to prove unsatisﬁability. Beame et al. [6]
+have shown that, for a simple DPLL variant (known as ordered DLL) the runtime is 2Θ(n/α) with
+probability 1 −o(1). Cocco and Monasson [18, 19] have used statistical physics techniques to even
+determine (non-rigorously) the constant in the exponent. In particular, they argue that, for large
+α, the runtime is approximately 20.292n/α.
+Sometimes one can prove such tight bounds rigorously. For example, consider the following very
+simple backtracking algorithm, which ﬁts within the framework of Algorithm 1. Fix an ordering
+of the variables from 1 to n. Then the heuristic h returns the lowest index of a variable which has
+not yet been assigned a value. Call this algorithm Na¨ıveBt. Then the following result holds:
+Proposition 8. The expected number of vertices E in the backtracking tree of the Na¨ıveBt algorithm
+when applied to a random k-SAT instance on n variables, with m = αn uniformly random clauses,
+for 1 ≤α ≤nk−1, satisﬁes
+2C′n ≤E ≤O(n2Cn),
+where C and C′ depend only on α and k. For k = 3, C ≤0.907/√α, C′ ≥0.906/√α −0.142/α2.
+Proof. See Appendix B.
+Similar analyses to Proposition 8 have been carried out many times in the literature, albeit
+often for slightly diﬀerent models (e.g. [13, 45]).
+Let Cn denote the expected runtime of the Na¨ıveBt algorithm applied to 3-SAT instances on n
+variables, where the expectation is taken with respect to a distribution over numbers of constraints
+m. If the probability that we have m constraints is pm, then by Proposition 8
+Cn ≥
+X
+m
+pm2n(0.906√
+n/m−0.142(n/m)2).
+On the other hand, up to a poly(n) factor, on any instance the runtime of the quantum backtracking
+algorithm is at most the square root of the classical one, multiplied by the number of solutions (if
+15
+
+--- PAGE 16 ---
+there are any). We consider a distribution pm which is only supported on values of m such that
+the probability that a random CSP with m constraints has a solution is O(2−n). For such values
+of m, we can ignore the additional cost for ﬁnding all the solutions. For 3-SAT, this is true for
+m > 16n/(ln 2), for example (see Appendix B).
+Letting Qn denote the expected runtime of the quantum algorithm applied to Na¨ıveBt, we
+therefore have
+Qn ≤
+X
+m
+pm20.454n3/2/√m poly(n).
+Consider the distribution pm ∝2−0.454n3/2/√m for 16n/(ln 2) < m ≤n3. Then
+Qn = poly(n),
+Cn = Ω(
+X
+m>16n/(ln 2)
+2(0.906−0.454)n3/2/√m−0.142(n/m)2) = Ω(20.094n),
+where the asymptotic bound follows from inserting m = ⌈16n/(ln 2)⌉. We therefore have an average-
+case exponential separation between the quantum and classical complexities of 3-SAT under this
+distribution; and, indeed, for various other distributions of the form pm ∝2−Cn3/2/√m. While
+this family of distributions is arguably less contrived than the Circuit SAT example given above
+(for example, the number of variables is ﬁxed; only the number of clauses varies), it still appears
+somewhat unnatural.
+It seems to be an interesting question to determine more natural input
+distributions which also lead to exponential quantum speedups.
+5
+Improving the quantum walk algorithm?
+We ﬁnish by addressing the question of how tight the bounds are which we have obtained on
+quantum search in trees. It is clear that, given a tree with T vertices, we must have a lower bound
+of the form Ω(
+√
+T) for ﬁnding a marked vertex (otherwise, we could use the algorithm to solve the
+unstructured search problem on T elements using o(
+√
+T) quantum queries, which is impossible [10]).
+There are several plausible ways in which the complexity of the algorithm presented here could be
+improved to get closer to this bound. However, there appear to be some challenges to doing so in
+each of these cases.
+1. Reduction of the dependence on the depth n. It is easy to see that, if we would like to apply
+the quantum backtracking algorithm to general trees, there must be some dependence on
+the depth in the runtime. Indeed, consider a path on T vertices, which has depth T −1.
+Then, if the marked vertex is the last one in the path, we require Ω(T) steps to ﬁnd it. More
+generally, it was shown by Aaronson and Ambainis [1] that for each pair T and n, there is
+a tree containing T vertices and with depth O(n) such that determining the existence of a
+marked vertex requires Ω(
+√
+Tn) queries. This holds even if we know the tree in advance and
+are allowed to perform arbitrary “local” operations to search within it.
+2. Reduction of the overhead for searching with multiple marked vertices. It would be interesting
+to determine whether the search algorithm in Section 2.2 could be generalised to work with a
+similar eﬃciency for an arbitrary number of marked vertices. The question of when one can
+convert a quantum walk speedup for detecting a marked element to a speedup for ﬁnding a
+marked element has been studied previously. But while it was shown by Szegedy [51] that
+the time to detect a marked element using a quantum walk is at most the square root of the
+classical hitting time, it is not known whether the time to ﬁnd a marked element has the
+same scaling in general.
+16
+
+--- PAGE 17 ---
+Indeed, Krovi et al. [39] have described a way (generalising previous results of [52, 42]) to
+modify the original quantum walk approach of Szegedy to obtain a quadratic speedup for the
+search problem in the case where there is a unique marked element. However, if there is more
+than one marked element, the runtime of their algorithm scales with a quantity they call
+the extended hitting time, which may be larger than the hitting time. In any case, all these
+algorithms assume that the graph is known in advance and the initial state of the quantum
+walk algorithm corresponds to the stationary distribution of the random walk. Neither of
+these assumptions applies here.
+3. Reduction of the dependence on k to ﬁnd one, or all, of k marked vertices. For the unstruc-
+tured search problem with k marked elements out of T, Grover’s algorithm can ﬁnd a marked
+element using O(
+p
+T/k) queries, which implies an algorithm which ﬁnds all marked elements
+in O(
+√
+Tk) queries. It would be natural to hope for a bound of a similar form for quantum
+search on trees, e.g. O(
+p
+Tn/k) to ﬁnd a marked vertex and O(
+√
+Tnk) to ﬁnd all k of them.
+Unfortunately, it is far from clear that this can be achieved.
+Indeed, consider the following argument due to Alexander Belov. Imagine we have access to
+an algorithm A which ﬁnds one of k > 1 marked vertices using o(
+√
+Tn) queries, and consider
+an arbitrary tree containing one marked leaf ℓ0. Modify the tree by attaching a subtree of
+depth O(log k) below that leaf containing k vertices, all of which are marked and are labelled
+such that ℓ0 can be determined from their labels. Then, using A, we can ﬁnd one of these
+vertices using o(
+√
+Tn) queries. Finding such a vertex enables us to ﬁnd ℓ0 with no additional
+queries, contradicting the aforementioned Ω(
+√
+Tn) lower bound [1]. However, this argument
+does not rule out the possibility that some other approach could ﬁnd all k marked vertices
+in, for example, O(
+√
+Tnk) time.
+One other way in which it might be possible to improve the quantum backtracking algorithm is in
+situations where the classical backtracking algorithm is lucky and ﬁnds a solution without exploring
+the whole tree. For such instances the quantum algorithm, which is forced to explore the whole
+tree, may not outperform the classical algorithm. It might be possible to improve the performance
+of the quantum algorithm in this situation by biasing it to prefer to explore the parts of the tree
+visited by the classical algorithm earlier on.
+Acknowledgements
+I would like to thank Alexander Belov and Aram Harrow for helpful comments on previous versions
+of this paper. This work was supported by EPSRC Early Career Fellowship EP/L021005/1.
+A
+Proof of technical claim for search with one marked element
+In this appendix, we prove the following claim from Section 2.2:
+Lemma 7 (restated). ∥Pχ|φ⊥⟩∥= O(χ
+√
+Tn).
+Let x0 be the unique marked vertex, assuming for simplicity in the proof (as justiﬁed in Section
+17
+
+--- PAGE 18 ---
+2.2) that ℓ(x0) = n, and hence that x0 is a leaf in the tree. We can write
+|φ⊥⟩
+=
+√
+2|r⟩−|φ′⟩=
+√
+2|r⟩−
+1
+√
+2n
+
+√n|r⟩+
+X
+x̸=r,x⇝x0
+(−1)ℓ(x)|x⟩
+
+
+=
+1
+√
+2|r⟩−
+1
+√
+2n
+X
+x̸=r,x⇝x0
+(−1)ℓ(x)|x⟩.
+Recall that ΠA and ΠB are projectors onto the invariant subspaces of RA and RB. The invariant
+subspace of RA is spanned by vectors of the form |ψ⊥
+x ⟩for each vertex x ∈A, and if x0 ∈A, in
+addition the vector |ψx0⟩. The invariant subspace of RB is similar (replacing A with B) but also
+contains |r⟩. Here ⟨ψx|ψ⊥
+x ⟩= 0 and |ψ⊥
+x ⟩has support only on {|x⟩} ∪{|y⟩: x →y}. In order
+to apply the eﬀective spectral gap lemma, we determine a vector |ξ⟩such that ΠA|ξ⟩= 0 and
+ΠB|ξ⟩= |φ⊥⟩.
+First assume x0 ∈B. We will take |ξ⟩to be a linear combination of vectors |ψx⟩for x ∈A.
+Then the ﬁrst of these two constraints is immediately satisﬁed. The second will be satisﬁed if, for
+a set of vectors |ζ⟩which span the invariant subspace of RB, i.e.
+|ζ⟩∈{|r⟩, |ψx0⟩} ∪{|ψ⊥
+x ⟩: ⟨ψ⊥
+x |ψx⟩= 0, x ∈B},
+we have ⟨ζ|ξ⟩= ⟨ζ|φ⊥⟩. To compute the required inner products, ﬁrst observe that |ψ⊥
+x ⟩only has
+support on x and its children, so for all x not on the path from r to x0, ⟨ψ⊥
+x |φ⊥⟩= 0. On the other
+hand, for each x ∈B such that x ⇝x0, deﬁne a basis for the space span{|ψ⊥
+x ⟩: ⟨ψ⊥
+x |ψx⟩= 0} by
+ﬁxing the vectors
+|ψ⊥
+x,i⟩= −|x⟩+ (dx −1)|Ni(x)⟩−
+X
+j̸=i
+|Nj(x)⟩,
+where Ni(x) denotes the i’th child of x, recalling that dx denotes the degree of x. We have
+⟨ψ⊥
+x,i|φ⊥⟩=
+(
+−dx/
+√
+2n
+if i = i0
+0
+otherwise
+(2)
+where i0 denotes the unique child of x on the path to x0.
+We now ﬁnd a vector |ξ⟩= P
+x αx|x⟩satisfying the above constraints. First, we require αr =
+⟨r|ξ⟩= ⟨r|φ⊥⟩= 1/
+√
+2 and αx0 = ⟨x0|φ⊥⟩= 1/
+√
+2n. For each x, let x′ denote the parent of x in
+the tree. For |ξ⟩to be a linear combination of vectors |ψx⟩, x ∈A, it is necessary and suﬃcient
+that αx = αx′ for all x ∈B; except in the case ℓ(x) = 1, where we require αx = √n αr. We in
+addition need αx = αx′ for all x ̸= r ∈A such that x′ is not on the path to x0, in order that
+⟨ψ⊥
+x′|ξ⟩= ⟨ψ⊥
+x′|φ⊥⟩= 0. For each child y of x ∈B, set αy = γ if y ̸⇝x0, and αy = δ if y ⇝x0.
+Then from (2) we have the ﬁnal constraints that
+−αx + 2γ −δ = 0 if y ̸⇝x0,
+−αx −(dx −2)γ + (dx −1)δ = −dx
+√
+2n if y ⇝x0.
+These equations have unique solution γ = αx −1/
+√
+2n, δ = αx −
+p
+2/n. This now uniquely deﬁnes
+all coeﬃcients αx. In particular, observe that
+αx0 =
+rn
+2 −
+n −1
+2
+ r
+2
+n =
+1
+√
+2n
+18
+
+--- PAGE 19 ---
+as required.
+This constructs |ξ⟩in the case where x0 ∈B. If instead x0 ∈A, the procedure is similar.
+Now |ψx0⟩is not in the invariant subspace of RB (which only makes it easier to satisfy the inner
+product constraints), but also |ξ⟩must be a linear combination of vectors |ψx⟩corresponding only
+to unmarked vertices x ∈A. This new constraint implies that now αx0 = 0. But following the
+above procedure now gives
+αx0 =
+rn
+2 −n
+2
+r
+2
+n = 0
+as required. In either case, for all x, we have |αx| ≤
+p
+n/2. So ∥|ξ⟩∥= O(
+√
+Tn) and hence, by the
+eﬀective spectral gap lemma (Lemma 3), ∥Pχ|φ⊥⟩∥= O(χ
+√
+Tn).
+B
+The runtime of the Na¨ıveBt backtracking algorithm for k-SAT
+Here we ﬁnd simple, yet fairly precise, bounds on the expected number of vertices in the backtrack-
+ing tree for the Na¨ıveBt algorithm when applied to random k-SAT with k = O(1).
+Assume we pick a random instance of k-SAT by choosing m = αn clauses, for some α such that
+1 ≤α ≤nk−1. Each clause contains k distinct variables, and each variable can be present negated
+or unnegated. Each clause is chosen uniformly at random, with replacement, from the set of all
+2k n
+k
+
+allowed such clauses. Recall that the Na¨ıveBt algorithm is a backtracking algorithm in the
+framework of Algorithm 1 where the heuristic h simply picks the lowest index of a variable which
+has not yet been assigned a value.
+The probability that a given assignment to variables x1, . . . , xℓis consistent with all the clauses
+in such a random instance is
+(1 −Pr[clause only depends on ﬁrst ℓvariables] Pr[assignment fails to satisfy clause])m
+=
+ 
+1 −
+ ℓ
+k
+
+2k n
+k
+
+!m
+.
+The expected number of solutions is
+2n(1 −2−k)m ≤2ne−2−kαn = 2(1−(2−k ln 2)α)n,
+so for α ≫2k/ ln 2, the probability that the instance is satisﬁable is exponentially small in n. The
+expected number of vertices in the backtracking tree is
+E :=
+n
+X
+ℓ=0
+2ℓ
+ 
+1 −
+ ℓ
+k
+
+2k n
+k
+
+!m
+.
+We have
+max
+ℓ
+2ℓ
+ 
+1 −
+ ℓ
+k
+
+2k n
+k
+
+!m
+≤E ≤(n + 1) max
+ℓ
+2ℓ
+ 
+1 −
+ ℓ
+k
+
+2k n
+k
+
+!m
+.
+For the upper bound, using 1 −x ≤e−x we obtain
+max
+ℓ
+2ℓ
+ 
+1 −
+ ℓ
+k
+
+2k n
+k
+
+!m
+≤max
+ℓ
+2ℓe−α2−kn ℓ(ℓ−1)...(ℓ−k+1)
+n(n−1)...(n−k+1) ≤max
+ℓ
+2ℓe−α2−kℓkn1−k(1−k2/ℓ).
+(3)
+19
+
+--- PAGE 20 ---
+By taking the derivative over ℓwe get that the maximum is achieved for ℓsuch that
+ℓ
+
+1 −k(k −1)
+ℓ
+1/(k−1)
+= n
+2k ln 2
+αk
+1/(k−1)
+.
+The left-hand side is of the form ℓ(1 −O(1/ℓ)) = ℓ−O(1), so we can ignore the O(1/ℓ) correction
+term as it can only change the ﬁnal bound by an O(1) factor. Rounding ℓto the nearest integer
+similarly does not change the asymptotic complexity. So, inserting the right-hand side in (3) and
+simplifying, we obtain
+E = O(n2Cn), where C =
+2k ln 2
+αk
+1/(k−1) 
+1 −1
+k
+
+.
+On the other hand, inserting this value of ℓinto the lower bound and using the inequality 1 −x ≥
+e−x−x2 gives
+E = Ω(2ℓe−α2−kℓkn1−k−α2−2kℓ2kn1−2k) = Ω(2C′n),
+where
+C′ =
+2k ln 2
+αk
+1/(k−1)  
+1 −1
+k −ln 2
+αk2
+2k ln 2
+αk
+1/(k−1)!
+.
+For example, for k = 3, we have C ≤0.907/√α, C′ ≥0.906/√α −0.142/α2.
+References
+[1] S. Aaronson and A. Ambainis. Quantum search of spatial regions. Theory of Computing,
+1:47–79, 2005. quant-ph/0303041.
+[2] A. Ambainis. Quantum walk algorithm for element distinctness. In Proc. 45th Annual Symp.
+Foundations of Computer Science, pages 22–31, 2004. quant-ph/0311001.
+[3] A. Ambainis, A. Childs, B. Reichardt, R. ˇSpalek, and S. Zhang. Any AND-OR formula of size
+n can be evaluated in time n1/2+o(1) on a quantum computer. SIAM J. Comput., 39(6):2513–
+2530, 2010. quant-ph/0703015.
+[4] A. Ambainis and R. de Wolf. Average-case quantum query complexity. J. Phys. A: Math.
+Gen., 34:6741–6754, 2001. quant-ph/9904079.
+[5] O. Angelsmark, V. Dahll¨of, and P. Jonsson. Finite domain constraint satisfaction using quan-
+tum computation. In Proc. Mathematical Foundations of Computer Science 2002, pages 93–
+103, 2002.
+[6] P. Beame, R. Karp, T. Pitassi, and M. Saks. The eﬃciency of resolution and Davis–Putnam
+procedures. SIAM J. Comput., 31(4):1048–1075, 2002.
+[7] P. van Beek. Backtracking search algorithms. In Handbook of Constraint Programming. Else-
+vier, 2006.
+[8] A. Belovs. Quantum walks and electric networks, 2013. arXiv:1302.3143.
+20
+
+--- PAGE 21 ---
+[9] A. Belovs, A. Childs, S. Jeﬀery, R. Kothari, and F. Magniez. Time-eﬃcient quantum walks
+for 3-distinctness. In Proc. 40th International Conference on Automata, Languages and Pro-
+gramming (ICALP’13), pages 105–122, 2013.
+[10] C. Bennett, E. Bernstein, G. Brassard, and U. Vazirani. Strengths and weaknesses of quantum
+computing. SIAM J. Comput., 26(5):1510–1523, 1997. quant-ph/9701001.
+[11] E. Bernstein and U. Vazirani. Quantum complexity theory. SIAM J. Comput., 26(5):1411–
+1473, 1997.
+[12] G. Brassard, P. Høyer, M. Mosca, and A. Tapp. Quantum amplitude ampliﬁcation and es-
+timation. Quantum Computation and Quantum Information: A Millennium Volume, pages
+53–74, 2002. quant-ph/0005055.
+[13] C. Brown and P. Purdom, Jr. An average time analysis of backtracking. SIAM J. Comput.,
+10(3):583–593, 1981.
+[14] N. Cerf, L. Grover, and C. Williams. Nested quantum search and structured problems. Phys.
+Rev. A, 61(3):032303, 2000. quant-ph/9806078.
+[15] A. Chandra, P. Raghavan, W. Ruzzo, R. Smolensky, and P. Tiwari. The electrical resistance
+of a graph captures its commute and cover times. Computational Complexity, 6(4):312–340,
+1996/1997.
+[16] A. Childs, R. Cleve, E. Deotto, E. Farhi, S. Gutmann, and D. Spielman. Exponential algo-
+rithmic speedup by a quantum walk. In Proc. 35th Annual ACM Symp. Theory of Computing,
+pages 59–68, 2003. quant-ph/0209131.
+[17] R. Cleve, A. Ekert, C. Macchiavello, and M. Mosca. Quantum algorithms revisited. Proc. R.
+Soc. Lond. A, 454(1969):339–354, 1998. quant-ph/9708016.
+[18] S. Cocco and R. Monasson. Statistical physics analysis of the computational complexity of
+solving random satisﬁability problems using backtrack algorithms. Eur. J. Phys. B, 22:505–
+531, 2001. cond-mat/0012191.
+[19] S. Cocco and R. Monasson. Trajectories in phase diagrams, growth processes, and computa-
+tional complexity: how search algorithms solve the 3-satisﬁability problem. Phys. Rev. Lett.,
+86(8), 2001. cond-mat/0009410.
+[20] S. Cocco and R. Monasson. Exponentially hard problems are sometimes polynomial, a large
+deviation analysis of search algorithms for the random satisﬁability problem, and its application
+to stop-and-restart solutions. Phys. Rev. E, 66(037101), 2002. cond-mat/0203012.
+[21] S. Cocco and R. Monasson.
+Restarts and exponential acceleration of the Davis-Putnam-
+Loveland-Logemann algorithm: A large deviation analysis of the generalized unit clause heuris-
+tic for random 3-SAT. Annals of Mathematics and Artiﬁcial Intelligence, 43(1–4):153–172,
+2005. cond-mat/0206242.
+[22] E. Dantsin, V. Kreinovich, and A. Wolpert. On quantum versions of record-breaking algorithms
+for SAT. ACM SIGACT News, 36(4):103–108, 2005.
+[23] M. Davis, G. Logemann, and D. Loveland. A machine program for theorem proving. C. ACM,
+5(7):394–397, 1962.
+21
+
+--- PAGE 22 ---
+[24] M. Davis and H. Putnam. A computing procedure for quantiﬁcation theory. J. ACM, 7(3):201–
+215, 1960.
+[25] N. E´en and N. S¨orensson. An extensible SAT-solver. In Proc. Theory and Applications of
+Satisﬁability Testing 2003, pages 502–518, 2003.
+[26] E. Farhi, J. Goldstone, S. Gutmann, J. Lapan, A. Lundgren, and D. Preda. A quantum adi-
+abatic evolution algorithm applied to random instances of an NP-complete problem. Science,
+292(5516):472–475, 2001. quant-ph/0104129.
+[27] E. Farhi, J. Goldstone, S. Gutmann, and M. Sipser.
+Quantum computation by adiabatic
+evolution. Technical Report MIT-CTP-2936, MIT, 2000. quant-ph/0001106.
+[28] E. Farhi and S. Gutmann. Quantum computation and decision trees. Phys. Rev. A, 58(2):915–
+928, 1998. quant-ph/9706062.
+[29] E. Freuder and A. Mackworth. Constraint satisfaction: an emerging paradigm. In Handbook
+of Constraint Programming. Elsevier, 2006.
+[30] M. F¨urer. Solving NP-complete problems with quantum search. In Proc. LATIN’08, pages
+784–792, 2008.
+[31] C. Gomes, C. Fern´andez, B. Selman, and C. Bessiere. Statistical regimes across constrainedness
+regions. In Principles and Practice of Constraint Programming – CP 2004, pages 32–46, 2004.
+[32] C. Gomes, H. Krautz, A. Sabharwal, and B. Selman. Satisﬁability solvers. In Handbook of
+Knowledge Representation, volume 3 of Foundations of Artiﬁcial Intelligence, pages 89–134.
+Elsevier, 2008.
+[33] C. Gomes and T. Walsh. Randomness and structure. In Handbook of Constraint Programming.
+Elsevier, 2006.
+[34] L. Grover. Quantum mechanics helps in searching for a needle in a haystack. Phys. Rev. Lett.,
+79(2):325–328, 1997. quant-ph/9706033.
+[35] T. Hogg and C. Williams.
+The hardest constraint problems: A double phase transition.
+Artiﬁcial Intelligence, 69:359–377, 1994.
+[36] H. Jia and C. Moore. How much backtracking does it take to color random graphs? rigorous
+results on heavy tails. In Principles and Practice of Constraint Programming – CP 2004, pages
+742–746, 2004. cond-mat/0412489.
+[37] A.
+Kitaev.
+Quantum
+measurements
+and
+the
+abelian
+stabilizer
+problem,
+1995.
+quant-ph/9511026.
+[38] D. Knuth. Estimating the eﬃciency of backtrack programs. Mathematics of Computation,
+29(129), 1975.
+[39] H. Krovi, F. Magniez, M. Ozols, and J. Roland. Quantum walks can ﬁnd a marked element
+on any graph. Algorithmica, pages 1–57, 2015. arXiv:1002.2419.
+[40] T. Lee, R. Mittal, B. Reichardt, R. ˇSpalek, and M. Szegedy.
+Quantum query complexity
+of state conversion. In Proc. 52nd Annual Symp. Foundations of Computer Science, pages
+344–353, 2011. arXiv:1011.3020.
+22
+
+--- PAGE 23 ---
+[41] I. Lynce and J. P. Marques-Silva. An overview of backtrack search satisﬁability algorithms.
+Annals of Mathematics and Artiﬁcial Intelligence, 37:307–326, 2003.
+[42] F. Magniez, A. Nayak, P. Richter, and M. Santha. On the hitting times of quantum versus
+random walks. Algorithmica, 63(1–2):91–116, 2012. arXiv:0808.0084.
+[43] F. Magniez, A. Nayak, J. Roland, and M. Santha. Search via quantum walk. SIAM J. Comput.,
+40(1):142–164, 2011. quant-ph/0608026.
+[44] A. Montanaro. Quantum search with advice. In Proc. 5th Conference on the Theory of Quan-
+tum Computation, Communication, and Cryptography (TQC’10), 2010. arXiv:0908.3066.
+[45] P. Purdom. Backtracking and random constraint satisfaction. Annals of Mathematics and
+Artiﬁcial Intelligence, 20:393–410, 1997.
+[46] I. Rish and D. Frost. Statistical analysis of backtracking on inconsistent CSPs. In Principles
+and Practice of Constraint Programming-CP97, pages 150–162, 1997.
+[47] U. Sch¨oning. A probabilistic algorithm for k-SAT and constraint satisfaction problems. In
+Proc. 40th Annual Symp. Foundations of Computer Science, pages 410–414, 1999.
+[48] B. Selman, D. Mitchell, and H. Levesque. Generating hard satisﬁability problems. Artiﬁcial
+Intelligence, 81(1–2):17–29, 1996.
+[49] N. Shenvi, J. Kempe, and K. Whaley. Quantum random-walk search algorithm. Phys. Rev.
+A, 67(5):052307, 2003. quant-ph/0210064.
+[50] L. Stockmeyer. On approximation algorithms for #P. SIAM J. Comput., 14(4):849–861, 1985.
+[51] M. Szegedy. Quantum speed-up of Markov chain based algorithms. In Proc. 45th Annual
+Symp. Foundations of Computer Science, pages 32–41, 2004. quant-ph/0401053.
+[52] A. Tulsi. Faster quantum walk algorithm for the two dimensional spatial search. Phys. Rev.
+A, 78:012310, 2008. arXiv:0801.0497.
+[53] G. Wang. Quantum algorithms for approximating the eﬀective resistances in electrical net-
+works, 2013. arXiv:1311.1851.
+[54] R. Williams. Improving exhaustive search implies superpolynomial lower bounds. SIAM J.
+Comput., 42(3):1218–1244, 2013.
+23

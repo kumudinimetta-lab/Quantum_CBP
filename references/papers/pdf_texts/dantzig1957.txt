@@ -1,0 +1,73 @@
+--- PAGE 1 ---
+This article was downloaded by: [137.132.123.69] On: 25 October 2015, At: 12:22
+Publisher: Institute for Operations Research and the Management Sciences (INFORMS)
+INFORMS is located in Maryland, USA
+Operations Research
+Publication details, including instructions for authors and subscription information:
+http://pubsonline.informs.org
+Discrete-Variable Extremum Problems
+George B. Dantzig,
+To cite this article:
+George B. Dantzig,  (1957) Discrete-Variable Extremum Problems. Operations Research 5(2):266-288. http://
+dx.doi.org/10.1287/opre.5.2.266
+Full terms and conditions of use: http://pubsonline.informs.org/page/terms-and-conditions
+This article may be used only for the purposes of research, teaching, and/or private study. Commercial use
+or systematic downloading (by robots or other automatic processes) is prohibited without explicit Publisher
+approval, unless otherwise noted. For more information, contact permissions@informs.org.
+The Publisher does not warrant or guarantee the article’s accuracy, completeness, merchantability, fitness
+for a particular purpose, or non-infringement. Descriptions of, or references to, products or publications, or
+inclusion of an advertisement in this article, neither constitutes nor implies a guarantee, endorsement, or
+support of claims made of that product, publication, or service.
+© 1957 INFORMS
+Please scroll down for article—it is on subsequent pages
+INFORMS is the largest professional society in the world for professionals in the fields of operations research, management
+science, and analytics.
+For more information on INFORMS, its publications, membership, or meetings visit http://www.informs.org
+--- PAGE 2 ---
+Downloaded from informs.org by [137.132.123.69] on 25 October 2015, at 12:22 . For personal use only, all rights reserved. 
+--- PAGE 3 ---
+Downloaded from informs.org by [137.132.123.69] on 25 October 2015, at 12:22 . For personal use only, all rights reserved. 
+--- PAGE 4 ---
+Downloaded from informs.org by [137.132.123.69] on 25 October 2015, at 12:22 . For personal use only, all rights reserved. 
+--- PAGE 5 ---
+Downloaded from informs.org by [137.132.123.69] on 25 October 2015, at 12:22 . For personal use only, all rights reserved. 
+--- PAGE 6 ---
+Downloaded from informs.org by [137.132.123.69] on 25 October 2015, at 12:22 . For personal use only, all rights reserved. 
+--- PAGE 7 ---
+Downloaded from informs.org by [137.132.123.69] on 25 October 2015, at 12:22 . For personal use only, all rights reserved. 
+--- PAGE 8 ---
+Downloaded from informs.org by [137.132.123.69] on 25 October 2015, at 12:22 . For personal use only, all rights reserved. 
+--- PAGE 9 ---
+Downloaded from informs.org by [137.132.123.69] on 25 October 2015, at 12:22 . For personal use only, all rights reserved. 
+--- PAGE 10 ---
+Downloaded from informs.org by [137.132.123.69] on 25 October 2015, at 12:22 . For personal use only, all rights reserved. 
+--- PAGE 11 ---
+Downloaded from informs.org by [137.132.123.69] on 25 October 2015, at 12:22 . For personal use only, all rights reserved. 
+--- PAGE 12 ---
+Downloaded from informs.org by [137.132.123.69] on 25 October 2015, at 12:22 . For personal use only, all rights reserved. 
+--- PAGE 13 ---
+Downloaded from informs.org by [137.132.123.69] on 25 October 2015, at 12:22 . For personal use only, all rights reserved. 
+--- PAGE 14 ---
+Downloaded from informs.org by [137.132.123.69] on 25 October 2015, at 12:22 . For personal use only, all rights reserved. 
+--- PAGE 15 ---
+Downloaded from informs.org by [137.132.123.69] on 25 October 2015, at 12:22 . For personal use only, all rights reserved. 
+--- PAGE 16 ---
+Downloaded from informs.org by [137.132.123.69] on 25 October 2015, at 12:22 . For personal use only, all rights reserved. 
+--- PAGE 17 ---
+Downloaded from informs.org by [137.132.123.69] on 25 October 2015, at 12:22 . For personal use only, all rights reserved. 
+--- PAGE 18 ---
+Downloaded from informs.org by [137.132.123.69] on 25 October 2015, at 12:22 . For personal use only, all rights reserved. 
+--- PAGE 19 ---
+Downloaded from informs.org by [137.132.123.69] on 25 October 2015, at 12:22 . For personal use only, all rights reserved. 
+--- PAGE 20 ---
+Downloaded from informs.org by [137.132.123.69] on 25 October 2015, at 12:22 . For personal use only, all rights reserved. 
+--- PAGE 21 ---
+Downloaded from informs.org by [137.132.123.69] on 25 October 2015, at 12:22 . For personal use only, all rights reserved. 
+--- PAGE 22 ---
+Downloaded from informs.org by [137.132.123.69] on 25 October 2015, at 12:22 . For personal use only, all rights reserved. 
+--- PAGE 23 ---
+Downloaded from informs.org by [137.132.123.69] on 25 October 2015, at 12:22 . For personal use only, all rights reserved. 
+--- PAGE 24 ---
+Downloaded from informs.org by [137.132.123.69] on 25 October 2015, at 12:22 . For personal use only, all rights reserved. 
+--- PAGE 25 ---
+Downloaded from informs.org by [137.132.123.69] on 25 October 2015, at 12:22 . For personal use only, all rights reserved. 

@@ -1,0 +1,1448 @@
+
+--- PAGE 1 ---
+arXiv:quant-ph/0608026v4  14 Feb 2011
+Search via Quantum Walk∗
+Fr´ed´eric Magniez†
+Ashwin Nayak‡
+J´er´emie Roland§
+Miklos Santha¶
+November 26, 2024
+Abstract
+We propose a new method for designing quantum search algorithms for ﬁnding a “marked” ele-
+ment in the state space of a classical Markov chain. The algorithm is based on a quantum walk `a la
+Szegedy (2004) that is deﬁned in terms of the Markov chain. The main new idea is to apply quantum
+phase estimation to the quantum walk in order to implement an approximate reﬂection operator. This
+operator is then used in an amplitude ampliﬁcation scheme. As a result we considerably expand the
+scope of the previous approaches of Ambainis (2004) and Szegedy (2004). Our algorithm combines the
+beneﬁts of these approaches in terms of being able to ﬁnd marked elements, incurring the smaller cost of
+the two, and being applicable to a larger class of Markov chains. In addition, it is conceptually simple
+and avoids some technical diﬃculties in the previous analyses of several algorithms based on quantum
+walk.
+1
+Introduction
+1.1
+Background
+At an abstract level, many search problems may be cast as the problem of ﬁnding a “marked” element
+from a set X with n elements. Let M ⊆X be the set of the so called marked elements. One approach
+to ﬁnding an element of M, if it is not empty, is to repeatedly sample from X uniformly until a marked
+element is picked. A more cost-eﬀective approach reuses resources expended in generating the ﬁrst sample
+(time, random bits, black-box queries, etc.) by simulating the steps of a Markov chain with state space X
+to generate the next sample. This approach often takes advantage of some structure present in the ground
+set X and the Markov chain, and leads to a more eﬃcient algorithm. In this article, we study quantum
+analogues of this randomized scheme.
+There are several ways of deﬁning quantum analogues of Markov chains, including both discrete and
+continuous time versions (see, for example, Ref. [29] for a detailed introduction). We restrict our attention
+to discrete time analogues.
+Discrete time quantum walks emerged gradually in the ﬁeld of quantum algorithms. On the line they are
+related to the quantum cellular automaton model of Meyer [25]. Watrous [32] introduced quantum walks on
+regular graphs, and used them to show that randomized logarithmic space is included in quantum logarithmic
+space. Afterwards notions related to quantum walks, such as mixing time, and deviation from the starting
+state, were studied for restricted graphs by several researchers [26, 4, 2, 27], suggesting the possibility of
+speed-up of classical algorithms based on random walk.
+∗A preliminary version of this work appeared in Proceedings of 39th ACM Symposium on Theory of Computing, pages 575–
+584, 2007.
+†LIAFA, Univ. Paris 7, CNRS, F-75205 Paris, France. magniez@liafa.jussieu.fr
+‡Department of Combinatorics and Optimization, and Institute for Quantum Computing,
+University of Waterloo;
+and Perimeter Institute for Theoretical Physics; 200 University Ave. W., Waterloo, ON, N2L 3G1, Canada.
+Email:
+ashwin.nayak@uwaterloo.ca.
+§NEC Laboratories America; Princeton, NJ 08540, USA. jroland@nec-labs.com
+¶LIAFA, Univ.
+Paris 7, CNRS, F-75205 Paris, France, and Centre for Quantum Technologies, National University of
+Singapore, Singapore 117543. santha@lri.fr
+1
+
+--- PAGE 2 ---
+Shenvi, Kempe, and Whaley [28] pointed out the algorithmic potential of quantum walks by designing
+a walk based algorithm to emulate Grover Search [16]. The ﬁrst algorithm using quantum walks that goes
+beyond the capability of Grover Search is due to Ambainis [6] for Element Distinctness. In his seminal
+paper he resolved the quantum query complexity of the problem, settling a diﬃcult question that had been
+open for several years [12, 1]. Finally Szegedy [29] developed a theory of quantum walk based algorithms.
+He designed a quantum search algorithm based on any symmetric, ergodic Markov chain that detects the
+presence of a marked element. He deﬁned a notion of quantum hitting time that is quadratically smaller
+than the classical average hitting time. Since then, in the framework of Ambainis or Szegedy, many new
+algorithms with substantially better complexity emerged in a variety of contexts [5, 24, 13, 22, 15].
+This work develops a new schema for quantum search algorithms, based on any ergodic Markov chain.
+We adapt the quantum analogue of classical Markov chains due to Szegedy to possibly non-symmetric
+Markov chains, but use it more in the style of the Ambainis algorithm. Departing from the two algorithms,
+however, we use quantum walks only indirectly.
+In conjunction with the well known phase estimation
+algorithm [19, 20, 14], the quantum walk helps us implement an approximate reﬂection operator.
+This
+operator may then be used within amplitude ampliﬁcation algorithms [16, 10, 17] for search. As a result,
+our work generalizes previous ones by extending the class of possible Markov chains, and improving the
+complexity in terms of its relation with the eigenvalue or singular value gap of the related Markov chain.
+In addition, our approach is conceptually simple, avoids several technical diﬃculties in the analysis of the
+earlier approaches, and leads to improvements in various aspects of the algorithms.
+1.2
+Two subtly diﬀerent search algorithms
+We identify a Markov chain over state space X with its transition matrix P = (pxy)x,y∈X, where pxy is the
+probability of transition from x to y. A chain is irreducible if every state is reachable from every other state,
+and an irreducible chain is ergodic if it is also aperiodic (equivalently, its reachability graph is non-bipartite).
+The eigenvalues of a Markov chain are at most 1 in magnitude.
+By the Perron-Frobenius theorem, an
+irreducible chain has a unique stationary distribution π = (πx), that is, a unique left eigenvector π with
+eigenvalue 1 and positive coordinates summing up to 1. If the chain is ergodic, the eigenvalue 1 is the only
+eigenvalue of P with magnitude 1. We denote by δ = δ(P) the eigenvalue gap of P, that is 1 −λ, where
+λ = λ(P) = maxν∈Λ |ν|, where Λ is the set of eigenvalues of P diﬀerent from 1. The time-reversed Markov
+chain P ∗= (p∗
+xy) of P is deﬁned by the equations πxpxy = πyp∗
+yx. The chain P is said to be reversible if
+P ∗= P. The Markov chain P is symmetric if P = P T where P T denotes the matrix transpose of P. The
+stationary distribution of any symmetric chain is the uniform distribution.
+The optimal quantum algorithm for Element Distinctness discovered by Ambainis [6] recasts the problem
+in terms of search for a marked state in a Johnson graph deﬁned by the problem instance. The algorithm
+may be viewed as a quantum analogue of the following search process, where P is a Markov chain deﬁned
+on state space X.
+Search Algorithm 1
+1. Initialize x to a state sampled from a probability distribution s over X.
+2. Repeat for t2 steps
+(a) If the state y reached in the previous step is marked, then stop and output y.
+(b) Else, simulate t1 steps of the Markov chain P starting with the current state y.
+3. If the algorithm has not terminated, stop, and output ‘no marked element exists’.
+The parameters t1 and t2 in the algorithm are determined by the properties of the Markov chain and the
+marked subset M. The idea behind this algorithm is illustrated by considering an ergodic Markov chain P.
+When t1 is large enough, the state y in step (2a) above is distributed (approximately) according to the
+stationary distribution of P. Then, the outer loop represents sampling from the stationary distribution until
+2
+
+--- PAGE 3 ---
+a marked element is found. When t2 is chosen to be inversely proportional to the probability that a state is
+marked according to the stationary distribution, the algorithm succeeds with high probability.
+The analysis of the Ambainis quantum algorithm depends heavily on the form of marked states, and
+was presented for subsets M arising out of k-Collision, a generalization of Element Distinctness, with the
+assumption of a unique collision.
+Inspired by this algorithm, Szegedy [29] designed a quantum search
+algorithm with uniform initial distribution, based on any symmetric, ergodic Markov chain. The Szegedy
+algorithm may be viewed as a quantum analogue of a subtly diﬀerent, but more natural, classical process.
+Search Algorithm 2
+1. Initialize x to a state sampled from a probability distribution s over X.
+2. Repeat for t steps
+(a) If the state y reached in the previous step is marked, then stop and output y.
+(b) Else, simulate one step of the Markov chain P from the current state y.
+3. If the algorithm has not terminated, stop, and output ‘no marked element exists’.
+The parameter t is also determined by the Markov chain P, and the set M of marked states. This
+algorithm is a greedy version of the ﬁrst algorithm: a check is performed after every step of the Markov
+chain to determine if a marked state has been reached, irrespective of whether the Markov chain has mixed.
+Let us formally derive the complexity of the two algorithms to clarify their diﬀerences. Assume that the
+search algorithms maintain a data structure d that associates some data d(x) with every state x ∈X. From
+d(x), we would like to determine if x ∈M. When operating with d, we distinguish three types of cost.
+Set-up cost S: The cost of sampling x ∈X according to the initial distribution s and of constructing
+the data structure d(x) for the state x.
+Update cost U: The cost of simulating a transition from x to y for a state x ∈X according to the
+Markov chain P and of updating d(x) to d(y).
+Checking cost C: The cost of checking if x ∈M using d(x).
+These costs may be thought of as vectors listing all the measures of complexity of interest, such as query and
+time complexity. We may now state generic bounds on the eﬃciency of the two search algorithms in terms
+of our cost parameters. Note that throughout this paper, we say that an event happens with high probability
+if it happens with probability at least some universal constant. All the search algorithms (classical and
+quantum) we discuss have one-sided error. The algorithms may fail with some probability to report any
+marked element even when they exist. This error probability may be driven down to the desired level in the
+standard manner by sequential repetition of the algorithms.
+Proposition 1. Let δ > 0 be the eigenvalue gap of an ergodic, symmetric Markov chain P on a state space X
+of size n, and let |M|
+|X| ≥ε > 0 whenever M ⊂X is non-empty. For the uniform initial distribution s,
+1. Search Algorithm 1 determines if a marked element exists and ﬁnds one such element with high
+probability if t1 ∈O( 1
+δ ) and t2 ∈O( 1
+ε) are chosen to be suitably large. The cost incurred is of order
+S + 1
+ε
+  1
+δ U + C
+
+.
+2. Search Algorithm 2 determines if a marked element exists and ﬁnds one such element with high
+probability if t ∈O( 1
+δε) is chosen to be suitably large. The cost incurred is of order S + 1
+δε (U + C) .
+Proof. The stopping time of Search Algorithm 2 is the average hitting time of the set M for the Markov
+chain P. We may therefore take t to be a constant factor more than this hitting time. As mentioned before,
+this time is bounded above by the stopping time for the ﬁrst algorithm. Therefore part 2 of the proposition
+follows from part 1.
+3
+
+--- PAGE 4 ---
+In the ﬁrst algorithm, we may take t2 to be proportional to the average hitting time of the set M for the
+Markov chain P t1. The quantity λ(P) is bounded by 1 −δ by hypothesis. The analogous quantity λ(P t1)
+is therefore bounded by (1 −δ)t1 ≤e−δt1. Taking t1 = 1/δ, we get a spectral gap ˜δ of at least 1/2 for P t1.
+We may now bound the average hitting time of M for P t1 by, for example, Equation (15) in Ref. [29] and
+Lemma 1 in Ref. [11] (also stated as Lemma 10 in Ref. [29]). This bound evaluates to
+1
+ε˜δ ≤2
+ε. The expression
+for the cost of the algorithm now follows.
+For special classes of graphs, for example for the 2-d toroidal grid, the hitting time may be signiﬁcantly
+smaller than the generic bound t = O(1/δε) given in part 2 (see Ref. [3, Page 11, Chapter 5]).
+1.3
+Quantum analogues
+As in the classical case, the quantum search algorithms look for a marked element in a ﬁnite set X, where a
+data structure d is maintained during the algorithm. Let Xd be the set of items along with their associated
+data, that is Xd = {(x, d(x)) : x ∈X}. For convenience we suppose that ¯0 ∈X and that d(¯0) = ¯0.
+The quantum walks due to Ambainis and Szegedy, as in our work, may be thought of as walks on edges
+of the original Markov chain, rather than its vertices. Thus, the associated state space is a linear subspace
+of the vector space H = CX×X, or Hd = CXd×Xd when we also include the data structure. For the sake
+of elegance in the mathematical analyses, our data structure keeps the data for both vertices of an edge,
+whereas in previous works the data was kept only for one of them.
+There is a natural isomorphism |ψ⟩7→|ψ⟩d between H and Hd, where on basis states |x⟩d = |x, d(x)⟩.
+This isomorphism maps a unitary operation U on H into Ud on Hd deﬁned by Ud|ψ⟩d = (U|ψ⟩)d. Our walks
+are discussed in the space Hd when, for implementation and cost considerations, it is important to properly
+deal with the data structure. However, for convenience, we analyze the mathematical properties of the walks
+without the data structure, in the space H. This is justiﬁed by the isomorphism between Hd and H.
+The initial state of the algorithm is explicitly related to the stationary distribution π of P. At each step,
+the right end-point of an edge (x, y) is “mixed” over the neighbors of x, and then the left end-point is mixed
+over the neighbors of the new right end-point. We again distinguish three types of cost generalizing those
+of the classical search. They are of the same order as the corresponding costs in the algorithms of Ambainis
+and Szegedy. Some operations of the algorithms not entering into these costs are not taken into account.
+This is justiﬁed by the fact that in all quantum search algorithms the overall complexity is of the order of
+the accounted part, which is expressed in terms of the costs below.
+(Quantum) Set-up cost S: The cost of constructing the state P
+x
+√πx|x⟩d|¯0⟩d from |¯0⟩d|¯0⟩d.
+(Quantum) Update cost U: The cost of realizing any of the unitary transformations
+|x⟩d|¯0⟩d
+7→
+|x⟩d
+P
+y
+√pxy|y⟩d,
+|¯0⟩d|y⟩d
+7→
+P
+x
+pp∗yx|x⟩d|y⟩d,
+and their inverses, where P ∗= (p∗
+xy) is the time-reversed Markov chain deﬁned in Section 1.2.
+(Quantum) Checking cost C: The cost of realizing the following conditional phase ﬂip
+|x⟩d|y⟩d
+7→
+ −|x⟩d|y⟩d
+if x ∈M,
+|x⟩d|y⟩d
+otherwise.
+The quantum search algorithms due to Ambainis and Szegedy give a quadratic speed up in the times t1, t2
+and t, with respect to the classical algorithms. Let us recall that for integers 0 < r < m and 0 < l < r
+the vertices of the Johnson graph with parameters m, r, l are the subsets of size r of a universe of size m,
+and there is an edge between two vertices if the size of their intersection is l. The eigenvalue gap δ of the
+symmetric walk on the Johnson graph with l = r −1, and r < m/2 is in Θ(1/r). If the set of marked vertices
+consists of vertices that contain a ﬁxed subset of constant size k ≤r, then their fraction ε is in Ω( rk
+mk ).
+4
+
+--- PAGE 5 ---
+Theorem 1 (Ambainis [6]). Let P be the random walk on the Johnson graph on r-subsets of a universe
+of size m, where r = o(m), and with intersection size r −1. Let M be either empty, or the class of all r-
+subsets that contain a ﬁxed subset of constant size k ≤r. Then, there is a quantum algorithm that with high
+probability, determines if M is empty or ﬁnds the k-subset, with cost of order S +
+1
+√ε( 1
+√
+δU + C).
+Theorem 2 (Szegedy [29]). Let δ > 0 be the eigenvalue gap of an ergodic, symmetric Markov chain P, and
+let |M|
+|X| ≥ε > 0 whenever M is non-empty. There exists a quantum algorithm that determines, with high
+probability, if M is non-empty with cost of order S +
+1
+√
+δε(U + C).
+If the checking cost C is substantially greater than that of performing one step of the walk, an algorithm
+with the cost structure of the Ambainis algorithm would be more eﬃcient. Moreover, the algorithm would ﬁnd
+a marked element if one exists. These advantages are illustrated by the algorithm for Triangle Finding [24].
+This algorithm uses two quantum walks `a la Ambainis recursively; the Szegedy framework seems to give
+a less eﬃcient algorithm. Nonetheless, the Szegedy approach has other advantages—it applies to a wider
+class of Markov chains and for arbitrary sets of marked states. Moreover, the quantity 1/
+√
+δǫ in Theorem 2
+may be replaced by the square-root of the classical hitting time [29]. These features make it more suitable
+for applications such as the near-optimal algorithm for Group Commutativity [22] which has no equivalent
+using the Ambainis approach.
+1.4
+Contribution, relation with prior work, and organization
+We present an algorithm that is a quantum analogue of Search Algorithm 1 and works for any ergodic
+Markov chain. It is most easily described for reversible Markov chains.
+Theorem 3. Let δ > 0 be the eigenvalue gap of a reversible, ergodic Markov chain P, and let ε > 0 be
+a lower bound on the probability that an element chosen from the stationary distribution of P is marked
+whenever M is non-empty. Then, there is a quantum algorithm that with high probability, determines if M
+is empty or ﬁnds an element of M, with cost of order S +
+1
+√ε( 1
+√
+δU + C).
+This algorithm considerably expands the scope of the approaches embodied in Theorems 1 and 2 above.
+It combines the beneﬁts of the two approaches in terms of being able to ﬁnd marked elements, incurring
+the smaller cost of the two, and being applicable to a larger class of Markov chains.
+In addition, it is
+conceptually simple, avoids several technical diﬃculties in the analysis of the earlier approaches, and leads
+to improvements in various aspects of algorithms for Element Distinctness, Matrix Product Veriﬁcation,
+Triangle Finding, and Group Commutativity. Namely, we give a single-shot method for any algorithm `a la
+Ambainis in presence of multiple solutions, without the need for a reduction to special cases such as that
+of a unique solution. This applies to Element Distinctness and Triangle Finding. For Element Distinctness,
+Matrix Product Veriﬁcation, and Group Commutativity, where an algorithm `a la Szegedy only detects the
+existence of a solution, we ﬁnd one with the same time and query complexity. Finally, we improve the query
+complexity of the best previously known algorithm for Triangle Finding by a polylog(n) factor.
+In Section 2, we describe a quantum analogue of a Markov chain based on the work of Szegedy [29] who
+deﬁned such a quantum process W(P, Q) for a classical bipartite walk (P, Q). By letting Q = P, he related
+the spectrum of the quantum walk W(P) to that of P for symmetric Markov chains. Using an absorbing
+version of P as in Search Algorithm 2, he designed a quantum analogue of this classical scheme. Even
+when P is not symmetric, letting Q = P ∗, the time-reversed Markov chain corresponding to P, leads to a
+natural connection between P and W(P). If P is reversible, then the eigenvalues of W(P) are closely related
+to those of P, as in the symmetric case. For an arbitrary, possibly non-reversible, ergodic Markov chain, this
+connection relates the eigenvalues of W(P) to the singular values of a “discriminant” matrix D(P) associated
+with P.
+In Section 3, we use the quantum walk W(P) associated with the unperturbed walk P in a completely
+diﬀerent way, more in the style of the Ambainis approach. Ambainis directly uses a power of W(P) to
+replace the “diﬀusion” operator in the Grover search algorithm. The beauty of this step, and the diﬃculty
+of proving its correctness, lies in the fact that even if no power of W(P) closely approximates the diﬀusion
+5
+
+--- PAGE 6 ---
+operator, some powers have suﬃcient properties to mimic its essential features (see Lemma 3 in Ref. [6]).
+While this lemma is suﬃcient to prove Theorem 1, it alone is not powerful enough to imply Theorem 3. The
+spectral gap of classical Markov chains and that of some special cases of quantum walks (such as the quantum
+walk on Johnson graphs proposed by Ambainis) may be ampliﬁed by sequential repetition. Nevertheless,
+this method and its obvious variants break down when we consider the walk W(P) for arbitrary chains P,
+and arbitrary sets of marked elements.
+Instead, we introduce a novel way to approximate the diﬀusion
+operator. Our approach is both conceptually simpler, and more general. We observe that W(P) ampliﬁes
+the spectral gap of a reversible Markov chain quadratically. We translate this to an eﬃcient approximation
+to the Grover diﬀusion operator (Theorem 6), using the well known phase estimation algorithm. We then
+begin an exposition of our algorithm by considering reversible Markov chains. To explain the basic idea of
+our approach, we ﬁrst prove our main result with an additional logarithmic factor (Theorem 7).
+In Section 4, using a technique developed by Høyer, Mosca, and de Wolf [17] we show how to eliminate
+the logarithmic factor in the previous theorem, thus proving Theorem 3.
+In Section 5, we extend the algorithm to a possibly non-reversible Markov chain whose discriminant has
+non-zero singular value gap (Theorem 8). The complexity of the algorithm in the general case is similar to
+the one for reversible Markov chains. The sole diﬀerence is that the singular value gap of the discriminant
+matrix D(P) takes the place of the spectral gap of P. While the eigenvalues of Markov chains are well
+studied, we are not aware of a similar theory for singular values of this matrix. Nonetheless, such a general
+result may prove useful for future applications.
+1.5
+Subsequent work
+Since our work ﬁrst appeared, much progress has been made on a question we had left unresolved. For any
+symmetric Markov chain, Szegedy [29] gave a procedure that detects the existence of marked elements in time
+of the order of the square-root of the classical hitting time. This result does not carry over to the potentially
+harder problem of ﬁnding a marked element. The latter (ﬁnding) problem has received particular attention
+in the case of the
+√
+N ×
+√
+N grid. The classical hitting time for this graph is in O(N log N) for any (non-zero)
+number of marked elements. Algorithms due to Ambainis, Kempe, and Rivosh [5] and Szegedy [29] ﬁnd a
+unique marked state in time O(
+√
+N log N), a √log N factor larger than the detection time. In a recent
+paper, Tulsi [30] ﬁnally shows how we may ﬁnd a unique marked element in time O(√N log N).
+Magniez, Nayak, Richter, and Santha [23] deﬁne new, Monte Carlo type classical and quantum hitting
+times that are potentially smaller than the existing notion of (Las Vegas type) hitting times. They also
+present new quantum algorithms for the detection and ﬁnding problems whose complexities are related to
+the Monte Carlo quantum hitting time. The detection algorithm is based on phase estimation, and the ﬁnding
+algorithm combines a similar phase estimation based procedure with an idea introduced by Tulsi. Extending
+Tulsi’s result for the 2D grid, they show that for any state-transitive Markov chain with a unique marked
+state, the quantum hitting time is of the same order for both the detection and ﬁnding problems. Krovi,
+Magniez, Ozols, and Roland [21] make a signiﬁcant improvement to this result by presenting a quantum
+algorithm for ﬁnding multiple marked elements in any reversible Markov chain. Taking a new, simpler,
+and more general approach, they introduce a notion of interpolation between any reversible chain and a
+perturbed version of this chain, in which the marked states are absorbing. The quantum analogue of the
+interpolated walk not only detects but also ﬁnds marked states with a quadratic speed-up over the classical
+hitting time.
+2
+Quantum analogue of a classical Markov chain
+Let P = (pxy) be the transition matrix of any irreducible Markov chain on a ﬁnite space X with |X| = n.
+We deﬁne a quantum analogue of P, based on and extending the notion of quantum Markov chain due to
+Szegedy [29]. The latter was inspired by an earlier notion of quantum walk due to Ambainis [6]. We also
+point out that a similar process on regular graphs was studied by Watrous [32]. Recall that P ∗denotes the
+time-reversed Markov chain of P.
+6
+
+--- PAGE 7 ---
+For a state |ψ⟩∈H, let Πψ = |ψ⟩⟨ψ| denote the orthogonal projector onto Span(|ψ⟩), and let ref(ψ) =
+2Πψ −Id denote the reﬂection through the line generated by |ψ⟩, where Id is the identity operator on H.
+For a subspace K of H spanned by a set of mutually orthogonal states {|ψi⟩: i ∈I}, let ΠK = P
+i∈I Πψi be
+the orthogonal projector onto K, and let ref(K) = 2ΠK −Id be the reﬂection through K.
+Let A = Span(|x⟩|px⟩: x ∈X) and B = Span(|p∗
+y⟩|y⟩: y ∈X) be vector subspaces of H = CX×X, where
+|px⟩
+=
+P
+y∈X
+√pxy |y⟩
+and
+|p∗
+y⟩
+=
+P
+x∈X
+pp∗yx |x⟩.
+Deﬁnition 1 (Quantum walk). The unitary operation W(P) deﬁned on H by W(P) = ref(B) · ref(A) is
+called the quantum walk based on the classical chain P.
+This quantum walk extends to a walk W(P)d on the space H augmented with data structures, as explained
+in Section 1.3. Recall that U is the quantum update cost as deﬁned in the same section.
+Proposition 2. The quantum walk with data, W(P)d, can be implemented at cost 4U.
+Proof. Recall that W(P)d = ref(B)d·ref(A)d. The reﬂection ref(A)d is implemented by mapping states |x⟩d|px⟩d
+to |x⟩d|¯0⟩d, applying ref(|¯0⟩d) on the second register, and inverting the ﬁrst transformation. While the ﬁrst
+and last steps each have cost U, we only charge unit cost for the second step since it does not depend on
+the data structure (|¯0⟩d = |¯0, ¯0⟩by deﬁnition). Therefore the implementation of ref(A)d is of cost 2U. The
+reﬂection ref(B)d may be implemented similarly.
+The eigen-spectrum of the transition matrix P plays an important role in the analysis of a classical
+Markov chain.
+Similarly, the behavior of the quantum process W(P) may be inferred from its spectral
+decomposition. We consider the discriminant matrix D(P) = (ppxyp∗yx). Since ppxyp∗yx = √πxpxy/√πy,
+the discriminant matrix is equal to
+D(P)
+=
+diag(π)1/2 · P · diag(π)−1/2,
+where diag(π) is the invertible diagonal matrix with the coordinates of the distribution π in its diagonal. Since
+the singular values of D(P) all lie in the range [0, 1], we may express them as cos θ, for some angles θ ∈[0, π
+2 ].
+(Note that this is a second type of use of the Greek letter ‘π’ in this article, and it denotes the usual
+Mathematical constant. A third type of use occurs later in the article. The meaning of the letter can be
+inferred from the context in which it is used.) For later reference, we rewrite Theorem 1 due to Szegedy [29]
+which relates the singular value decomposition of D(P) to the spectral decomposition of W(P). This theorem
+is a variant of a result due to Jordan [18] (see also Ref. [8, Section VII.1, page 201]), and may be derived
+from it.
+Theorem 4 (Szegedy [29]). Let P be an irreducible Markov chain, and let cos θ1, . . . , cos θl be an enumeration
+of those singular values (possibly repeated) of D(P) that lie in the open interval (0, 1). Then:
+1. On A + B those eigenvalues of W(P) that have non-zero imaginary part are exactly e±2iθ1, . . . , e±2iθl,
+with the same multiplicity.
+2. On A ∩B the operator W(P) acts as the identity Id. The linear subspace A ∩B is spanned by the left
+(and right) singular vectors of D(P) with singular value 1.
+3. On A ∩B⊥and A⊥∩B the operator W(P) acts as −Id. The linear subspace A ∩B⊥(respectively,
+A⊥∩B) is spanned by the set of left (respectively, right) singular vectors of D(P) with singular value 0.
+4. W(P) has no other eigenvalues on A + B; on A⊥∩B⊥the operator W(P) acts as Id.
+We deﬁne ∆(P), the phase gap of W(P) as 2θ, where θ is the smallest angle in (0, π
+2 ) such that cos θ is
+a singular value of D(P). This deﬁnition is motivated by the previous theorem: in the complex plane, the
+angular distance of 1 from any other eigenvalue is at least ∆(P).
+7
+
+--- PAGE 8 ---
+3
+From quantum walk to search
+3.1
+Outline of search algorithm
+We now describe a search algorithm that may be viewed as a quantum analogue of Search Algorithm 1
+of Section 1.2. Consider the following quantum state in the Hilbert space H:
+|π⟩
+=
+X
+x∈X
+√πx |x⟩|px⟩
+=
+X
+y∈X
+√πy |p∗
+y⟩|y⟩.
+(Note that its use as a label for the quantum state above is the third type of use of the letter ‘π’ in this
+article.) This state serves as the initial state for our algorithm, and corresponds to starting in the stationary
+distribution π in the classical search algorithms. Taking into account the data structure, preparing |π⟩d from
+|¯0⟩d|¯0⟩d has cost S + U as it requires one set-up operation to prepare P
+x∈X
+√πx |x⟩d|¯0⟩d, followed by one
+update operation to map this state to |π⟩d. Assume that M ̸= ∅. Let M = CM×X denote the subspace with
+marked items in the ﬁrst register. We would like to transform the initial state |π⟩to the target state |µ⟩,
+which is the (normalized) projection of |π⟩onto the “marked subspace” M:
+|µ⟩
+=
+ΠM|π⟩
+∥ΠM|π⟩∥
+=
+1
+√pM
+X
+x∈M
+√πx |x⟩|px⟩,
+where pM = ∥ΠM|π⟩∥2 = P
+x∈M πx is the probability of a set M of marked states under the stationary
+distribution π. Roughly speaking, we eﬀect this transformation by implementing a rotation `a la Grover [16]
+in the two-dimensional real subspace S = Span(|π⟩, |µ⟩) generated by the states.
+Ideally, we would like to eﬀect the rotation ref(π)d·ref(µ⊥)d in Sd, where |µ⊥⟩is the state in S orthogonal
+to |µ⟩which makes an acute angle with |π⟩. The angle ϕ between |π⟩and |µ⊥⟩is given by sin ϕ = ⟨µ|π⟩=
+√pM. The product of the two reﬂections above is a rotation by an angle of 2ϕ within the space S. Therefore,
+after O(1/ϕ) = O(1/√pM) iterations of this rotation starting with the state |π⟩, we would have approximated
+the target state |µ⟩.
+Restricted to the subspace S, the operators ref(µ⊥) and −ref(M) are identical. Therefore, if we ensure
+that the state of the algorithm remain close to the subspace S throughout, we would be able to implement
+ref(µ⊥)d. This involves checking at cost C whether an item in the ﬁrst register is marked.
+The reﬂection ref(π)d is computationally harder to perform. The straightforward strategy would be to
+rotate |π⟩d to the state |¯0⟩d|¯0⟩d, use ref(|¯0⟩d|¯0⟩d), and then undo the ﬁrst rotation. However, rotating |π⟩d
+to
+|¯0⟩d|¯0⟩d is exactly the inverse operation of the preparation of the initial state |π⟩d from |¯0⟩d|¯0⟩d, and
+therefore requires the same cost S + U. This may be much more expensive than the update cost 4U incurred
+by the walk W(P)d. To use W(P)d instead, our idea is to apply phase estimation to it, and exploit this
+procedure to approximate the required diﬀusion operator on Ad + Bd which contains the subspace Sd.
+The above approach is only valid when the probability pM is known in advance. This assumption may
+be removed using standard techniques, without increasing the asymptotic complexity of the algorithms [9].
+Indeed, if only a lower bound ε > 0 on pM is known for non-empty M, then the above argument can be
+modiﬁed in order to determine if M is empty or ﬁnd an element of M. We ﬁrst sample from the stationary
+distribution a few times to accommodate the case that pM > 1/4. If no marked element is found, we proceed
+as if pM ≤1/4. Following [9, Lemma 2], we iterate the rotation ref(π)d · ref(µ⊥)d a total of T times on the
+initial state, where T is chosen uniformly at random in [0, 1/√ε ]. If M is not empty, a marked element is
+found with probability at least 1/4, and otherwise no marked element is found. We refer to this version of
+the Grover algorithm as the randomized Grover algorithm.
+3.2
+Diﬀusion operator from quantum walk
+To explain our approach, in the rest of this section, and in the next one, we assume that the classical
+Markov chain P is ergodic and reversible. For a reversible chain the corresponding discriminant D(P) is
+symmetric. Symmetry implies that the singular values of D(P) equal the absolute values of its eigenvalues.
+8
+
+--- PAGE 9 ---
+Since D(P) = diag(π)1/2 · P · diag(π)−1/2 is similar to the matrix P, their spectra are the same. Therefore,
+we only study the spectrum of P. The Perron-Frobenius theorem and the ergodicity of P imply that the
+eigenvalue 1 has multiplicity 1, and is the only eigenvalue of P with absolute value 1. The corresponding
+eigenvector of D(P) is (√πx ), and every singular (or eigen-) vector of D(P) orthogonal to this has singular
+value strictly less than 1. Transferring this property to the quantum walk W(P) via Theorem 4, |π⟩is the
+unique eigenvector of the unitary operator W(P) in A + B with eigenvalue 1, and the remaining eigenvalues
+in A + B are bounded away from 1. We use this observation to identify the component of any state |ψ⟩∈S
+perpendicular to |π⟩.
+The main idea in our implementation of the above approach is to use phase estimation [19, 20, 14].
+Theorem 5 (Phase estimation; Cleve, Ekert, Macchiavello, and Mosca [14]). For every pair of integers
+m, s ≥1, and a unitary operator U of dimension 2m × 2m, there exists a quantum circuit C(U) that acts
+on m + s qubits and satisﬁes the following properties:
+1. The circuit C(U) uses 2s Hadamard gates, O(s2) controlled phase rotations, and makes 2s+1 calls to
+the controlled unitary operator c-U.
+2. For any eigenvector |ψ⟩of U with eigenvalue 1, i.e., if U|ψ⟩= |ψ⟩, then C(U)|ψ⟩|0s⟩= |ψ⟩|0s⟩.
+3. If U|ψ⟩= e2iθ|ψ⟩, where θ ∈(0, π), then C(U)|ψ⟩|0s⟩= |ψ⟩|ω⟩, where |ω⟩is an s-qubit state such that
+|⟨0s|ω⟩| = sin(2sθ)/(2s sin θ).
+Moreover the family of circuits C parametrized by m and s is uniform.
+This circuit is called phase estimation because measuring the state |ω⟩in the computational basis yields
+an approximation to θ/π.
+In our case we only need to discriminate between the eigenvalue 1 and the
+remaining eigenvalues. In the following theorem we show how phase estimation is used to design a quantum
+circuit R(P) which implements an operation that is close to the reﬂection ref(π).
+Theorem 6. Let P be an ergodic Markov chain on a state space of size n ≥2, such that the phase gap of
+the quantum walk W(P) based on P is ∆(P). Then for any integer k there exists a quantum circuit R(P)
+that acts on 2⌈log2 n⌉+ ks qubits, where s ∈log2(
+1
+∆(P )) + O(1), and satisﬁes the following properties:
+1. The circuit R(P) uses 2ks Hadamard gates, O(ks2) controlled phase rotations, and makes at most
+k 2s+1 calls to the controlled quantum walk c-W(P) and its inverse c-W(P)†.
+2. If |π⟩is the unique 1-eigenvector of W(P) as deﬁned above, then R(P)|π⟩|0ks⟩= |π⟩|0ks⟩.
+3. If |ψ⟩lies in the subspace of A + B orthogonal to |π⟩, then ∥(R(P) + Id)|ψ⟩|0ks⟩∥≤21−k.
+Moreover the family of circuits R(P) parametrized by n and k is uniform.
+Proof. We describe the circuit R(P). Let m = n2 and s =
+l
+log2(
+2π
+∆(P ))
+m
+. We start by applying the phase
+estimation circuit C(U) to the quantum walk W(P), a unitary operator of dimension m × m. To increase
+the accuracy of the phase estimation, we repeat the circuit k times, creating k identical copies of the s-qubit
+state |ω⟩holding estimates of the phase. Observe that only the number of ancillary qubits increases from s
+to ks in this process. Since C(U) leaves the eigenvectors of W(P) in the ﬁrst register unchanged, we do not
+need additional copies of the state |ψ⟩.
+The above operations approximately resolve any state |ψ⟩in A + B along the eigenvectors of W(P) by
+labeling them with estimates of the corresponding eigenvalue phases. We now ﬂip the phase (i.e., multiply
+it by −1) of all computational basis states with a non-zero estimate of the phase in any of the k copies. Our
+intention is to ﬂip the phase of all eigenvectors other than |π⟩. Finally, we reverse the phase estimation. All
+these operations together constitute R(P).
+The state |π⟩|0ks⟩stays unchanged under the action of R(P). When |ψ⟩is orthogonal to |π⟩it is a linear
+combination of eigenvectors of W(P) whose eigenvalues are of the form e±2iθ, where ∆(P)/2 ≤θ < π/2. By
+9
+
+--- PAGE 10 ---
+deﬁnition of s, the state |ω⟩holding the estimate for any phase θ ̸= 0 then satisﬁes |⟨0s|ω⟩| ≤1/2. With k
+repetitions of the phase estimation, we can therefore decompose |ψ⟩|0ks⟩into a sum |ψ0⟩+ |ψ1⟩, such that
+the phase estimate is zero in each of the k copies of |ω⟩on the state |ψ0⟩, is non-zero in at least one copy on
+the state |ψ1⟩, and ∥ψ0∥≤2−k. Then R(P)|ψ⟩|0ks⟩= |ψ0⟩−|ψ1⟩, and (R(P) + Id)|ψ⟩|0ks⟩= 2|ψ0⟩, whose
+norm is at most 21−k.
+3.3
+The search algorithm for reversible Markov chains
+Let us consider the following quantum procedure.
+Quantum Search(P, ε)
+1. Repeat 5 times:
+(a) Sample a state x from the stationary distribution π of P.
+(b) If x ∈M, output x and stop.
+2. Choose T uniformly at random in [0, 1/√ε ], let k ∈log2(T ) + O(1), and let s be as
+given by Theorem 6.
+3. Prepare the initial state |π⟩d|0T ks⟩.
+4. Repeat T times:
+(a) For any basis vector |x⟩d|y⟩d|z⟩of Hd and the ancillary (T ks)-qubit space, ﬂip
+the phase if x ∈M:
+|x⟩d|y⟩d|z⟩7→
+ −|x⟩d|y⟩d|z⟩,
+if x ∈M
+|x⟩d|y⟩d|z⟩,
+otherwise.
+(b) Apply circuit R(P)d of Theorem 6 with k as above, using a fresh set of ancilla
+qubits |0ks⟩in each iteration.
+5. Observe the ﬁrst register.
+6. Output x if x ∈M, otherwise output ‘no marked element exists’.
+Theorem 7. Let δ > 0 be the eigenvalue gap of a reversible, ergodic Markov chain P, and let ε > 0 be
+a lower bound on the probability that an element chosen from the stationary distribution of P is marked
+whenever M is non-empty. Then, with high probability, the procedure Quantum Search(P, ε) determines
+if M is empty or else ﬁnds an element of M with cost of order S +
+1
+√ε
+h
+1
+√
+δ log
+1
+√ε
+
+U + C
+i
+.
+Proof. For convenience, we reason in the Hilbert space H, without the data structures, and also omit the
+ancilla qubits used by the circuit R(P). Between applications of R(P) the ancilla qubits remain in a state
+close to |0T ks⟩.
+First observe that if M is empty then no marked element is found by Quantum Search(P, ε). We
+assume now that M is non-empty. When pM > 1/4, we detect a marked element in Step 1 with probability
+at least 1 −(3/4)5 > 3/4. In analyzing the correctness of the remaining steps, we may therefore assume
+that pM ≤1/4. Let S be the two-dimensional subspace S = Span(|π⟩, |µ⟩). Recall that the randomized
+Grover algorithm consists in T iterations of ref(π) · ref(µ⊥), where T is chosen uniformly at random from
+[0, 1/√ε ]. Since ε ≤pM ≤1/4, with constant probability the randomized Grover algorithm rotates the
+vector |π⟩in the space S into a state whose inner product with |µ⟩is a constant. Using a hybrid argument
+as in Refs. [7, 31], we prove that the algorithm Quantum Search(P, ε) simulates, with an arbitrarily small
+constant probability of error, the randomized Grover algorithm, and therefore ﬁnds a marked element with
+high probability, whenever such an element exists.
+10
+
+--- PAGE 11 ---
+For i ≥0, we deﬁne |φi⟩as the result of i Grover iterations applied to |π⟩, and |ψi⟩as the result
+of i iterations of step (4) in Quantum Search(P, ε) applied to |π⟩.
+We show by induction on i, that
+∥|ψi⟩−|φi⟩∥≤i21−k. Indeed, we can write |ψi⟩as |φi⟩+ (|ψi⟩−|φi⟩). The actions of ref(µ⊥) and −ref(M)
+are identical on |φi⟩since the state is in S. Set |τ⟩= |φi+1⟩−R(P)·ref(M)|φi⟩. Since ref(M)|φi⟩is in S, and
+S is a subspace of A + B, conclusion (3) of Theorem 6 can be applied, which implies that ∥τ∥≤21−k. Using
+∥|ψi+1⟩−|φi+1⟩∥≤∥|τ⟩∥+ ∥|ψi⟩−|φi⟩∥, the statement follows. For k ∈log2(T ) + c, where c is a constant,
+this implies that ∥|ψT ⟩−|φT ⟩∥≤21−c, which can be made arbitrarily small by choosing c suﬃciently large.
+Let us now turn to the cost of the procedure. Since measuring |π⟩gives us a sample from the stationary
+distribution π, the cost of Step 1 is of the order of S. Preparing |π⟩d costs S + U, and in each iteration
+the single phase ﬂip costs C. In the circuit R(P)d, the controlled quantum walk and its inverse can be
+implemented with four update operations, each of cost U. Indeed, the implementation of W(P), described in
+the proof of Proposition 2 works also for the controlled quantum walk if we replace ref(|¯0⟩d) by the controlled
+operator c-ref(|¯0⟩d). Since the controlled reﬂection is also of unit cost, this change does not alter the cost of
+the implementation.
+In R(P)d the number of controlled quantum walks and its inverse is in O((1/∆(P)) log(1/√ǫ)). We claim
+that ∆(P) = Ω(
+√
+δ). Let λ0, ..., λn−1 be the eigenvalues of P, possibly with repetitions, such that 1 = λ0 >
+|λ1| ≥. . . ≥|λn−1|. Since the discriminant D(P) is similar to P, their spectra are the same, and therefore
+the singular values of D(P) are |λ0| , |λ1| , . . . , |λn−1|. By deﬁnition, ∆(P) = 2θ1, where cos θ1 = |λ1|. The
+following straightforward (in)equalities relate ∆(P) to δ(P): ∆(P) ≥
+1 −e2iθ1 = 2
+q
+1 −|λ1|2 ≥2
+√
+δ. This
+ﬁnishes the cost analysis.
+Let us observe that the origin of the quadratic speed-up due to quantum walks may be traced to the
+quadratic relationship between the phase gap ∆(P) of the quantum walk W(P) and the eigenvalue gap δ of
+the classical Markov chain P, observed at the end of the above proof.
+4
+Search with approximate reﬂection operators
+In this section, we describe how our approximate reﬂection operator may be incorporated into a search
+algorithm without incurring additional cost for reducing its error. The basic idea is to adapt the recursive
+amplitude ampliﬁcation (RAA) algorithm due to Høyer, Mosca, and de Wolf [17] to our setting. To describe
+it, we use the notation from Section 3.1 where we discussed how the Grover algorithm works to rotate a
+starting state |π⟩into a target state |µ⟩, where ⟨µ|π⟩= sin ϕ = √pM. We deﬁne procedures Ai recursively,
+for i ≥0. Let the procedure A0 be the identity map Id, and for i > 0, let
+Ai
+=
+Ai−1 · ref(π) · A†
+i−1 · ref(µ⊥) · Ai−1.
+We deﬁne the states |πi⟩as Ai|π⟩. Then |πi⟩forms an angle 3iϕ with |µ⊥⟩, and therefore the state |πt⟩is
+close to |µ⟩when t = log3
+1
+ϕ + O(1). The ﬁnal recursive algorithm is thus At.
+We may estimate the cost Cost(t) of this search algorithm in terms of the cost c of implementing the two
+original reﬂections, ref(π) and ref(µ⊥). We have Cost(0) = 0, and for i ≥1, Cost(i) = 3 · Cost(i −1) + c, and
+therefore the cost of At is O(c/√ε).
+The RAA algorithm is more suitable for situations where we have imperfect procedures that implement
+the basic reﬂections ref(π), ref(µ⊥). Høyer et al. [17] demonstrated this when there is an ideal (error-free)
+procedure for ref(π), and a procedure for ref(µ⊥) that has ideal behavior only with high probability. Here,
+we adapt their approach to the case where it is the ﬁrst reﬂection ref(π) which may only be approximated (it
+is probably possible to deal with the case where both reﬂections are imperfect, but for the sake of simplicity,
+we only deal with the case when the implementation of ref(µ⊥) is ideal since this is suﬃcient for our purpose).
+In the context of quantum walk based search, an imperfection appears in the form given by Theorem 6. The
+basic idea is to create an analogue of the recursive algorithms Ai when ref(π) is replaced by increasingly ﬁne
+approximations based on Theorem 6.
+We now state this precisely in full generality for potential further applications. Assume that for any
+β > 0, we have a quantum circuit R(β) acting on H ⊗K, where K is an extra register of s(β) qubits. For
+11
+
+--- PAGE 12 ---
+a given integer t, and a precision parameter γ, the quantum circuit consists of t induction steps and acts
+on H ⊗
+hNt
+i=1 Ki
+i
+, where Ki is an extra register used at step i. Let si = s(βi) be the size of register Ki,
+Let S = Pt
+i=1 si. We use |π⟩d|0S⟩as the initial state of the algorithm.
+The quantum circuit follows exactly the RAA algorithm explained above. We essentially replace ref(π)
+at step i by an approximation R(βi), acting on H ⊗Ki, and Id on the rest. Here is now one explicit step of
+the induction, where the basis case Approximate RAA(0, γ) is simply the identity map :
+Approximate RAA(i, γ)
+1. Apply Approximate RAA(i −1, γ).
+2. For any basis vector (|x⟩d|y⟩d) ⊗|z⟩, where |x⟩|y⟩∈H, ﬂip the phase if x ∈M.
+3. Undo Approximate RAA(i −1, γ).
+4. If any of the registers Kj, with j < i, are not in state |0sj⟩, respectively, then ﬂip the
+phase of the state. Otherwise, apply R(βi) on H ⊗Ki, where βi =
+18
+4π3 γ/i2.
+5. Apply Approximate RAA(i −1, γ).
+We now prove that this algorithm can be used to ﬁnd a marked element when pM is known. We will
+later show how to modify the algorithm when only a lower bound on pM is known.
+Lemma 1. Assume that for any β > 0, we have a quantum circuit R(β) acting on H ⊗K, where K is an
+extra register of s qubits (s = s(β) may depend on β), with the following properties:
+1. The circuit R(β) has cost c1 log 1
+β.
+2. R(β)|π⟩|0s⟩= |π⟩|0s⟩.
+3. ∥(R(β) + Id)|ψ⟩|0s⟩∥≤β when |ψ⟩is orthogonal to |π⟩.
+Further, assume that we are able to apply −ref(M) with cost c2, and let t be the smallest non-negative
+integer such that 3t sin−1 √pM
+∈
+[π/4, 3π/4]. Then, for every real γ > 0, Approximate RAA(t, γ)
+maps |π⟩|0S⟩to a state that has projection of length at least ( 1
+√
+2 −γ) in M ⊗
+hNt
+i=1 Ki
+i
+, and incurs a cost
+of order 3t · (c1 log 1
+γ + c2).
+Proof. For simplicity, we omit the data structure in our error analysis, but take it into account in bounding
+the complexity of the algorithm. Let si = s(βi) be the size of register Ki. Let S = Pt
+i=1 si. Recall that we
+use |φ0⟩= |π⟩|0S⟩as the initial state. We also denote by |φi⟩the output state of Approximate RAA(i, γ)
+on input |φ0⟩. Note that the component of |φi⟩on Kj is |0sj⟩, for all j > i. Deﬁne the reﬂection operator Ri
+as the product of the recursive steps 3-5 of Approximate RAA(i, γ).
+In order to understand the behavior of Ri, let us examine the action of R(βi) in step 4. At the beginning
+of that step, the algorithm state still has component |0sj⟩on Kj, for all j ≥i. Therefore the conditioning,
+and the fact that R(βi) is an approximation to ref(π), directly gives that Ri behaves on the current state
+as an approximation to ref(φi−1). To be more precise, let Ei = Ri −ref(φi−1) be the error made in our
+implementation of ref(φi−1). We state the following fact without proof since it directly derives from the
+hypothesis on R(βi).
+Fact 1. Ei satisﬁes the following properties:
+1. Ei|φi−1⟩= 0, and
+2. ∥Ei|ψ⟩|0Si⟩∥≤βi, for all |ψ⟩∈H ⊗
+hNi−1
+j=1 Kj
+i
+such that |ψ⟩|0Si⟩⊥|φi−1⟩, where Si = Pt
+j=i sj.
+12
+
+--- PAGE 13 ---
+To analyze this algorithm, we keep track of the projection of |φi⟩on the marked subspace. The marked
+subspace corresponds to M⊗
+hN
+j Kj
+i
+; it consists of states in which the ﬁrst register of the H-part is marked.
+We denote this space by
+˜
+M. Deﬁne the normalized projections of |φi⟩on the marked subspace
+˜
+M and on
+its orthogonal complement as:
+|µi⟩
+=
+Π ˜
+M|φi⟩
+∥Π ˜
+M|φi⟩∥
+|µ⊥
+i ⟩
+=
+(Id −Π ˜
+M)|φi⟩
+∥(Id −Π ˜
+M)|φi⟩∥.
+We thus have
+|φi⟩
+=
+sin ϕi |µi⟩+ cos ϕi |µ⊥
+i ⟩.
+(1)
+where sin2 ϕi = ∥Π ˜
+M|φi⟩∥2 is the probability of ﬁnding a marked item by measuring the ﬁrst register
+according to {Π ˜
+M, Id −Π ˜
+M}. For later use, let us also deﬁne |φ⊥
+i ⟩as the state in the 2-dimensional subspace
+spanned by |µi⟩and |µ⊥
+i ⟩that is orthogonal to |φi⟩:
+|φ⊥
+i ⟩
+=
+cos ϕi |µi⟩−sin ϕi |µ⊥
+i ⟩.
+For the initial state |φ0⟩, we have sin2 ϕ0 = pM. If all the errors βi were zero, Approximate RAA
+would implement the RAA algorithm in the subspace spanned by |µi⟩= |µ0⟩and |µ⊥
+i ⟩= |µ⊥
+0 ⟩, with the
+angles ϕi+1 = 3ϕi, that is ϕi = 3iϕ0. Therefore by recursively iterating our procedure for a total number of
+t steps, we would end up with a state whose inner product with |µ0⟩is at least
+1
+√
+2.
+Analysis of the errors — We show that Approximate RAA still works when the errors βi are
+suﬃciently small. In that case, the 2-dimensional subspace Span(|µi⟩, |µ⊥
+i ⟩) may drift away from the initial
+subspace Span(|µ0⟩, |µ⊥
+0 ⟩), and the angles ϕi may be diﬀerent from the ideal value ¯ϕi = 3iϕ0. We derive
+bounds on the error ei:
+ei
+=
+|sin ϕi −sin ¯ϕi| ,
+(2)
+the diﬀerence between the amplitude sin ϕi of the marked part of the state |φi⟩and the ideal amplitude, sin ¯ϕi.
+We assume without loss of generality that 0 < γ <
+1
+√
+2 since the case γ ≥
+1
+√
+2 is vacuous. We prove that
+after t steps et ≤γ. This will conclude the error analysis since
+1
+√
+2 ≤sin ¯ϕt ≤1.
+We have
+|φi+1⟩
+=
+Ri+1 · ref( ˜
+M⊥) |φi⟩
+=
+ref(φi) · ref( ˜
+M⊥) |φi⟩+ Ei+1 · ref( ˜
+M⊥) |φi⟩
+=
+sin 3ϕi |µi⟩+ cos 3ϕi |µ⊥
+i ⟩+ |ωi+1⟩,
+(3)
+where we used the fact that ref(φi) · ref( ˜
+M⊥) implements a perfect amplitude ampliﬁcation step, and we
+introduced an error state |ωi⟩, deﬁned as
+|ωi+1⟩
+=
+Ei+1 · ref( ˜
+M⊥) |φi⟩
+=
+Ei+1 · ref( ˜
+M⊥)
+ sin ϕi |µi⟩+ cos ϕi |µ⊥
+i ⟩
+
+=
+Ei+1
+ −sin ϕi |µi⟩+ cos ϕi |µ⊥
+i ⟩
+
+=
+Ei+1
+ cos 2ϕi |φi⟩−sin 2ϕi |φ⊥
+i ⟩
+
+=
+−sin 2ϕi Ei+1 |φ⊥
+i ⟩,
+where we used Fact 1, property 1. Moreover, |φ⊥
+i ⟩⊥|φi⟩, so ∥ωi+1∥≤βi+1 |sin 2ϕi| by Fact 1, property 2.
+Finally, comparing Eq. (1) and Eq. (3), we get
+| sin ϕi+1 −sin 3ϕi|
+≤
+βi+1 |sin 2ϕi| .
+13
+
+--- PAGE 14 ---
+We may now bound the error deﬁned in Eq. (2) as:
+ei+1
+≤
+| sin ϕi+1 −sin 3ϕi| + | sin 3ϕi −sin ¯ϕi+1|
+≤
+βi+1 |sin 2ϕi| + | sin 3ϕi −sin 3 ¯ϕi|
+≤
+βi+1(sin 2 ¯ϕi + | sin 2ϕi −sin 2 ¯ϕi|)
++ | sin 3ϕi −sin 3 ¯ϕi|
+≤
+βi+1(sin 2 ¯ϕi + 2ei) + 3ei
+≤
+2βi+1( ¯ϕi + ei) + 3ei,
+(4)
+where we have used the triangle inequality and the following trigonometric inequalities
+| sin 2A −sin 2B|
+≤
+2| sin A −sin B|
+| sin 3A −sin 3B|
+≤
+3| sin A −sin B|
+sin A
+≤
+A
+that hold for any angles A, B ∈[0, π/4].
+We deﬁne a quantity ˜ei, intended to be an upper bound on ei (it would be if ˜ei ≤¯ϕi). Let
+˜e0
+=
+0
+˜ei+1
+=
+4βi+1 ¯ϕi + 3˜ei.
+We show that ˜ei ≤γ for every i ≤t. Indeed, let us deﬁne ui as
+˜ei
+=
+γ ¯ϕi ui.
+We therefore have the following recursion for ui
+u0
+=
+0
+ui+1
+=
+ui + 4
+3γ βi+1,
+(∀i ≥0)
+so that
+ui
+=
+4
+3γ
+i
+X
+j=1
+βj.
+Recall that we have chosen βi =
+18
+4π3 γ/i2, so that {βi} deﬁne a convergent series and the non-decreasing
+sequence (ui) tends to 1/π when i →∞. We therefore have ˜ei ≤γ ¯ϕi/π ≤γ since 0 ≤
+¯ϕt ≤π for i ≤t.
+Since 0 < γ ≤1, we have ˜ei ≤¯ϕi, and we can show by induction that ei ≤˜ei for all i ≤t. This ﬁnishes
+the error analysis.
+Complexity — We now evaluate the complexity of our algorithm. We know from the hypotheses of
+the theorem that applying R(βi) costs c1 log 1
+βi , while applying ref( ˜
+M⊥) = −ref(M) ⊗IdN
+j Kj costs c2.
+Moreover, by deﬁnition of Approximate RAA, applying Approximate RAA(i, γ) requires 3 calls to
+Approximate RAA(i −1, γ), one call to R(βi) and one call to ref(M). Hence, if we denote by Cost(i) the
+cost of applying Approximate RAA(i, γ), we have
+Cost(0)
+=
+0
+Cost(i)
+=
+3 Cost(i −1) + c1 log 1
+βi
++ c2.
+Since we have ﬁxed βi =
+18
+4π2 γ/i2, we ﬁnd that Cost(i) equals
+c1
+i
+X
+j=1
+3i−j
+
+2 log j + log 1
+γ + O(1)
+
++ c2
+i
+X
+j=1
+3i−j
+=
+3i
+
+
+
+c1 log 1
+γ + c2 + O(1)
+
+i
+X
+j=1
+1
+3j + 2c1
+i
+X
+j=1
+log j
+3j
+
+
+14
+
+--- PAGE 15 ---
+where both sums converge as i →∞. After t steps we have Cost(t) ∈O
+
+3t · (c1 log 1
+γ + c2)
+
+.
+If the cost refers to time complexity, then there is an additional term pertaining to the reﬂection Ri. This
+arises from the check to see if the ancilla are in state |0S⟩. This does not change the asymptotic complexity
+of the algorithm.
+Note that Lemma 1 requires knowledge of pM to infer the necessary number of iterations t. When only a
+lower bound ε on pM is known, we can use the algorithm Tolerant RAA(t, γ), which only adds a constant
+factor overhead with respect to Approximate RAA(t, γ).
+Tolerant RAA(tmax, γ)
+1. Sample a state x from the stationary distribution π of P.
+2. if x ∈M, output x, and stop.
+3. Prepare the initial state |π⟩d|0S⟩and set i = 0.
+4. Increment i. Apply Approximate RAA(i, γ).
+5. Measure the ﬁrst register according to ΠM.
+If successful, observe and output the ﬁrst register, and stop.
+6. If i < tmax go back to Step 4, otherwise output “No marked element”.
+Lemma 2. Assume that for any β > 0, we have a quantum circuit R(β) acting on H ⊗K, where K is an
+extra register of s qubits (s = s(β) may depend on β), with the following properties:
+1. The circuit R(β) has cost c1 log 1
+β.
+2. R(β)|π⟩|0s⟩= |π⟩|0s⟩.
+3. ∥(R(β) + Id)|ψ⟩|0s⟩∥≤β when |ψ⟩is orthogonal to |π⟩.
+Further, assume that we are able to apply −ref(M) with cost c2, and let tmax be the smallest non-negative
+integer such that 3tmax sin−1 √ǫ
+∈
+[π/4, 3π/4], where pM ≥ǫ > 0 whenever pM > 0. Then, for every
+real γ such that 0 < γ ≤
+1
+40, Tolerant RAA(tmax, γ) always outputs “No marked element” if M is empty,
+otherwise it ends with a marked element with probability at least 1/12 −3γ, and incurs a cost of order
+3tmax · (c1 log 1
+γ + c2).
+Proof. First, if M is empty then clearly the algorithm always outputs “No marked element”. We now assume
+that M is non-empty and pM ≥ε. If pM ≥1/2, the ﬁrst two steps of the algorithm succeed with probability
+at least 1/2. So in the analysis of the remaining steps, we additionally assume that pM < 1/2.
+We will use the notations of Lemma 1, together with the following ones. For i ≥1, deﬁne |ψi⟩as the
+state after Step 4, sin2 θi = ∥Π ˜
+M|ψi⟩∥2 the probability to project |ψi⟩onto the marked subspace M, and
+the normalized projections |νi⟩= Π ˜
+M|ψi⟩/ sin θi and |ν⊥
+i ⟩= Π ˜
+M⊥|ψi⟩/ cosθi, where
+˜
+M⊥is the orthogonal
+complement of
+˜
+M. Initially, we set |ν⊥
+0 ⟩= |φ0⟩= |π⟩|0S⟩.
+Let us denote by Ai the unitary operator corresponding to circuit Approximate RAA(i, γ), and let t
+be the smallest positive integer such that 3t sin−1 √pM
+∈
+[π/4, 3π/4]. By Lemma 1, Applying At on
+|φ0⟩= |π⟩|0S⟩prepares a state |φt⟩that has projection at least 1/
+√
+2 −γ on M.
+Since we do not know t, we will apply Ai for all possible values i ∈[1, tmax]. To avoid having to prepare a
+fresh copy of |φ0⟩for each attempt, which would incur an additional cost, for i > 1 we apply Ai on the state
+|ν⊥
+i−1⟩left over from the previous attempt, which produces the state |ψi⟩= Ai|ν⊥
+i−1⟩instead of |φi⟩= Ai|φ0⟩.
+15
+
+--- PAGE 16 ---
+Analysis of the errors — Let δi = ∥|ψi⟩−|φi⟩∥= ∥|ν⊥
+i−1⟩−|φ0⟩∥denote the error at step i. By
+construction, we have δ1 = 0 and, for i ≥1,
+δi+1 = ∥|ν⊥
+i ⟩−|φ0⟩∥≤∥|ν⊥
+i ⟩−|µ⊥
+i ⟩∥+
+i−1
+X
+k=0
+∥|µ⊥
+k+1⟩−|µ⊥
+k ⟩∥+ ∥|µ⊥
+0 ⟩−|φ0⟩∥.
+(5)
+Let us evaluate the ﬁrst term. By deﬁnition we have
+|ψi⟩= sin θi|νi⟩+ cos θi|ν⊥
+i ⟩,
+(6)
+|φi⟩= sin ϕi|µi⟩+ cos ϕi|µ⊥
+i ⟩.
+Since ∥|ψi⟩−|φi⟩∥= δi we also have
+|ψi⟩= sin ϕi|µi⟩+ cos ϕi|µ⊥
+i ⟩+ |ξi⟩,
+(7)
+where ∥ξi∥≤δi. Projecting Equations (6) and (7) onto
+˜
+M⊥, we obtain
+cos θi|ν⊥
+i ⟩= cos ϕi|µ⊥
+i ⟩+ Π ˜
+M⊥|ξi⟩,
+which implies that | cos θi −cos ϕi| ≤δi and in turn
+∥|ν⊥
+i ⟩−|µ⊥
+i ⟩∥≤
+2δi
+cos ϕi
+≤3δi,
+for any i < t. For the last inequality, we have used the fact that ¯ϕi < π
+4 , and therefore cos ϕi ≥cos ¯ϕi −ei ≥
+√
+2
+2 −γ ≥2
+3, since γ ≤
+1
+40.
+Let us now evaluate the second term in Equation (5). Recall that
+|φk+1⟩= sin ϕk+1 |µk+1⟩+ cos ϕk+1 |µ⊥
+k+1⟩
+= sin 3ϕk |µk⟩+ cos3ϕk |µ⊥
+k ⟩+ |ωk+1⟩,
+where ∥ωk+1∥≤βk+1 sin 2 ¯ϕk ≤4βk+1 ¯ϕk, by the calculations leading to Eq. (4), and the bound ek ≤˜ek ≤¯ϕk.
+Projecting this equation onto
+˜
+M⊥, we obtain | cos 3ϕk −cos ϕk+1| ≤∥ωk+1∥and in turn
+∥|µ⊥
+k+1⟩−|µ⊥
+k ⟩∥≤2∥ωk+1∥
+cos ϕk+1
+≤12βk+1 ¯ϕk = 12βk+13kϕ0,
+for any k < t −1, where we have used the fact that cos ϕk+1 ≥2
+3.
+For the last term of Equation (5), since ⟨µ⊥
+0 |φ0⟩= cos ϕ0, we have
+∥|µ⊥
+0 ⟩−|φ0⟩∥=
+p
+2 −2 cos ϕ0 = 2 sin(ϕ0/2) ≤ϕ0.
+Putting everything back together, we have
+δi+1 ≤3δi + 12ϕ0
+i−1
+X
+k=0
+3kβk+1 + ϕ0,
+which, from δ1 = 0, implies
+δt ≤ϕ0
+t−2
+X
+k=0
+3k + 12ϕ0
+t−2
+X
+k=0
+
+
+t−k−2
+X
+j=0
+3j
+
+3kβk+1
+≤1
+2 3t−1ϕ0 + 12ϕ0
+t−2
+X
+k=0
+1
+2 3t−k−1
+
+3kβk+1
+≤1
+2 3t−1ϕ0 + 2 · 3tϕ0
+t−2
+X
+k=0
+βk+1
+≤π
+8 + 9γ
+8 .
+16
+
+--- PAGE 17 ---
+Since the projection of |φt⟩onto
+˜
+M has length at least
+1
+√
+2 −γ, the projection of |ψt⟩onto
+˜
+M has length
+at least
+1
+√
+2 −γ −δt ≥
+1
+√
+12 −3γ, which means that the next measurement projects this state onto
+˜
+M with
+probability at least
+1
+12 −3γ.
+Complexity — As for the complexity analysis, note that we apply Ai for all i ∈[1, tmax]. From Lemma 1,
+the cost of Ai is of order Cost(i) ∈O(3i · (c1 log 1
+γ + c2)), therefore the cost of Tolerant RAA(tmax, γ) is
+dominated by
+tmax
+X
+i=1
+Cost(i) ∈O(3tmax · (c1 log 1
+γ + c2)),
+(8)
+since this deﬁnes a geometric sum.
+We now have all the elements to prove Theorem 3 (stated in Section 1.4).
+Proof of Theorem 3. The algorithm consists in Tolerant RAA(tmax, 1
+72) from Lemma 2, using for the ap-
+proximate reﬂections R(β) the quantum phase estimation circuit R(P) from Theorem 6.
+First, no marked element is found if M is empty.
+Assume for now that M is non empty.
+We will
+prove that the assumptions of Lemma 2 are satisﬁed. Therefore the probability of ﬁnding an element for
+Tolerant RAA(tmax, 1
+72) is at least 1/24.
+Setting k =
+l
+log2( 1
+β ) + 1
+m
+in Theorem 6, R(P) simulates a reﬂection with an error upper bounded by
+21−k ≤β. Implementing R(P)d then requires k 2s+1 calls to the controlled quantum walk c-W(P)d or its
+inverse, where s ∈log2( 1
+√
+δ) + O(1). Since implementing c-W(P)d or its inverse has a cost 4U, the cost
+of implementing the circuit R(P)d for a given error β is c1 log 1
+β , with c1 of order
+1
+√
+δU.
+Furthermore,
+preparing the initial state |π⟩d has a cost S + U, and implementing −ref(M)d has a cost c2 = C. Finally,
+since tmax ∈log3
+1
+√ε + O(1), the total cost of Tolerant RAA(tmax, 1
+72) is of order S +
+1
+√ε( 1
+√
+δ U + C).
+5
+Non-reversible Markov chains
+In this section, we discuss the performance of the search algorithm presented earlier for any ergodic, but
+possibly non-reversible Markov chain P. For the analysis of the quantum walk W(P) we directly examine
+the singular value decomposition of the discriminant matrix D(P) = diag(π)1/2 ·P ·diag(π)−1/2. This matrix
+has the same eigenvalues as P, but the singular values of D(P) may be diﬀerent from the eigenvalues of
+P. The singular values of D(P) lie in the interval [0, 1]. The vector v = (√πx ) is both a left and a right
+eigenvector of D(P) with eigenvalue 1. Therefore, Span(v) and Span(v)⊥are invariant subspaces of D(P),
+and we may choose v to be a left and right singular vector. If every singular vector orthogonal to v has a
+singular value strictly smaller than 1, that is D(P) has a non-zero singular value gap, then Theorem 3 and
+its proof stay valid when the eigenvalue gap of P is replaced by the singular value gap of D(P).
+The discriminant of an irreducible walk does not necessarily have non-zero singular value gap, even if it
+is ergodic. Ergodicity implies a non-zero eigenvalue gap for P, but there are examples of ergodic Markov
+chains whose discriminants have 0 singular value gap. In the next proposition we show that if every state
+in the Markov chain has a transition to itself with non-zero probability, then its discriminant has non-zero
+singular value gap (the proof is given in the appendix). There is a standard and simple modiﬁcation to any
+Markov chain P such that the resulting chain has this property: with some probability α ∈(0, 1), stay at
+the current state, and with probability 1 −α, make a transition according to P.
+Proposition 3. Let P = (pxy) be an irreducible Markov chain on a ﬁnite state space X, such that pxx > 0,
+for every x ∈X. Then, the discriminant matrix D(P) has exactly one singular value equal to 1.
+Finally, we state the theorem on the performance of the quantum search algorithm presented in Section 4
+when the underlying Markov chain is not necessarily reversible.
+17
+
+--- PAGE 18 ---
+Theorem 8. Let P = (pxy) be an irreducible Markov chain on a ﬁnite state space X, such that D(P) has
+exactly one singular value equal to 1. Let δ > 0 be the singular value gap of D(P), and let ε > 0 be a lower
+bound on the probability that an element chosen from the stationary distribution of P is marked whenever M
+is non-empty. Then, there is a quantum algorithm that with high probability, determines if M is empty or
+ﬁnds an element of M, with cost of order S +
+1
+√ε( 1
+√
+δU + C).
+6
+Acknowledgments
+A part of this work was done while the authors were visiting Institut Henri Poincar´e, Paris, France, during
+the Programme on Quantum Information, Computation, and Complexity, January–April 2006.
+This research was partially supported by the European Commission IST projects QAP 015848 and QCS
+25596, and by the French ANR projects AlgoQP and QRAC 08-EMER-012. A. N. was supported in part by
+NSERC Canada, CIFAR, an ERA (Ontario), QuantumWorks, CFI, OIT, MITACS, and ARO/NSA (USA).
+Research at Perimeter Institute for Theoretical Physics is supported in part by the Government of Canada
+through Industry Canada and by the Province of Ontario through MRI. Research at the Centre for Quantum
+Technologies is funded by the Singapore Ministry of Education and the National Research Foundation. J.
+R. acknowledges support from the Belgian FNRS, NSF Grant CCF-0524837 and ARO Grant DAAD 19-03-
+1-0082, and during this work he was aﬃliated with LRI, Universit´e Paris-Sud; QuIC, Universit´e Libre de
+Bruxelles; and Computer Science Division, U.C. Berkeley.
+We thank the anonymous referees for their careful reading of the earlier drafts of this article, and for
+suggestions that vastly improved the quality of presentation.
+References
+[1] S. Aaronson and Y. Shi. Quantum lower bounds for the collision and the element distinctness problems.
+Journal of the ACM, pages 595–605, 2004.
+[2] D. Aharonov, A. Ambainis, J. Kempe, and U. Vazirani. Quantum walks on graphs. In Proceedings of
+the 33rd ACM Symposium on Theory of Computing, pages 50–59, 2001.
+[3] D.
+Aldous
+and
+J.
+A.
+Fill.
+Reversible
+Markov
+Chains
+and
+Random
+Walks
+on
+Graphs.
+http://www.stat.berkeley.edu/users/aldous/RWG/book.html. Monograph in preparation, August 2006
+version.
+[4] A. Ambainis, E. Bach, A. Nayak, A. Vishwanath, and J. Watrous. One-dimensional quantum walks. In
+Proceedings of the 33rd ACM Symposium on Theory of Computing, pages 37–49, 2001.
+[5] A. Ambainis, J. Kempe, and A. Rivosh. Coins make quantum walks faster. In Proceedings of the 16th
+ACM-SIAM Symposium on Discrete Algorithms, pages 1099–1108, 2005.
+[6] A. Ambainis. Quantum walk algorithm for Element Distinctness. In Proceedings of the 45th IEEE
+Symposium on Foundations of Computer Science, pages 22–31. IEEE Computer Society Press, 2004.
+[7] C. H. Bennett, E. Bernstein, G. Brassard, and U. Vazirani. Strengths and weaknesses of quantum
+computing. SIAM Journal on Computing, 26(5):1510–1523, 1997.
+[8] R. Bhatia. Matrix Analysis, volume 169 of Graduate Texts in Mathematics. Springer-Verlag, 1993.
+[9] M. Boyer, G. Brassard, P. Høyer, and A. Tapp. Tight bounds on quantum searching. Fortschritte Der
+Physik, 46(4-5):493–505, 1998.
+[10] G. Brassard, P. Høyer, M. Mosca, and A. Tapp. Quantum amplitude ampliﬁcation and estimation.
+In J. S. J. Lomonaco and H. E. Brandt, editors, Quantum Computation and Quantum Information: A
+Millennium Volume, volume 305 of Contemporary Mathematics Series. American Mathematical Society,
+2002.
+18
+
+--- PAGE 19 ---
+[11] A. Z. Broder and A. R. Karlin. Bounds on the cover time. Journal of Theoretical Probability, 2(1):101–
+120, 1989.
+[12] H. Buhrman, C. D¨urr, M. Heiligman, P. Høyer, M. Santha, F. Magniez, and R. de Wolf. Quantum
+algorithms for Element Distinctness. SIAM Journal of Computing, 34(6):1324–1330, 2005.
+[13] H. Buhrman and R. ˇSpalek.
+Quantum veriﬁcation of matrix products.
+In Proceedings of the 17th
+ACM-SIAM Symposium on Discrete Algorithms, pages 880–889, 2006.
+[14] R. Cleve, A. Ekert, C. Macchiavello, and M. Mosca. Quantum algorithms revisited. Proceedings of the
+Royal Society A: Mathematical, Physical and Engineering Sciences, 454(1969):339–354, 1998.
+[15] S. D¨orn and T. Thierauf. The quantum query complexity of algebraic properties. In Proceedings of the
+16th International Symposium on the Fundamentals of Computation Theory, volume 4639 of Lecture
+Notes in Computer Science, pages 250–260, Berlin/Heidelberg, 2007. Springer.
+[16] L. K. Grover. A fast quantum mechanical algorithm for database search. In Proceedings of the 28th
+ACM Symposium on Theory of Computing, pages 212–219, 1996.
+[17] P. Høyer, M. Mosca, and R. de Wolf. Quantum search on bounded-error inputs. In Proceedings of
+the 30th International Colloquium on Automata, Languages and Programming, volume 2719 of Lecture
+Notes in Computer Science, pages 291–299. Verlag, 2003.
+[18] C. Jordan. Essai sur la g´eom´etrie `a n dimensions. Bulletin de la Soci´et´e Math´ematique de France,
+3:103–174, 1875.
+[19] A. Kitaev.
+Quantum measurements and the Abelian stabilizer problem.
+Technical Report quant-
+ph/9511026, arXiv.org, 1995.
+[20] A. Y. Kitaev, A. H. Shen, and M. N. Vyalyi.
+Classical and Quantum Computation, volume 47 of
+Graduate Studies in Mathematics. American Mathematical Society, Providence, RI, 2002.
+[21] H. Krovi, F. Magniez, M. Ozols, and J. Roland. Finding is as easy as detecting for quantum walks. In
+Proceedings of 37st International Colloquium on Automata, Languages and Programming, volume 6198
+of Lecture Notes in Computer Science, pages 540–551, Berlin/Heidelberg, 2010. Springer.
+[22] F. Magniez and A. Nayak.
+Quantum complexity of testing group commutativity.
+Algorithmica,
+48(3):221–232, July 2007.
+[23] F. Magniez, A. Nayak, P. C. Richter, and M. Santha. On the hitting times of quantum versus random
+walks. In Proceedings of the 20th ACM-SIAM Symposium on Discrete Algorithms, pages 86–95, 2009.
+[24] F. Magniez, M. Santha, and M. Szegedy. Quantum algorithms for the triangle problem. SIAM Journal
+on Computing, 37(2):413–424, 2007.
+[25] D. Meyer. From quantum cellular automata to quantum lattice gases. Journal of Statistical Physics,
+85(5-6):551–574, 1996.
+[26] A. Nayak and A. Vishwanath.
+Quantum walk on the line.
+Technical Report quant-ph/0010117,
+arXiv.org, 2000.
+[27] P. C. Richter. Almost uniform sampling via quantum walks. New Journal of Physics, 9(3):72, 2007.
+[28] N. Shenvi, J. Kempe, and K. B. Whaley. Quantum random-walk search algorithm. Physical Review A,
+67, 2003. Article no. 052307.
+[29] M. Szegedy. Quantum speed-up of Markov chain based algorithms. In Proceedings of the 45th IEEE
+Symposium on Foundations of Computer Science, pages 32–41. IEEE Computer Society Press, 2004.
+19
+
+--- PAGE 20 ---
+[30] A. Tulsi. Faster quantum walk algorithm for the two dimensional spatial search. Physical Review A,
+78, 2008. Article no. 012310.
+[31] U. Vazirani. On the power of quantum computation. Philosophical Transactions of the Royal Society
+of London, Series A, 356:1759–1768, 1998.
+[32] J. Watrous. Quantum simulations of classical random walks and undirected graph connectivity. Journal
+of Computer and System Sciences, 62(2):376–391, 2001.
+Proof of Proposition 3
+We ﬁrst state and prove that all the singular values of D(P) lie in [0, 1].
+Lemma 3. Let P = (pxy)x,y∈X be an irreducible Markov chain with stationary distribution π = (πx)x∈X.
+Then the singular values of the matrix D(P) given by
+D(P)
+=
+diag(π)1/2 · P · diag(π)−1/2
+all lie in the interval [0, 1].
+Proof. Singular values are by convention taken to be non-negative real. To verify that ∥D(P)∥, the largest
+singular value of D(P) is at most 1, consider the inner product u†D(P)v, for some unit vectors u, v. The
+maximum absolute value that this inner product achieves is the norm of D(P). By the Cauchy-Schwarz
+inequality, the inner product may be bounded as
+u†D(P)v
+
+=
+
+X
+xy
+¯uxvy
+rπx
+πy
+pxy
+
+≤
+ X
+xy
+|ux|2 pxy
+!1/2  X
+xy
+|vy|2 πx
+πy
+pxy
+!1/2
+(9)
+≤
+1,
+since P
+x πxpxy = πy.
+Proof of Proposition 3. From Lemma 3, we know that the singular values of D(P) all lie in [0, 1]. Further v =
+(√πx ) is a left (and right) singular vector with singular value 1. We show below that for any left and right
+singular vectors u, w ∈CX, if u† D(P) w = 1, then u = w = v (modulo an overall phase). This establishes
+the uniqueness of the singular value 1 and a non-zero singular value gap in D(P).
+Suppose u† D(P) w = 1. This implies that the Cauchy-Schwarz inequality in Equation (9) in the proof of
+Lemma 3 is tight. Then necessarily, the two unit vectors u′, w′ ∈CX×X given by u′ = (ux√pxy)x,y∈X and
+w′ = (wy
+p
+πxpxy/πy)x,y∈X are parallel. Ignoring an overall phase, we may assume that they are in fact equal.
+This means that for every pair x, y ∈X such that pxy > 0, ux = wy
+p
+πx/πy. In particular, since pxx > 0,
+ux = wx for every x, and so ux = uy
+p
+πx/πy for every neighbor y of x in the graph underlying the Markov
+chain P.
+Furthermore, for any path x1, x2, . . . , xk in the graph, chaining together the equations
+uxi+1
+=
+uxi
+rπxi+1
+πxi
+,
+for i = 1, . . . , k −1, we get that
+uxi
+=
+ux1
+r πxi
+πx1
+,
+20
+
+--- PAGE 21 ---
+for every i. Since the chain P is irreducible, i.e., the underlying graph is strongly connected, there is a path
+from x1 to y for every y ∈X. Thus,
+uy
+=
+ux1
+r πy
+πx1
+,
+for every y.
+Since the vector u is a unit vector, this implies that u = w = (√πx)x∈X = v (up to an
+unimportant global phase).
+21

@@ -1,0 +1,1453 @@
+
+--- PAGE 1 ---
+arXiv:1807.08970v2  [quant-ph]  25 Jul 2018
+Computational speedups using small quantum devices
+Vedran Dunjko,1, 2, ∗Yimin Ge,1, † and J. Ignacio Cirac1, ‡
+1Max Planck Institut f¨ur Quantenoptik, Hans-Kopfermann-Str. 1, 85748 Garching, Germany
+2LIACS, Leiden University, Niels Bohrweg 1, 2333 CA Leiden, The Netherlands
+(Dated: July 26, 2018)
+Suppose we have a small quantum computer with only M qubits. Can such a device genuinely
+speed up certain algorithms, even when the problem size is much larger than M? Here we answer
+this question to the aﬃrmative. We present a hybrid quantum-classical algorithm to solve 3SAT
+problems involving n ≫M variables that signiﬁcantly speeds up its fully classical counterpart. This
+question may be relevant in view of the current quest to build small quantum computers.
+Quantum computers can use the superposition princi-
+ple to speed up certain computations. However, it is not
+clear if they can be useful when they are, as expected for
+the foreseeable future, limited in size. The reason is that
+classical and quantum algorithms alike typically exploit
+global structures of problems, and restricting superpo-
+sitions to certain block sizes will break that structure.
+Thus, one may expect that for problems where arbitrarily
+sized quantum computers oﬀer advantages, small quan-
+tum computers may end up being of no signiﬁcant help
+given large inputs.
+In this paper we study this problem and show that this
+is not generally true: there are relevant algorithms which
+utilize the global structure, and where quantum comput-
+ers signiﬁcantly smaller than the problem size can oﬀer
+signiﬁcant speedups.
+More precisely, we focus on the
+famous algorithm of Sch¨oning for boolean satisﬁability,
+and present a modiﬁed hybrid quantum-classical algo-
+rithm which signiﬁcantly outperforms its purely classical
+version even given small quantum computers.
+Satisﬁability (SAT) problems are among the basic
+computational problems and naturally appear in many
+contexts dealing with combinatorial optimization, like
+scheduling or planning tasks, as well as in statistical
+physics. A prominent SAT problem is 3SAT, which in-
+volves clauses with up to three literals.
+3SAT is the
+canonical example of so-called NP-complete problems,
+which are believed to be exponentially diﬃcult even for
+quantum computers.
+Nevertheless, quantum comput-
+ers can still accelerate their solution [1, 2], and given
+their ubiquity, they may become one of the most impor-
+tant applications of quantum computers. However, the
+best quantum algorithms, which essentially “quantum-
+enhance” classical SAT solvers [1], require a large number
+of qubits, and are not directly applicable given a quan-
+tum computer of limited size.
+There are a number of
+possibilities how one could use a limited-size quantum de-
+vice. For instance, one could speed up smaller structure-
+independent subroutines which occur, e.g., in the prepa-
+ration phases of algorithms (e.g., whenever search over
+∗v.dunjko@liacs.leidenuniv.nl
+† yimin.ge@mpq.mpg.de
+‡ ignacio.cirac@mpq.mpg.de
+few items is performed, one could utilize Grover’s algo-
+rithm [3]). However, for obtaining “genuine” speedups,
+e.g, those which interpolate between the runtimes of the
+fully classical and a fully quantum algorithm, according
+to the size of the available quantum device, one should
+attack the actual computational bottlenecks. As we will
+show, if this is done in a straightforward fashion, one may
+encounter a threshold eﬀect: if the quantum device is too
+small, i.e., can handle only a small fraction of the entire
+instance, a na¨ıve hybrid algorithm turns out to be slower
+than its classical version.
+Here we demonstrate how this eﬀect can sometimes be
+circumvented, in the context of satisﬁability problems.
+Speciﬁcally, we provide a quantum-assisted version of a
+well-understood classical algorithm, which achieves gen-
+uine improvements given quantum computers of basically
+any size, avoiding the aforementioned threshold eﬀect [4].
+Our results are also applicable to broader kSAT prob-
+lems, and more generally highlight the characteristics
+of classical algorithms, and certain algorithmic methods
+which can be exploited to provide threshold-free enhance-
+ments.
+3SAT problems:
+In SAT problems, we are given a
+boolean formula F : {0, 1}n →{0, 1} over n binary vari-
+ables x = (x1, . . . , xn) ∈{0, 1}n. The task is to ﬁnd a so-
+called satisfying assignment x, i.e., fulﬁlling F(x) = 1,
+if one exists.
+In 3SAT, F is speciﬁed by a set of L
+clauses {Cj}, where each clause speciﬁes three literals
+{lj
+1, lj
+2, lj
+3, }. Each literal speciﬁes one of the n binary vari-
+ables (x) or a negated variable (x), for instance {l1, l2, l3}
+could be {x3, x5, x8}. An assignment of variables x thus
+speciﬁes the values of all literals. Cj is satisﬁed by x if
+any of the literals in Cj attains the value 1. A formula
+F, written as F(x) = VL
+j=1(lj
+1 ∨lj
+2 ∨lj
+3) using standard
+logic operator notation, is satisﬁed by x if all its clauses
+are satisﬁed.
+Classical algorithms:
+Many classical algorithms for
+3SAT are known which are signiﬁcantly faster than brute-
+force search. Their performance can usually be charac-
+terised by a constant γ ∈(0, 1), meaning that the algo-
+rithm solves 3SAT in a runtime of O∗(2γn) [5]. One of the
+best and most famous ones is the algorithm of Sch¨oning
+[6]. It initializes a random assignment of the variables,
+then repeatedly ﬁnds an unsatisﬁed clause, randomly se-
+lects one literal in that clause, and ﬂips the corresponding
+
+--- PAGE 2 ---
+2
+variable. This sampling algorithm terminates once a sat-
+isfying assignment is reached, or once this process is it-
+erated O(n) times. Sch¨oning proved that the probability
+of this algorithm ﬁnding a satisfying assignment (if one
+exists) is at least (3/4)n which, by iteration, leads to a
+Monte Carlo algorithm with expected runtime O∗(2γ0n)
+with γ0 := log2(4/3) ≈0.415. A signiﬁcant speedup of
+the classical algorithm is a reduction of its value of γ.
+To study the potential of small quantum computers, we
+investigate whether small devices suﬃce to enhance the
+algorithm of Sch¨oning by achieving such a reduction.
+Straightforward hybrid algorithms for small quantum
+computers:
+In [1] a quantum algorithm inspired by
+Sch¨oning’s method which exploits amplitude ampliﬁca-
+tion [7] was introduced. It solves 3SAT instances with
+n variables in runtime O∗(2γ0n/2) and requires ≈βn
+qubits for a β > 2.
+Given a quantum computer with
+only M ≈βm qubits (m ≪n), one has a few options
+how to create a hybrid algorithm to achieve speedups. A
+“bottom up” approach would be to use the quantum-
+enhanced algorithm as an m-variable instance solver,
+which is then used as a subroutine in an overarching clas-
+sical algorithm. For instance, to tackle the problem of n
+variables, one could sequentially go through all possible
+partial assignments of n −m variables. Each partial as-
+signment induces a SAT problem with m variables, which
+could then be solved on the small quantum device. The
+runtime of such an algorithm is O∗(2(n−m)+γ0m/2) which
+highlights the threshold eﬀect: the hybrid algorithm be-
+comes slower than the classical algorithm of Sch¨oning if
+m/n ≲0.74.
+Roughly speaking, the main problem of
+hybrid algorithms using a small device as a sub-instance
+solver is that they break the global structure of the prob-
+lem exploited by the classical algorithm. This results in
+hybrid algorithms whose runtimes interpolate [8] between
+a fully quantum runtime, and something slower than the
+classical algorithm – hence the resulting threshold eﬀect.
+Alternatively, we use a “top down” approach, explored
+in the remainder of the paper, where the subroutines of
+the classical algorithm, which carry most of the compu-
+tational work, are identiﬁed and quantum-enhanced.
+Our results: We present a hybrid algorithm that avoids
+the threshold eﬀect.
+More precisely, given a quantum
+computer with M = cn qubits, where c ∈(0, 1) is an ar-
+bitrary constant, our algorithm solves 3SAT with n vari-
+ables in a runtime of O∗(2(γ0−f(c)+ε)n), where f(c) > 0
+is a constant and ε can be made arbitrarily small (the
+details of the function f(c) are given in the supplemental
+material). This constitutes a polynomial speedup over
+Sch¨oning’s algorithm for arbitrarily small c.
+Algorithm description:
+Our hybrid algorithm is a
+quantum-assisted version of de-randomized variants of
+Sch¨oning’s algorithm [9, 10], which we review ﬁrst. Given
+a bitstring x ∈{0, 1}n, let Br(x) denote the r−ball cen-
+tered at x, i.e., the set of all bitstrings y diﬀering from
+x in at most r positions (i.e., their Hamming distance
+is ≤r).
+Then, relying on results from coding theory,
+the space of possible assignments is covered by a num-
+ber of r−balls. Given such a covering set, speciﬁed by
+the centers of the balls, the algorithm sequentially checks
+whether there exists a satisfying assignment within each
+of the r-balls. This space splitting algorithm reduces SAT
+to the problem of ﬁnding a satisfying assignment within
+an r−ball, called Promise-Ball-SAT (PBS). A determin-
+istic algorithm PromiseBall(F, r, x) for PBS was in-
+troduced in [9]. This is a simple, recursive divide-and-
+conquer algorithm: on input it takes a formula, speciﬁed
+by a set of clauses (with no more than three literals),
+a radius, and a center x.
+The algorithm ﬁrst checks
+some obvious conditions for (un)satisﬁability (if r ≤0
+and F(x) = 0 or if any clause is empty), or if x is a sat-
+isfying assignment. Otherwise, in the recursive step, it
+ﬁnds the ﬁrst unsatisﬁed clause C, and calls Promise-
+Ball(F|l=1, r −1, x) for every literal l ∈C (we assume
+that the variables, literals and clauses are enumerated in
+a pre-speciﬁed order). Here, F|l=1 denotes the formula
+obtained by setting the variable corresponding to l to the
+value ensuring l = 1, i.e., all clauses involving l (or ¯l) are
+removed (or truncated) [11].
+This algorithm solves PBS in time O∗(3r). For com-
+parison, Sch¨oning sampling solves PBS in time O∗(2r).
+The overall runtime of the space-splitting algorithm of
+[9] can be expressed as a function of the runtime of the
+PBS-solving subroutine (see supplemental material for
+details). What is relevant for us, however, is that when-
+ever a PBS solver with runtime O∗(2r) (e.g., randomized
+Sch¨oning) is used in the space-splitting algorithm, we re-
+cover the original Sch¨oning’s runtime with γ0 ≈0.415.
+To see how a small quantum device can help, note that
+every recursive call in PromiseBall reduces r by 1. One
+idea is then to, at the moment r becomes small enough,
+use a quantum algorithm for PBS instead of a classical
+recursive call. This leads to a general approach for us-
+ing small quantum devices to speed up algorithms which
+recursively call themselves (or other subroutines) with
+ever decreasing instance sizes. We will refer to this as
+the standard hybrid approach.
+While this is a step in the right direction, there
+are two types of obstacles to consider.
+First, since
+PromiseBall is signiﬁcantly slower than the basic al-
+gorithm of Sch¨oning, this still leads to a threshold prob-
+lem: M would have to be at least a large fraction of
+n to gain an advantage.
+The second issue pertains
+to the quantum memory requirements of the quantum
+PromiseBall algorithm, which involves a few techni-
+cal steps.
+In particular, straightforward quantum im-
+plementations of PromiseBall require Ω(n) ancillary
+qubits, even if r is small, which is too much given the
+size of our quantum device.
+While it is not diﬃcult
+to reduce this to O(r log n), the resulting hybrid algo-
+rithm, although avoiding a threshold, would have a very
+low, in fact sub-polynomial, quantum advantage in the
+limit of large instances, and not yield a true improve-
+ment in terms of γ.
+However, even this problem can
+be circumvented, using more involved memory structures
+combined with specialized algorithms which algorithmi-
+
+--- PAGE 3 ---
+3
+cally delete unneeded information to reduce the qubit
+requirements.
+More precisely, we provide a quantum
+implementation of PromiseBall which requires only
+O(r log(n/r)+r+log n) qubits and which is quadratically
+faster than classical PromiseBall. As the last step, we
+use these ideas in combination with a more recent and
+eﬃcient classical deterministic algorithm for PBS [10],
+leading to our ﬁnal algorithm.
+Space and time eﬃcient quantum algorithm for PBS:
+Note ﬁrst that any (recursive) algorithm for PBS which
+‘carries’ the formulas as explicit inputs has to use suﬃ-
+ciently many bits to represent them. This already vio-
+lates our constraints on the number of (qu)bits our algo-
+rithm should use. Thus, as a ﬁrst step towards a space-
+eﬃcient quantum algorithm for PBS, we specify a non-
+recursive (classical) variant of PromiseBall which does
+not manipulate the formulas explicitly. Afterwards, we
+optimize the memory required by the algorithm and turn
+it into a quantum algorithm using amplitude ampliﬁca-
+tion to obtain the speedup.
+The structure of PromiseBall yields a ternary tree
+of depth r, induced by the up to three choices of literals
+in the recursive step of the algorithm. Thus, a sequence
+of choices s1, . . . , sr ∈{1, 2, 3} speciﬁes a leaf in the tree,
+and hence the subset of literals whose values have been
+ﬂipped. In other words, the algorithm PromiseBall in-
+duces a mapping from s1, . . . , sr to a set of at most r
+variables to be ﬂipped, denoted V = {v1, . . . , vr′}, where
+r′ ≤r. The non-recursive algorithm, as a subroutine,
+computes the list of variables V indexed by the sequence
+⃗s = s1, . . . , sr, generates the candidate assignments xV
+realized by ﬂipping the values of the variables speciﬁed
+by V , and checks if they satisfy the formula. This sub-
+routine can be executed in polynomial time. The overall
+algorithm simply goes through all 3r sequences ⃗s, yield-
+ing the runtime O∗(3r).
+This can easily be turned into a quantum algorithm
+QBall12, which realizes the mapping:
+|s1, ..., sr⟩|0⟩|0⟩
+QBall12
+−→
+|
+{z
+}
+QBall1
+|s1, ..., sr⟩
+QBall2
+z
+}|
+{
+|V ⟩|F(xV )⟩,
+where the ﬁrst part of the algorithm (QBall1) generates
+the indices of the variables in V , and the second part
+(QBall2) veriﬁes whether the formula F is satisﬁed by
+the assignment xV . The full quantum algorithm for PBS,
+which we call QBall, then uses amplitude ampliﬁcation
+to ﬁnd one sequence ⃗s which yields a satisfying assign-
+ment, using O(3r/2) calls of the QBall1,2 subroutines,
+each with polynomial runtime.
+What remains to be seen is how to implement the al-
+gorithm space-eﬃciently. We give the basic ideas here,
+and full details in the supplemental material. For ease
+of presentation, we ﬁrst show how QBall2 can be re-
+alized straightforwardly, using many ancillas, and then
+show how to reduce their number. Such an implementa-
+tion of QBall2 would simply utilize n additional qubits
+(one for each variable) and initially assign them the value
+x. Then, the circuit would iterate through the registers
+specifying V (na¨ıvely requiring O(r log n) qubits), and in-
+troduce (controlled) negations (Pauli σx gates) to those
+ancillary qubits selected by the values in V . This would
+ﬁnalize the variable presetting stage, and set the input to
+the formula to xV . From there, we would sequentially
+evaluate each clause, by associating a gate controlled by
+the variable qubits corresponding to the variables occur-
+ring in the clause. This controlled gate applies the ap-
+propriate negations to realize the literals, increasing a
+counter if a clause is satisﬁed. After this is iterated for
+each clause, the circuit ﬂips the value of the output qubit
+only if the counter equals L, meaning all the clauses are
+satisﬁed. Such a circuit would use O(log(L)+n) ancillas.
+Since L = O(poly(n)), the key problem is the dependence
+on n. The situation is simpliﬁed by noting that although
+the circuits our algorithms generate depend on F, x and r,
+we can w.l.o.g. assume that x = (0, . . . , 0), and subsume
+the appropriate negations directly into F [12]. Next, ob-
+serve that since the clauses are evaluated sequentially,
+we actually only require three variable-speciﬁc ancillas,
+specifying the values of the variables appearing in the
+current clause: for each clause, each of the three ancillas
+correspond to the three variables occurring in the given
+clause. The variable presetting stage is now done indi-
+vidually for each clause Cj: before clause evaluation, the
+circuit iterates through the V −specifying register, and
+ﬂips the kth ancilla if the speciﬁcation matches the kth
+variable within the clause Cj. The three ancillas are un-
+computed after Cj is evaluated, and can be reused. This
+requires at most O(log n) additional qubits.
+The algorithm QBall1 is more involved, but again
+one of the main savings utilizes the observation that
+few ancillas, which can be reused, suﬃce to determine
+whether a given clause is satisﬁed. The rough descrip-
+tion of our algorithm is as follows. QBall1 comprises
+a main loop which sequentially adds one variable spec-
+iﬁcation vi to the already speciﬁed set as follows: the
+ith circuit block takes the speciﬁcations of the ﬁrst i −1
+variables v1, . . . , vi−1 as inputs, iterates through all the
+clauses, and evaluates each clause Cj (in a manner sim-
+ilar to QBall2), using the values v1, . . . , vi−1 to cor-
+rectly preset the clause-speciﬁc input.
+If the clause is
+not satisﬁed, it uses the value of si to select the speciﬁ-
+cation of one variable occurring in Cj, taking into ac-
+count that variables which have already been ﬂipped
+cannot be selected again, and storing this speciﬁcation
+as vi. To ensure reversibility, additional counters have
+to be used, but these can be uncomputed and recy-
+cled (see supplemental material for details).
+The ﬁnal
+compression relies on a more eﬃcient encoding of V,
+which, as an ordered list would use O(r log n) qubits.
+Since the ordering does not matter, instead of storing
+the positional values, we can store the relative shifts
+v1, v2 −v1, . . . , vr′ −vr′−1 > 0 of a sorted version of the
+list, using no more digits than necessary and a separa-
+tion symbol to denote the next number. Since these val-
+
+--- PAGE 4 ---
+4
+ues add up to at most n, it is see that O(r log(n/r) + r)
+qubits suﬃce for this encoding. This structure indeed
+encodes a set, since the initial ordering is erased. How-
+ever, straightforward algorithms that use such encodings
+of sets instead of ordered lists encounter problems with
+reversibility.
+To illustrate this, note that in the pro-
+cess of adding a new variable to V , one must realize
+the two steps |{v1, . . . , vi−1}⟩|0⟩7→|{v1, . . . , vi−1}⟩|vi⟩,
+i.e., ﬁnding the new element, and |{v1, . . . , vi−1}⟩|vi⟩7→
+|{v1, . . . , vi}⟩|0⟩, i.e., placing it into the set, and, criti-
+cally, freeing the ancillary qubit for the next step. How-
+ever, this is irreversible, since the information which ele-
+ment was added last is lost. The full ordering information
+requires additional O(r log(r)) additional qubits, which
+would nullify all advantage. Of course, one could instead
+realise the reversible operation |{v1, . . . , vi−1}⟩|vi⟩|0⟩7→
+|{v1, . . . , vi−1}⟩|vi⟩|{v1, . . . , vi}⟩, followed by applying
+the inverse of the entire circuit up to this point to un-
+compute |{v1, . . . , vi−1}⟩|vi⟩, but this would result in an
+exponential instead of polynomial runtime of QBall1.
+We circumvent this issue by splitting V into O(log r) sets
+of sizes 1, 2, 4, . . ., and the loading of each larger block is
+followed by an algorithmic deletion of all smaller blocks.
+This ensures that the overall number of qubits needed for
+this encoding is still just O(r log(n/r) + r), at the cost
+of 2O(log(r)) additional steps, which is still only polyno-
+mial. These structures and primitives lead to an over-
+all space- and time-eﬃcient implementation of QBall1
+(see the supplemental material for details). Combining
+these subroutines with quantum search over the vector
+⃗s, we obtain the algorithm QBall, solving PBS in time
+O∗(3r/2) and using O(r log(n/r) + r + log n) qubits.
+Hybrid algorithm for 3SAT: The runtime of QBall
+not only quadratically beats that of PromiseBall, but
+also outperforms the randomized algorithm of Sch¨oning
+(2r vs. 2log2(3)r/2 ≈20.79r). Since our quantum devices
+are size-limited, they can only solve PBS for suﬃciently
+small r. In principle, we could use the standard hybrid
+approach for PromiseBall, i.e, call QBall instead of
+PromiseBall deep in the recursion tree when r is suﬃ-
+ciently small. But, as mentioned earlier, this still leads to
+a threshold problem. This is resolved by considering an
+improved classical deterministic algorithm for PBS [10],
+where coding theory is applied once more to cover the
+space of the choice vectors ⃗s with covering balls. This
+yields an algorithm with runtime O∗((2 + ǫ)r), where ǫ
+can be chosen arbitrarily small – in other words, the run-
+time of this algorithm for PBS essentially matches the
+runtime of Sch¨oning. While the details of this algorithm
+are not important here, the critical point is that, like the
+original PromiseBall algorithm, it recursively calls it-
+self to solve PBS with ever smaller values of r (each time
+reduced by a quantity which depends on ǫ). Thus, the
+standard hybrid approach can be applied. Since QBall
+beats the runtime of this improved classical algorithm
+for PBS, the hybrid algorithm is faster than Sch¨oning’s
+algorithm, and, unlike using PromiseBall, there is no
+threshold induced by sub-optimal classical routines.
+To estimate the runtime of our hybrid algorithm,
+note that since the quantum algorithm only requires
+O(r log(n/r) + r + log n) qubits, a device with M = cn
+qubits can solve PBS for r = f(c)n for a function f (see
+supplemental material for details). Since the hybrid al-
+gorithm replaces a classical subroutine of runtime O∗(2r)
+with a quantum subroutine of runtime O∗(3r/2) in a re-
+cursion tree below depth r = f(c)n, the runtime of the
+hybrid algorithm beats that of the classical one by a fac-
+tor of O∗((
+√
+3/2)f(c)n). Thus, the combined runtime of
+the hybrid algorithm is O∗(2(γ0+ε−0.21f(c))n), as claimed.
+Conclusions and Outlook: We have shown that a small
+quantum computer can speed up the solving of rele-
+vant computational problems of signiﬁcantly larger size.
+While obvious for structureless problems (e.g., unstruc-
+tured search), when considering algorithms which use the
+problem’s structure, such as in the case of Sch¨oning’s al-
+gorithm, speedups are non-trivial: the way the problem
+is partitioned must maintain the structure which is ex-
+ploited by the classical algorithm to avoid thresholds.
+In terms of the broader underlying question, our work
+complements [13], where classical-assisted quantum algo-
+rithms are considered. Those techniques are applicable
+in the opposite regime when the quantum computer is
+almost the size of the problem, and the computation is
+of comparatively small depth.
+Our algorithm achieves a signiﬁcant speedup, as given
+by a reduction of the rate γ, which is the relevant per-
+formance parameter, characterizing runtimes of the form
+O∗(2γn).
+The speedup we provide here holds relative
+to the algorithm of Sch¨oning. Our results however gen-
+eralize to certain other algorithms which are based on
+Sch¨oning’s algorithm (e.g., [14, 15] ), since those are
+mainly achieved by using better initial assignments, and
+to the variants tackling kSAT (k > 3). Historically, the
+best solvers with provable bounds are based either on the
+ideas of Sch¨oning, or alternatively, the approach of [16],
+which includes, to our knowledge, the current classical
+record holder [17]. It would be interesting to see whether
+this second class of SAT algorithms is also amenable to
+the types of enhancements we achieve here.
+Apart from fundamental interest, the question of this
+work is becoming increasingly more relevant given the
+current progress in prototypes of small quantum com-
+puters [18–20]. We assume an error-free ideal scenario,
+while in practice this may be one of the bottlenecks to
+exploit small devices [21]. Thus, it would be particularly
+interesting to see how the presented algorithm behaves
+given noise, and develop methods to decrease the num-
+ber of gates, thereby increasing tolerance.
+Acknowledgements.– VD acknowledges the support
+from the Alexander von Humboldt Foundation.
+JIC
+acknowledges the ERC Advanced Grant QENOCOBA
+under the EU Horizon 2020 program (grant agreement
+742102).
+
+--- PAGE 5 ---
+5
+[1] A. Ambainis, SIGACT News 35, 22 (2004).
+[2] A. Ambainis,
+K.
+Balodis,
+J.
+Iraids,
+M.
+Kokainis,
+K. Pr¯usis,
+and J. Vihrovs, “Quantum speedups for
+exponential-time
+dynamic
+programming
+algorithms,”
+(2018), arXiv:1807.05209.
+[3] L. K. Grover, in Proceedings of the Twenty-eighth Annual
+ACM Symposium on Theory of Computing, STOC ’96
+(ACM, New York, NY, USA, 1996) pp. 212–219.
+[4] Our scenario is related to, but distinct from, the work
+in [13]. There, the authors consider how a classical com-
+puter can help simulate a given quantum algorithm which
+requires only slightly more qubits than are available. In
+contrast, we change the algorithm, i.e., propose hybrid
+algorithms which use a signiﬁcantly smaller quantum de-
+vice, to speed up a ﬁxed classical algorithm. The two ap-
+proaches are also complementary in their applicability:
+the main results of [13] are most powerful for shallow
+computations. In particular, their results could only be
+directly applied for SAT solving if one has access to an
+exponentially sized quantum computer to begin with, as
+the computation may be exponentially deep.
+[5] The O∗notation suppresses the terms which contribute
+only polynomially, see, e.g., [10].
+[6] T. Sch¨oning, in 40th Annual Symposium on Foundations
+of Computer Science (Cat. No.99CB37039) (1999) pp.
+410–414.
+[7] G. Brassard, P. Hoyer, M. Mosca, and A. Tapp, (2000),
+arXiv:quant-ph/0005055.
+[8] By “interpolate” we mean that the hybrid algorithm’s
+runtime is characterized by a function h(n, m) of the size
+of the quantum device (approx. m), and the instance size
+n, which is (strictly) monotonically decreasing in m, and
+which roughly attains the classical, and fully quantum
+runtimes for m = 1 and m = n, respectively.
+[9] E. Dantsin, A. Goerdt, E. A. Hirsch, R. Kannan, J. Klein-
+berg, C. Papadimitriou, P. Raghavan, and U. Sch¨oning,
+Theoretical Computer Science 289, 69 (2002).
+[10] R. A. Moser and D. Scheder, in Proceedings of the
+Forty-third Annual ACM Symposium on Theory of Com-
+puting, STOC ’11 (ACM, New York, NY, USA, 2011) pp.
+245–252.
+[11] If a literal appearing in a clause C = {l1, l2, l3} evaluates
+to 1, then C is satisﬁed regardless of the other variable
+assignments, and can be removed from the formula. If a
+literal (say l1) evaluates to 0, then for C to be true we
+need to satisfy the truncated clause C = {l2, l3}.
+[12] Let Fx be the formula obtained by negating any literal
+in F which corresponds to a variable to which x assigns
+the value 1, so that Fx(0, . . . , 0) = F(x). By subsuming
+x into F, we mean that we use Fx instead of F.
+[13] S. Bravyi, G. Smith, and J. A. Smolin, Phys. Rev. X 6,
+021043 (2016).
+[14] T. Hofmeister, U. Sch¨oning, R. Schuler, and O. Watan-
+abe, in STACS 2002, edited by H. Alt and A. Ferreira
+(Springer Berlin Heidelberg, Berlin, Heidelberg, 2002)
+pp. 192–202.
+[15] K. Iwama, K. Seto, T. Takai,
+and S. Tamaki, in Al-
+gorithms and Computation, edited by O. Cheong, K.-Y.
+Chwa, and K. Park (Springer Berlin Heidelberg, Berlin,
+Heidelberg, 2010) pp. 73–84.
+[16] R. Paturi, P. Pudl´ak, M. E. Saks, and F. Zane, J. ACM
+52, 337 (2005).
+[17] T. Hertli, SIAM Journal on Computing 43, 718 (2014).
+[18] “IEEE
+spectrum.
+IBM
+edges
+closer
+to
+quantum
+supremacy with 50-qubit processor,” Hyperlink, note =
+Accessed: 2018-06-11 ().
+[19] “American Physical Society meeting. engineering super-
+conducting qubit arrays for quantum supremacy,” Hy-
+perlink accessed: 2018-06-11.
+[20] “Intel newsroom. 2018 CES: Intel advances quantum and
+neuromorphic computing research,” Hyperlink, note =
+accessed: 2018-06-11.
+[21] J. Preskill, “Quantum computing in the NISQ era and
+beyond,” (2018), arXiv:1801.00862.
+[22] T. J. Yoder, G. H. Low, and I. L. Chuang, Phys. Rev.
+Lett. 113, 210501 (2014).
+[23] More speciﬁcally, since we quantum-enhance the algo-
+rithm of [10], our approach circumvents a threshold phe-
+nomenon relative to this algorithm. Since the algorithm
+of [10] is referred to as a de-randomization of the algo-
+rithm of Sch¨oning, with matching run-time, we for sim-
+plicity talk about avoiding the threshold relative to the
+algorithm of Sch¨oning itself.
+[24] For the interested reader we point out that the ﬁne-
+graining of complexity of a given problem with respect
+to multiple parameters of a given instance, as is the case
+here, is studied by so-called parametrized complexity the-
+ory.
+[25] Since d appears in 23n/d, to make sure this contribution is
+not a dominating term in the overall complexity, setting
+d = 15 will suﬃce as 2n/5 ≤2γqn).
+[26] Http://users-cs.au.dk/dscheder/SAT2012/searchball.pdf.
+[27] The implementation given in Section A yields A = 10
+and B = 50 using a straightforward of encoding each trit
+using two qubits. We remark however that these numbers
+can be improved signiﬁcantly.
+
+--- PAGE 6 ---
+6
+SUPPLEMENTAL MATERIAL
+In the supplemental materials we provide the details referred to in the main text. In Section A, we provide a
+high level description of the algorithm, along with the key ideas. The important aspects of the algorithm are rather
+straightforward, however, for completeness we provide a fully detailed exposition of the central quantum algorithm
+QBall. In Section B, we provide the details of the full hybrid algorithm and a detailed runtime analysis.
+A.
+Detailed quantum algorithm for PBS
+In this section, we describe the quantum algorithm for PBS. Let r ≥0 be an integer and F a 3-SAT formula over n
+variables. The problem is to decide whether there exists a satisfying assignment of F with hamming weight at most
+r.
+As explained in the main text, the most involved part of the algorithm is a subroutine called QBall1 which takes
+as input s1, . . . , sr ∈{1, 2, 3} and outputs a set V = V (⃗s) of at most r variables with the property that F has a
+satisfying assignment with hamming distance at most r if and only if there exists an ⃗s ∈{1, 2, 3}r such that the
+assignment x(V (⃗s)), obtained by setting all variables in V (⃗s) to 1 and all other ones to 0, is a satisfying assignment.
+This algorithm is a quantum version of the non-recursive variant of the PromiseBall algorithm described in the
+main text, which is quantized using amplitude ampliﬁcation. We will therefore ﬁrst develop a classical reversible
+circuit (which depends on F and r), using at most O(r log(n/r) + r + log n) ancilla bits that maps ⃗s to a space-
+eﬃcient encoding of the set V (⃗s). Although the algorithm below is, for now, purely classical (and reversible), we will
+nevertheless use bra/ket notation for simplicity.
+1.
+Key ideas of the quantum algorithm for the Promise Ball problem
+Before going into the particulars of the algorithm, it is worth-while to highlight the key ideas we utilize, and explain
+why we go into such detail to explain a relatively simple algorithm. As mentioned, given the radius r and ball center
+x (this can be shifted to all-zero by modifying the formula), our algorithm can be summarized as follows:
+1: Set V = ∅.
+2: For i = 1 to r do begin
+3:
+Set xV to be the assignment where the variables in V gave been ﬂipped.
+4:
+Find ﬁrst clause in F which is not satisﬁed by x’
+5:
+If such a clause exists, use si to select the next variable vi. Else set vi to a dummy variable (index beyond n).
+6:
+Update V : = V ∪{vi}.
+7: end.
+The output V of the above process collects speciﬁcations of r variables, and the variables with indices below or equal
+to n specify the satisfying assignment, if one exists. We use dummy variables as this avoids the need for controlled
+operations which would change the algorithm behaviour (e.g. terminate the loop once no suitable clause is found),
+which end up requiring more memory to be implemented reversibly. The majority of subtleties in our algorithms
+pertain precisely to this: utilizing as few systems as possible, while maintaining reversibility.
+As mentioned in the main text, one of the key issues is dealing with the size of the representation of V . If V is
+represented as an ordered list, we end up using r log(n) qubits, which is too much for our purposes. On the other
+hand, V can be implemented as a set, forgetting the order, in which case we require only r log(n/r) qubits (we only
+need to store the shifts between the indices of the variables once they are ordered). This is suﬃcient for our purposes,
+however, now the process of adding one variable to the set, which occurs at each step 1 . . . , r, is no longer reversible
+– more speciﬁcally, a reversible operation produces registers which still, implicitly, contain information about the
+positions. Since all the processes we utilize will be used in an overarching amplitude ampliﬁcation process, we must
+use only reversible operations – no measurements with classical feedback can be used. If these registers containing the
+implicit position information are not re-used, we end up using too much memory. On the other hand, to re-use those
+registers, since measurement is not an option, we need to un-compute information, which may be computationally
+expensive.
+To exemplify the problem, it is possible to implement the operation
+|Set Vi−1⟩|vi⟩|0⟩7→|Set Vi−1⟩|vi⟩|Set Vi−1 ∪{vi}⟩,
+(1)
+
+--- PAGE 7 ---
+7
+followed by the deletion of the ﬁrst register in the state |SetVi−1⟩, by reversing whatever circuit was used to generate
+it. This would enable us to realize the transform
+|Set Vi−1⟩|vi⟩|Set Vi−1 ∪{vi}⟩7→|Set Vi⟩|0⟩|0⟩
+(2)
+where Vi = Vi−1 ∪{vi}. This constitutes an algorithmic deletion procedure, where we have deleted all unnecessary
+information. However, it is easy to see that the process calling the inverse of the entire circuit up to step i −1, which
+is (recursively) done for each i, leads to a run-time which will be exponential in i. Since i ranges to r, we end up
+with an algorithm with an exponential number of steps in r. In the interesting cases when r is a fraction of n, this
+becomes (signiﬁcantly) more expensive than the overall classical algorithm.
+In the process detailed below, we circumvent this problem by using a more structured memory which allows for
+more eﬃcient deletion. Speciﬁcally, we will split the memory into approximately log(r) sets, each storing twice as
+many variable indices, so of sizes l = 1, 2, 4, . . ., in total storing all r variable speciﬁcations. This memory structure is
+still space-eﬃcient, in that it still requires O(r log(n/r)) (qu)bits. However, such a structure can be used for eﬃcient
+deletion. The basic idea can be illustrated by the following algorithm, which is less eﬃcient than our ﬁnal proposal
+given later, but easier to analyze.
+For each size l, we will utilize two memory blocks. The moment the two memory blocks of some size l′ are ﬁlled with
+variable indices, they are merged and stored into the larger memory block of size 2l′. These two memory blocks of
+size l′ are now algorithmically deleted by inverting the processes which ﬁlled them. Again, like in the ﬁrst algorithmic
+deletion procedure, the algorithm is speciﬁed using recursive calls. However, in the former case, the depth of the
+recursion was r. In the more eﬃcient algorithm, the recursion depth is up to the number of diﬀering block sizes. Since
+we use O(log(r)) diﬀerent-sized blocks, the overall computational cost is proportional to O(2log(r)), so polynomial,
+and not exponential, in r.
+The more eﬃcient algorithms below are based on the same idea, and presented in more detail. The high-level
+descriptions of all the subroutines required to realize all the elementary steps to execute the overall algorithm are
+provided in Table I. Each sub-routine must satisfy the same two critical properties we just discussed for the highest
+level of the algorithm description.
+First, each subroutine must be economic with respect to how many ancillary
+(qu)bits are used. Second, since each subroutine is used many times, it is also critical that the ancillary qubits are
+always reset (uncomputed), so they can be reused, and that the deletion is suﬃciently eﬃcient. To make sure both
+properties are maintained, we provide all the subroutine description to full detail.
+2.
+Algorithm overview
+The basic idea for the algorithm to calculate V (⃗s) from ⃗s consists of a main loop going through i = 1, . . . , r, and
+attempts to ﬁnd another variable vi to be added to V in the following way. The algorithm ﬁnds the ﬁrst clause Cj
+that is not satisﬁed by setting all variables in V to 1 (we assume that there is some predeﬁned order of the clauses
+C1, . . . , CL). We then select the next variable vi to be the sith variable in Cj that is not already in V . If no such
+variable exist (i.e., the entire clause Cj is already in V ) or there exist no unsatisﬁed clause under the current V , then
+the algorithm adds a dummy variable xn+i to V . Na¨ıvely and without any further processing, this would lead to an
+encoding of V that simply stores the ordered list v1, . . . , vr, taking O(r log n) bits in total. As mentioned in the main
+text, this would ultimately lead to too much of a qubit requirement of the corresponding quantum algorithm to give
+a strong speed up. We therefore ﬁrst describe how to eﬃciently encode a set of variables.
+Let S = {y1, . . . , yk} be a set, where 0 < y1 < · · · < yk ≤2n are integers. Deﬁne |Enc S⟩to be a sequence of at most
+O(k log(n/k) + k) trits encoding (y1, y2 −y1, . . . , yk −yk−1), where each number is encoded on the binary subspace of
+the trits using no more digits than necessary and the third symbol of the trit subspace serves as a separation character
+between successive numbers. Note that since the numbers add up to at most n, the number of trits required for this
+encoding is indeed at most
+⌈log2 y1⌉+ ⌈log2(y2 −y1)⌉+ · · · + ⌈log2(yk −yk−1)⌉+ 2k ≤log2 y1 + log2(y2 −y1) + · · · + log2(yk −yk−1) + 3k (3)
+≤k log2
+yk
+k + 3k
+(4)
+≤k log2
+n
+k + 4k,
+(5)
+where the second line follows from concavity of the logarithm. Note that this is signiﬁcantly less than the na¨ıve
+encoding of S which uses O(k log n) bits. For concreteness, we will assume that after the last separation character,
+the remaining trits are in 0.
+This gives us an eﬃcient way of storing a set of at most r elements. However, encoding V as |Enc V ⟩at all stages
+of the algorithm is problematic, because reversibility would be lost (indeed, the map |Enc Vi−1⟩7→|Enc Vi⟩is not
+
+--- PAGE 8 ---
+8
+Main subroutines:
+Calculatei
+|si⟩|EﬀEnc Vi−1⟩|0⟩7→|s⟩|EﬀEnc V ⟩|vi⟩
+Given a trit si and (an eﬃcient encoding of) the current set of variables, produces the next
+variable vi to be ﬂipped.
+Mergei
+|⃗s⟩|EﬀEnc Vi−1⟩|vi⟩7→|⃗s⟩|EﬀEnc Vi⟩
+Adds the next variable to the set while maintaining eﬃcient encoding, and uncomputes the
+value of the added variable.
+Key ancillary subroutines:
+Extractk
+|Enc S⟩|j⟩|0⟩7→|Enc S⟩|j⟩|yj⟩
+Extracts the jth element (w.r.t. ascending ordering) from the encoding of the set S of known
+size k. Critical subroutine in Calculatei.
+Shiftk
+|Enc S⟩|j⟩|0⟩7→|Enc S⟩|j⟩|yj −yj−1⟩
+Used in Extractk. The set-encoding stores shifts between neighbouring
+elements, and this subroutine extracts them. In essence, it counts special separation char-
+acters delineating diﬀerent numbers in the set encoding.
+Containsk
+|Enc S⟩|v⟩|0⟩7→|Enc S⟩|v⟩|v ∈S?⟩
+Checks if v is present in the set S, given encoding of S. Required for checking if a clause
+is satisﬁed when ﬂipping the values of literals if they occur in S, and also when selecting
+the next variable, as we can only select those which have not been chosen previously. Uses
+Extractk.
+Checkj,i
+|EﬀEnc Vi−1⟩|0⟩7→|EﬀEnc Vi−1⟩|Cj(Vi−1)⟩
+Checks if the jth clause is satisﬁed when the variables in the set Vi−1 are ﬂipped. One of
+the key subroutines.
+Selecti
+|EﬀEnc Vi−1⟩|si⟩|L + 1 −j⟩|0⟩7→|EﬀEnc Vi−1⟩|si⟩|L + 1 −j⟩|vj,i⟩
+Once a clause Cj is identiﬁed to not be satisﬁed, this subroutine uses the choice si and the
+set of already ﬂipped variables to select a variable in Cj
+will be ﬂipped next.
+Appendk
+|v⟩|Enc S⟩|0⟩7→|v⟩|Enc S ∪{v}⟩
+Adds an element to the set S and computes the encoding of the new set. The added element
+is assumed to be larger than the largest element in S.
+Unionk1,k2
+|Enc S1⟩|S2⟩|0⟩7→|Enc S1⟩|Enc S2⟩|Enc S1 ∪S2⟩
+Generates an eﬃcient encoding of the union of two eﬃciently encoded sets. In essence, uses
+Extract on both sets to compare elements, storing the smaller, and keeping a position counter
+for both. Uses Appendk.
+TABLE I. Summary of subroutines for the space-eﬃcient reversible implementation to solve PBS. The two main subroutines
+ran in succession ﬁnd the next variable, add it to the set, and, critically, free the ancillary registers so they can be reused.
+injective). We therefore store the set of variables during the algorithm as follows. Let Vi = {v1, . . . , vi} be the set of
+variables obtained after the ith round. Note that |Vi| = i. We now divide Vi into subsets Vi,1, . . . , Vi,mi of sizes which
+are powers of two corresponding to the binary expansion of i. For example, if i = 13 (binary expansion 1101), we
+have Vi,1 = {v1, v2, v3, v4, v5, v6, v7, v8}, Vi,2 = {v9, v10, v11, v12} and Vi,3 = {v13}.
+To eﬃciently store Vi, we eﬃciently encode the set as |EﬀEnc Vi⟩:= |Enc Vi,1⟩. . . |Enc Vi,mi⟩. Note that the number
+
+--- PAGE 9 ---
+9
+of bits required for |EﬀEnc Vi⟩is at most
+⌈log2 r⌉
+X
+l=0
+
+2l log2
+n
+2l + 2l+2
+=
+⌈log2 r⌉
+X
+l=0
+2l log2
+n
+r +
+⌈log2 r⌉
+X
+l=0
+2l+2 +
+⌈log2 r⌉
+X
+l=0
+2l log2
+r
+2l
+(6)
+≤4r log2
+n
+r + 16r + 2r
+⌈log2 r⌉
+X
+l=0
+1
+2⌈log2 r⌉−l (⌈log2 r⌉−l)
+(7)
+≤4r log2
+n
+r + 20r
+(8)
+= O(r log(n/r) + r),
+(9)
+where in (7), the ﬁrst two terms follow from P⌈log2 r⌉
+l=0
+2l ≤4r and the last term follows from 2⌈log2 r⌉≥r > 2⌈log2 r⌉−1,
+and (8) follows from
+⌈log2 r⌉−l
+X
+l=0
+1
+2⌈log2 r⌉(⌈log2 r⌉−l) <
+∞
+X
+j=0
+j
+2j = 2.
+(10)
+For a given i ∈{1, . . . , r}, the circuit is divided into a calculate phase and a merge phase. The calculate phase
+performs
+Calculatei |si⟩|EﬀEnc Vi−1⟩|0⟩= |si⟩|EﬀEnc Vi−1⟩|vi⟩,
+(11)
+i.e., ﬁnds the next variable to be added to V . The merge phase performs
+Mergei |⃗s⟩|EﬀEnc Vi−1⟩|vi⟩= |⃗s⟩|EﬀEnc Vi⟩,
+(12)
+i.e., converts the eﬃcient encoding of the old set into the eﬃcient encoding of the new set. It achieves ths by using
+a series of set merge operations comprising calculating the representation of the set-union and the uncomputation of
+original the set representations.
+While the main ideas of both phases are straightforward, the primary challenge is to develop these algorithms in
+the form of circuits that are both reversible and at the same time require few ancillas. For the latter, it is imperative
+that at the end of any subroutine, all ancillas, which can be assumed to be initially in the 0 state, are returned to 0
+so that they can be reused. Note that not achieving this would increase the ancilla requirement for each call of any
+such subroutine and would likely result in the algorithm requiring too many ancillas. For convenience, we therefore
+introduce the following notion.
+Deﬁnition 1. Let f : {0, 1}q →{0, 1}q be a bijection. We say that f can be implemented reversibly using l ancillas
+and g gates if there exists a (classical) reversible circuit of at most g elementary gates which implements the map
+|x⟩|0⟩⊗l 7→|f(x)⟩|0⟩⊗l .
+(13)
+Proposition 1.
+(i) Calculatei can be implemented reversibly using O(log n) ancillas and O(poly(n)) gates.
+(ii) Mergei can be implemented reversibly using O(r log(n/r) + r + log n) ancillas and O(poly(n)) gates.
+In the next two subsections, we prove Proposition 1 by describing each phase in detail. Table I gives an overview
+of the key subroutines involved.
+3.
+The calculate phase
+In this part of the algorithm for a given i ∈{1, . . . , r}, we calculate the sith variable in the ﬁrst unsatisﬁed clause.
+This part of the algorithm has two components. First, ﬁnding the ﬁrst clause that is not satisﬁed, and second, selecting
+the corresponding variable.
+On input, we have |EﬀEnc Vi−1⟩|si⟩. Note that the sizes of the sets are known in advance. We ﬁrst show how
+given a set, we can eﬃciently and reversibly extract its elements using few bits. For a set S = {y1, . . . , yk} of integers
+0 < y1 < · · · < yk ≤2n of known size k, deﬁne the reversible operation Extractk |Enc S⟩|j⟩|0⟩= |Enc S⟩|j⟩|yj⟩for
+j ∈{1, . . . , k}. We will assume that any set S we consider has at most r ≤n elements.
+
+--- PAGE 10 ---
+10
+Lemma 1. Extractk can be implemented reversibly using O(log n) ancilla bits and O(poly(n)) gates.
+Proof. We ﬁrst show how to implement the operation Shiftk |Enc S⟩|j⟩|0⟩= |Enc S⟩|j⟩|yj −yj−1⟩, where by conven-
+tion y0 = 0. This operation comprises three parts: ﬁrst compute the position of the (j −1)st separation character in
+|Enc S⟩and the number of trits to the jth separation character (we call this operation U1,k), second copy the relevant
+trits to a separate register (we call this operation U2), and third uncompute all other ancillas by running U −1
+1,k.
+We introduce three counters, called the block position counter, the length counter and the j-counter, going from 0
+to ⌈k log2(n/k)⌉+ 4k, 0 to ⌈log2 n⌉+ 1, and 0 to k respectively, and all initially set to 0. Note that all three counters
+use no more than O(log n) bits. To implement U1,k, we do the following steps.
+First, we add k to the j-counter to set it to k. Then, for each trit in |Enc S⟩sequentially, we do the following:
+Controlled on the j-counter being larger than k −j + 1, increase the block position counter by one; controlled the trit
+being a termination symbol, decrease j-counter by one. This ends with the j-counter being 0, and the block position
+counter containing the position of the jth block.
+Note, the implementation of operations controlled on the state of counters can be done by a number comparison,
+and the latter can be implemented reversibly with one ancilla bit.
+Next, for each trit in |Enc S⟩, we sequentially do the following: If the j-counter is equal to j −1, increase the lenght
+counter by one; if the trit is a termination symbol, increase the j-counter register by one.
+Since the length counter is only increased in the jth block, it stores its length. The j-counter now has the (known)
+value k and we can reset it to 0.
+This implements U1,k, which performs
+U1,k |Enc S⟩|j⟩|0⟩|0⟩= |Enc S⟩|j⟩|pos(S, j)⟩|len(S, j)⟩
+(14)
+and resets all ancillas to 0, where pos(S, j) is the position of the (j −1)th separation character and len(S, j) =
+pos(S, j + 1) −pos(S, j) is the number of trits to the jth separation character.
+To implement U2, it will be convenient to deﬁne the family of U(j, l) copy-unitaries. Each such unitary is a sequence
+of l CNOT gates, which copy the trits from position j +1 to position j +l as the last l bits of the shift-output register.
+Each such unitary costs only l CNOTS. The c −U(j, l) is the controlled family of such unitaries, which is controlled
+on the states of the block position and the length counter, and the corresponding U(j, l) is only activated if the block
+position counter and the length counter are equal to j and l, respectively. For completeness, these are only well-deﬁned
+if j + l ≤⌈k × log2(n/k)⌉+ 4k, i.e., the lenght of the register containing |Enc S⟩. If the labels are out-of-bounds, we
+substitute them with identities. Although they copy trits, they will only be used as to act on the binary subspace, as
+we will not be copying the termination symbols. U2 is then given by
+U2 =
+⌈log2(n/k)⌉+4k
+Y
+j=1
+⌈log2n⌉+1
+Y
+l=1
+c −U(j, l).
+(15)
+Note that only one U(j, l) will be activated, namely the one speciﬁed by the position and length registers. In total,
+U2 contains O((log(n/k) + k) log(n)) = O(log(n)2) gates, and uses no ancillas. Applying U −1
+1,k then completes the
+implementation of Shiftk.
+Finally, Extractk can be implemented by introducing an additional counter from 1 to k, and k calls to controlled-
+Shiftk, each controlled on the counter being ≤j, followed by incrementing that counter. This way, each call adds
+yl −yl−1 to the output register if l ≤j.
+This ﬁnally leaves the output register in |yj⟩and all ancillas in 0, as
+desired.
+This extraction subroutine can be used to check if a given variable index v ∈{1, . . . , 2n} is contained in a set
+of known size. To this end, deﬁne the (reversible) operation Containsk which performs Containsk |Enc S⟩|v⟩|0⟩=
+|Enc S⟩|v⟩|v ∈S?⟩, where the last bit is 1 if v ∈S and 0 otherwise.
+Lemma 2. Containsk can be implemented reversibly using O(log n) ancilla bits and O(poly(n)) gates.
+Proof. We introduce a counter from 0 to k and O(log n) additional ancilla bits. Then, for each j = 1, . . . , k, we use
+Lemma 1 to extract the jth element, controlled on the counter being in 0. We then check whether the extracted
+element is equal to v, and store the result in a separate temporary result bit. We then uncompute the controlled
+extraction and, controlled on the result bit being in 1, increment the counter. After doing this for all j = 1, . . . , k,
+the result bit is in 1 if the element is in S and 0 if not. We apply a CNOT of the temporary result bit to the output
+bit and then run the inverse of the entire circuit up to that point to reset the ancillas.
+
+--- PAGE 11 ---
+11
+Next, for a clause Cj, let
+Cj(V ) =
+(
+1
+Cj satisﬁed by x(V )
+0
+otherwise.
+(16)
+We furthermore deﬁne a subroutine Checkj,i which performs
+Checkj,i |EﬀEnc Vi−1⟩|0⟩= |EﬀEnc Vi−1⟩|Cj(Vi−1)⟩.
+(17)
+Note the dependence of Checkj,i on i reﬂects that the routine is adjusted slightly for diﬀerent set sizes appearing in
+|EﬀEnc Vi⟩(which are known in advance).
+Lemma 3. Checkj,i can be implemented reversibly using O(log n) ancilla bits and O(poly(n)) gates.
+Proof. We introduce three additional ancilla bits storing the values of the three variables in the clause. Then, for each
+variable and each set in |EﬀEnc Vi−1⟩, we use Lemma 2 to check if the variable is in the set. The result is copied onto
+the variable bit using a CNOT, and the Containsk operation is then reversed. Note that the sets can be assumed to
+be disjoined. Then, the variable bits are ﬂipped according to the literals in the clause. The clause is then evaluated
+and the result stored in a separate bit. We then apply the inverse of the circuit to reset the ancillas.
+Next, we show how to select a variable from a given clause. For a clause Cj with variables xa, xb, xc with 0 < a < b <
+c ≤n, let vj,i(Vi−1, si) be the sith smallest number in {a, b, c}\Vi−1. If si > |{a, b, c}\Vi−1|, then vj,i(Vi−1, si) = n+ i.
+We now deﬁne the reversible operation Selecti which performs
+Selecti |EﬀEnc Vi−1⟩|si⟩|L + 1 −j⟩|0⟩= |EﬀEnc Vi−1⟩|si⟩|L + 1 −j⟩|vj,i(Vi−1, si)⟩
+(18)
+for j = 1, . . . , L and
+Selecti |EﬀEnc Vi−1⟩|si⟩|0⟩|0⟩= |EﬀEnc Vi−1⟩|si⟩|0⟩|n + i⟩.
+(19)
+Lemma 4. Selecti can be implemented reversibly using O(log n) ancilla bits and O(poly(n)) gates.
+Proof. First, we add n+i to the result register controlled on the counter input register being in 0. Then, for each j, we
+do the following operations controlled on the counter input register being in L + 1 −j: Use Lemma 2 to check which
+variables are contained in Vi−1 and store the result in three variable ancilla bits (similarly to the implementation
+Checkj,i in Lemma 3). Then, for each combination of values of the variable ancilla bits and si, add the value of
+vj,i to the result register controlled on the values of the variable register and si. We then apply the inverse of the
+controlled-Containsk operations to uncompute the variable ancilla bits.
+To implement Calculatei, we ﬁrst deﬁne Gj,i to be the following circuit: On input we have |EﬀEnc Vi−1⟩, a counter
+from 0 to L using O(log L) bits, a result bit and O(log n) workspace ancillas. Gj,i ﬁrst performs a controlled-Checkj,i,
+controlled on the counter being in 0, on the register containing |EﬀEnc Vi−1⟩and O(log n) of the workspace ancillas.
+Then, we perform a CNOT onto the result bit, controlled on the ancilla containing Cj(Vi−1) being 0. We then run
+controlled-Check−1
+j,i , controlled on the counter being in 0, to uncompute the workspace ancillas. Then, we add 1 to
+the counter, controlled on the result bit being 1.
+The implementation of Calculatei is now as follows.
+1. Run
+G1,i . . . GL,i |EﬀEnc Vi−1⟩|0⟩|0⟩.
+It
+is
+easy
+to
+see
+that
+this
+results
+in
+|EﬀEnc Vi−1⟩|L + 1 −jmin⟩|1 −F(x(Vi−1))⟩, where jmin is the smallest j such that Cj is unsatisﬁed un-
+der x(Vi−1) if such a clause exist, and L + 1 otherwise, and F(x(V )) is 1 if x(V ) is a satisfying assignment for
+F and 0 otherwise.
+2. Run
+Selecti
+on
+|EﬀEnc Vi−1⟩|si⟩|L + 1 −jmin⟩
+and
+O(log n)
+workspace
+ancillas.
+This
+produces
+|EﬀEnc Vi−1⟩|si⟩|L + 1 −jmin⟩|vi⟩, where vi is the index of the variable to be added to V .
+3. Apply the inverse of step 1. This results in |EﬀEnc Vi−1⟩|si⟩|vi⟩and all other ancilla bits being reset to 0, as
+desired.
+This proves Proposition 1(i).
+
+--- PAGE 12 ---
+12
+4.
+The merge phase
+The main tool of the merge phase is a reversible operation Unionk1,k2 that calculates the union of two sets S1, S2
+of (known) sizes k1, k2 ≤r,
+Unionk1,k2 |Enc S1⟩|Enc S2⟩|0⟩= |Enc S1⟩|Enc S2⟩|Enc S1 ∪S2⟩.
+(20)
+Lemma 5. Unionk1,k2 can be implemented reversibly with O(K log(n/K) + K + log n) ancilla bits and O(poly(n))
+gates, where K = k1 + k2.
+The basic idea is to simply extract the j1th and j2th elements of S1, S2 at a time, where j1 and j2 are the current
+values of two counter registers, appends the smaller of those elements to the output set, and increase either j1 or j2
+depending on which one was added. This results in all elements in S1 ∪S2 being added to the output set in increasing
+order. As such, we ﬁrst show how to eﬃciently append an element to a set of known size.
+Lemma 6. Let S = {v1, . . . , vk} be a set with 0 < v1 < · · · < vk < 2n and let v ∈{vk +1, . . . , 2n}. Then the operation
+Appendk |v⟩|Enc S⟩|0⟩= |v⟩|Enc S ∪{v}⟩
+(21)
+can be implemented reversibly using O(log n) ancilla bits and trits and O(poly(n)) gates.
+Proof. The proof is very similar to the proof of Lemma 1, the steps are as follows.
+1. Use Extractk to extract the value of the largest element vk ∈S onto a separate register (note that k is known).
+2. Calculate the diﬀerence of v with that value and store that diﬀerence in a separate register of O(log n) bits
+which we call the diﬀerence register. The ancilla workspace now contains |vk⟩|v −vk⟩.
+3. Introduce a counter from 0 to O(log log n) which we call the length counter, and an additional control bit initially
+in 0, and use them to ﬁnd the number of relevant binary digits in the diﬀerence register (i.e., ⌈log2(v −vk)⌉+ 1)
+as follows. Starting from the most signiﬁcant digit of the diﬀerence register, in turn do the following for each bit
+in the diﬀerence register: ﬁrst, controlled on the bit being 1 and end the length counter being 0, ﬂip the control
+bit. Then, controlled on the control bit being 1, add 1 to the length counter. After doing this for all bits in
+the diﬀerence register, the length counter will be in ⌊log2(v −vk)⌋+ 1 and the control bit in 1 (since we assume
+v > vk). Flip the control bit to reset it. The ancilla workspace now contains |vk⟩|v −vk⟩|⌊log2(v −vk)⌋+ 1⟩.
+4. Use the operation U1,k deﬁned in the proof of Lemma 1 to ﬁnd the position of the last (i.e., kth) separation
+character in |Enc S⟩. The ancilla workspace now contains |vk⟩|v −vk⟩|⌊log2(v −vk)⌋+ 1⟩|pos(S, k + 1)⟩.
+5. Deﬁne a family of unitaries V (j, l) which is a sequence of l CNOTs copying the ﬁrst l bits in the diﬀerence
+register to the binary subspace of the (j + 1), . . . , (j + l)th trits of the set register, followed by ﬂipping the
+(j + l + 1)st trit in the set register into a separation character (note that we assume that all these trits are
+initially in 0). This operation is only well-deﬁned for j + l < ⌈(k + 1) log2(n/(k + 1)) + 4(k + 1)⌉. For out of
+bounds values of j, l, we deﬁne V (j, l) to be the identity. Deﬁne c−V (j, l) to be V (j, l) controlled on the append
+position counter being j and the length counter being l. Apply
+⌈(k+1) log2(n/(k+1))+2(k+1)⌉
+Y
+j=1
+⌈log2 n⌉
+Y
+l=1
+cV (j, l).
+(22)
+This appends the value of v −vk (without leading zeros) and a separation character after the last separation
+character in the set register.
+6. To reset the ancilla workspace, ﬁrst apply the inverse of step 4, but replacing U −1
+1,k with U −1
+1,k+1. This resets
+the ancilla register containing |pos(S, k + 1)⟩. Then apply the inverse of step 3 and step 2. This resets the
+ancilla registers containing |⌊log2(v −vk)⌋+ 1⟩and |v −vk⟩, respectively. Finally apply the inverse of step 1,
+but replacing Extract−1
+k
+with Extract−1
+k+1. This resets the ancilla register containing vk and thus all remaining
+ancillas.
+Note that in the last step, the changes from U −1
+1,k to U −1
+1,k+1 and Extract−1
+k
+to Extract−1
+k+1, respectively, are necessary
+because after step 5, the set register contains a set of size k + 1 and not k.
+
+--- PAGE 13 ---
+13
+Proof of Lemma 5. We introduce the following ancilla registers: two counters from 1 to k1 and k2, respectively, called
+the ﬁrst and second j-counter, respectively, two registers of O(log n) bits called the ﬁrst and second candidate registers,
+respectively, K trits called comparison trits and O(K log(n/K) + K) bits to temporarily store |Enc S1 ∪S2⟩.
+As explained above, the basic idea is to simply extract the elements of S1, S2 corresponding to the current values
+of the j-counters, then add the smaller of those element to the output set, and increase the corresponding j-counter.
+Additional care however has to be taken to ensure that the algorithm still runs correctly when all elements of one
+of the sets have been added. As such, the algorithm is as follows. Sequentially, for each j = 0, . . . , K −1, do the
+following:
+1. For b = 1, 2 in turn, run controlled-Extractkb on |Enc Sb⟩, the bth j-counter and the bth candidate register, where
+the operation is controlled on the (3 −b)th j-counter not being in j −k1. Note that since the sum of the two
+j-counters is always equal j at all stages, the latter condition is equivalent to all elements of Sb having already
+been added.
+2. For b = 1, 2 in turn, add n + 1 to the bth candidate register, controlled on the (3 −b)th j-counter being in j −k1.
+This ensures that when all elements of one of the sets have already been added, the value in the candidate
+register corresponding to the other set is always smaller.
+3. We compare the values of the two candidate registers and determine the smaller one. To do that, note that it is
+easy to eﬃciently and reversibly implement the minimum ﬁnding operation Min |v1⟩|v2⟩|0⟩= |v1⟩|v2⟩|m(v1, v2)⟩,
+where
+m(v1, v2) =
+
+
+
+
+
+1
+v1 < v2
+2
+v2 < v1
+0
+v1 = v2,
+(23)
+using only O(log log n)) ancilla bits. We use the jth comparison trit as the third register when calling Min.
+4. For b = 1, 2 in turn, we call controlled-Appendj on the bth candidate register and the temporary set register,
+controlled on the jth comparison trit being b.
+5. We apply the inverse of the operations in steps 1-2. This resets both candidate registers to 0.
+6. For b = 1, 2 in turn, we add 1 to the bth j-counter controlled on the jth comparison trit being in b.
+After doing this for j = 0, . . . , K −1, we copy the state of the temporary set register onto the output register and
+then apply the inverse of the entire circuit up to that point. This resets the comparison trits and both j-counters.
+We now describe how to implement Mergei.
+The ﬁrst step is to convert vi into Enc{vi} using Append0. We then apply a sequence of merge operations of sets
+that follows the pattern of a binary addition: suppose we expand i −1 in binary and add 1 to it using the standard
+addition procedure. Then, every carry bit corresponds to merging two sets. More formally, let g ≥0 be the largest
+integer such that 2g divides i (g speciﬁes the the ﬁrst non-zero position in the binary expansion of i from the least
+signiﬁcant bit position). Then, the sequence of merge operations is as follows. For l = 0, . . . , g −1, we merge the sets
+{vi−2l+1+1, . . . , vi−2l} and {vi−2l+1, . . . , vi}.
+Each merge of two sets S1 = {vi−2l+1+1, . . . , vi−2l}, S2 = {vi−2l+1, . . . , vi} has two parts. First, we use Lemma 5
+to compute |Enc S1 ∪S2⟩. Second, we uncompute |S1⟩|S2⟩by running the inverse of the circuit from the end of the
+merge phase for i −2l+1. Note that since S1,2 always contain successive variables up to vi, this is possible.
+We illustrate this procedure for i = 20. Note that the binary expansion of i −1 is 19 = 16 + 2 + 1, so V19,1 =
+{v1, . . . , v16}, V19,2 = {v17, v18}, V19,3 = {v19}. Our aim is to go from
+|EﬀEnc V19⟩|Enc{v20}⟩= |Enc{v1, . . . , v16}⟩|Enc{v17, v18}⟩|Enc{v19}⟩|Enc{v20}⟩
+(24)
+to
+|Enc{v1, . . . , v16}⟩|Enc{v17, v18, v19, v20}⟩= |EﬀEnc V20⟩.
+(25)
+Note that reversibility is preserved since the operation will also involve the |⃗s⟩register. First, we call Union1,1 to
+compute
+Union1,1 |Enc{v19}⟩|Enc{v20}⟩|0⟩= |Enc{v19}⟩|Enc{v20}⟩|Enc{v19, v20}⟩.
+(26)
+
+--- PAGE 14 ---
+14
+We then uncompute |Enc{v19}⟩|Enc{v20}⟩by running the inverse of the part of the circuit from the end of
+merge phase of i = 18. Indeed, that part of the computation mapped |Enc{v1, . . . , v16}⟩|Enc{v17, v18}⟩|0⟩|0⟩to
+|Enc{v1, . . . , v16}⟩|Enc{v17, v18}⟩|Enc{v19}⟩|Enc{v20}⟩. Thus, running the inverse of this part of the circuits results
+in |Enc{v1, . . . , v16}⟩|Enc{v17, v18}⟩|Enc{v19, v20}⟩. Next, we call Union2,2, which produces
+Union2,2 |Enc{v17, v18}⟩|Enc{v19, v20}⟩|0⟩= |Enc{v17, v18}⟩|Enc{v19, v20}⟩|Enc{v17, v18, v19, v20}⟩.
+(27)
+We then uncompute |Enc{v17, v18}⟩|Enc{v19, v20}⟩by running the inverse of the part of the circuit from the end of
+the merge phase for i = 16. This results in
+|Enc{v1, . . . , v16}⟩|Enc{v17, v18, v19, v20}⟩,
+(28)
+which is the desired result.
+What remains to be seen is the runtime scaling of Mergei.
+We show now that the runtime of each merge
+operation (comprising calculating the union of two sets and uncomputing these sets) scales polynomially with
+the number of elements involved.
+To see this, we ﬁrst show that the runtime Ml of the operation mapping
+|EﬀEnc Vi−2l⟩|0⟩to |EﬀEnc Vi−2l⟩|Enc{vi−2l+1, . . . , vi}⟩for any i is bounded by Ml = O∗(4l), where we as-
+sume that |EﬀEnc Vi−2l⟩has no sets of 2l elements or less.
+This can be seen by induction.
+The claim is triv-
+ial for l = 0.
+Suppose now that this is true for any i and any l′ < l.
+Then, the operation that maps
+|EﬀEnc Vi−2l+1⟩|0⟩to |EﬀEnc Vi−2l+1⟩|Enc{vi−2l+1+1, . . . , vi}⟩comprises two parts. First, we map |EﬀEnc Vi−2l+1⟩|0⟩
+to |EﬀEnc Vi−2l+1⟩|Enc{vi−2l+1+1, . . . , vi−2l}⟩= |EﬀEnc Vi−2l⟩. This operation takes runtime Ml. Next, we map
+|EﬀEnc Vi−2l⟩|0⟩to |EﬀEnc Vi−2l⟩|Enc{vi−2l+1, . . . , vi}⟩, which also takes runtime Ml. Next, we call Union2l,2l to
+compute
+Union2l,2l |Enc{vi−2l+1+1, . . . , vi−2l}⟩|Enc{vi−2l+1, . . . , vi}⟩|0⟩=
+|Enc{vi−2l+1+1, . . . , vi−2l}⟩|Enc{vi−2l+1, . . . , vi}⟩|Enc{vi−2l+1+1, . . . , vi}⟩.
+(29)
+The runtime of this call can be bounded by a polynomial p(n) that is independent of l or i. Finally, to uncompute
+|Enc{vi−2l+1+1, . . . , vi−2l}⟩|Enc{vi−2l+1, . . . , vi}⟩, we apply of the inverse of the two operations before the call to the
+union, each taking runtime Ml. This implies Ml+1 ≤4Ml + p(n), which clearly gives Ml = O∗(4l), as claimed. In
+particular, this implies that merging {vi−2l+1+1, . . . , vi−2l} and {vi−2l+1, . . . , vi}, comprising of ﬁrst calculating their
+union and then uncomputing the original sets, takes runtime at most O∗(4l).
+Since i ≤r, we need to do this operation at most once for each l ∈{0, . . . , ⌈log2 r⌉}. Thus, the runtime of Mergei
+is at most
+O∗
+
+
+⌈log2 r⌉
+X
+l=0
+4l
+
+= O∗(poly(r)) = O(poly(n)).
+(30)
+This proves Proposition 1(ii).
+5.
+Quantum algorithm for PBS
+To summarize, we have proven the following
+Proposition 2 (Classical reversible circuit for QBall1). The map |⃗s⟩|0⟩7→|⃗s⟩|EﬀEnc V (⃗s)⟩can be implemented
+reversibly using O(r log(n/r) + r + log n) ancillas and O(poly(n)) gates.
+For completeness, we also show how to (classically) reversibly imeplement QBall2.
+Proposition 3 (Classical reversible circuit for QBall2). The map |EﬀEnc V (⃗s)⟩|0⟩7→|EﬀEnc V ⟩|F(x(V ))⟩can be
+implemented reversibly using O(log n) ancillas and O(poly(n)) gates.
+Proof. The algorithm is similar to Calculatei. Let Gj,i be deﬁned as in the implementation of Calculatei. We can
+assume that V = V (⃗s) has exactly r elements. The algorithm is as follows.
+1. Run G1,r+1 . . . GL,r+1 |EﬀEnc Vr⟩|0⟩|0⟩. This results in |EﬀEnc Vr⟩|L + 1 −jmin⟩|1 −F(x(Vi−1))⟩, where jmin
+is the smallest j such that Cj is unsatisﬁed under x(Vr) if such a clause exist, and L + 1 otherwise.
+2. Use a CNOT to copy the last bit onto the output bit, invert it, and apply the inverse of step 1 to reset the
+ancillas.
+
+--- PAGE 15 ---
+15
+As mentioned above, this can now easily be turned into a quantum algorithm for PBS.
+Theorem 1 (Quantum algorithm for PBS). There exists a quantum algorithm that solves r-PBS in runtime O∗(3r/2),
+using at most O(r log(n/r) + r + log n) qubits.
+Proof. First, quantize the classical reversible circuits of Proposition 2–3 by turning each (reversible) classical gate into
+its quantum equivalent. Then, We initialise the |⃗s⟩register into
+1
+√
+3r
+3
+X
+s1,...,sr=1
+|s1, . . . , sr⟩
+(31)
+and apply the (quantum) QBall1 followed by QBall2. The latter produces the state
+1
+√
+3r
+3
+X
+s1,...,sr=1
+|s1, . . . , sr⟩|V (⃗s)⟩|F(V (⃗s))⟩.
+(32)
+The last step is to run amplitude ampliﬁcation (or alternatively, ﬁxed point search [22]) to increase the overlap with 1
+on the last qubit. This uses at most O(
+√
+3r) repetitions of QBall1,2. The overall runtime of the quantum algorithm
+is therefore O∗(3r/2).
+B.
+Hybrid algorithm and runtime analysis
+In this section, we provide the details of the full quantum-enhanced algorithm to solve 3SAT using a small quantum
+device. In Section B 1 we provide the basic ideas and the broad overview. The subsequent sections provide all the
+details of the analysis for completeness. Speciﬁcally, in Section B 2, we ﬁrst look at general runtime properties of
+the space splitting algorithm which reduces 3SAT to PBS. In Section B 3, we summarise the classical algorithm to
+solve PBS from [10], which is more eﬃcient than PromiseBall. In Section B 4, we show how that algorithm can
+be quantum enhanced using QBall and derive it’s runtime. The full runtime to solve 3SAT is ﬁnally derived in
+Section B 5.
+1.
+Key ideas on the hybrid algorithm
+As clariﬁed in the main text, the results of [9] have shown that an algorithmic speed-up for the Promise Ball problem
+can lead to a faster algorithm for SAT solving. This connection is given quantitatively with Eq. (33 ) in Section B 2
+below. Speciﬁcally, any algorithm which solves Promise Ball faster than the algorithm of Sch¨oning (recall, Sc¨oning
+sampling can equivalently be used to solve Promise Ball) will also outperform Sch¨oning’s algorithm on the overarching
+SAT problem itself. Thus the focus of our approach is in providing speed-ups for the Promise Ball problem.
+In the previous section of this Supplemental Materials, we have provided the details of the quantum algorithm
+which space-eﬃciently solves the Promise Ball problem, provided suﬃciently many qubits are available. However, in
+the space-restricted scenario, we have to resort to other methods. Speciﬁcally, we focus on a more advanced algorithm,
+a de-randomization of the algorithm of Sch¨oning, for classical Promise Ball solving provided in [10]. This algorithm
+has two features critical for our purposes. First, even without quantum enhancements, this algorithm is (essentially)
+as fast as the original algorithm of Sch¨oning. This ensures that no thresholds will emerge, relative to the algorithm of
+Sch¨oning, as any speed-up will imply beating the original Sch¨oning run-time [23]. Second, it is a divide-and-conquer
+algorithm: it works by calling itself on an instance smaller relative to the all the important parameters. This is in
+general a non-trivial demand: the Promise Ball problem comes with at least two relevant parameters: radius r and
+the number of variables n. In terms of classical time-complexity, the run-time of the algorithm for Promise Ball is
+exponential only with respect to r, and not n [24], so recursing over r makes sense in the classical regime. However,
+since we are dealing with a (very) limited-size machine, reducing the instance size for Promise Ball only relative to the
+radius r would not in general suﬃce. One would still seemingly need to represent the entire formula on the quantum
+device, which is impossible since we assume we have (signiﬁcantly) fewer qubits than n. Luckily, we have shown that
+we do not need to carry the representation of the formula as input. This is critical for the standard hybrid approach,
+where the quantum routine is invoked when the instance is small enough, to be applicable.
+A ﬁnal contribution of this Section is the overall run-time analysis, provided in Sections B 4 and B 5. The key
+technical subtleties of this analysis are two-fold. First, a quantum machine which can handle Promise Ball over n
+
+--- PAGE 16 ---
+16
+variables up to radius r requires somewhat more than r (qu)bits. On the other hand, the expressions quantifying run-
+time incorporate the quantities related to the radius r that can be handled. This implies that any expression which
+quantiﬁes the total run-time relative to a size of the quantum device must include the explicit functional relationship
+between r, n and the number of qubits we need to solve Promise Ball with parameters (n, r) on a quantum computer.
+The second issue has to do with details of the faster algorithm in [10], where the recursive calls reduce the instance
+sizes with respect to non-unit steps of ∆> 1, where ∆inﬂuences the eﬃciency of the overall algorithm. Due to this,
+the precise analysis of the achieved speed-up via the standard hybrid approach is slightly more involved than for the
+basic, slower, Promise Ball algorithm presented in the main text. These technical points are elaborated in detail in
+section B 4.
+2.
+runtime properties of the algorithm of [9]
+In [9], it was shown that using the space splitting algorithm (which reduces 3SAT to PBS), 3SAT over n variables
+can be solved in time
+T (n) = qd(n)(23n/d+2(1−h(ρ))n)
+|
+{z
+}
+Cover Set preparation
++qd(n)2(1−h(ρ))n
+|
+{z
+}
+Cover Set size
+× T2(n, ρ)
+| {z }
+PBS cost
+,
+(33)
+where ρ (the fraction specifying the radius of the balls via r = ρn) and d are parameters which can be optimized, qd
+is a polynomial depending on d, h(ρ) = −(ρ log2(ρ) + (1 −ρ) log2(1 −ρ)) is the binary entropy function, and T2(n, ρ)
+is the runtime of the algorithm used to solve PBS with n variables and radius r = ρn.
+Sch¨oning’s algorithm can also be understood as a PBS solver. It can be shown that Sch¨oning sampling, starting
+from a center x, which is at Hamming distance r from a satisfying assignment, produces a satisfying assignment with
+probability at least 2−r [10]. By iteration, we obtain a PBS solver with runtime O∗(2r).
+Since d can be chosen large enough such that the dominating term of T (n) is 2(1−h(ρ))n × T2(n, ρ) [25] to quantify
+the improvement given a quantum-enhanced subroutine, it suﬃces to optimize this term with respect to ρ. If (the
+dominating part of) T2 is of the form T2(n, ρ) = O∗(2ζρn), the optimum is obtained by just minimizing 1 −h(ρ) + ζρ.
+Important values of ζ are ζ = log2 (3) and ζ = 1, corresponding to PBS solved by the deterministic algorithm of [9]
+and the basic (and also fast deterministic) Schoning’s algorithm, attaining optima at values ρ = 1/4, and ρ = 1/3,
+respectively. For completeness, the overall eﬀective values γ, for the overall algorithm using PBS routines as listed
+are approximately 0.58 and 0.41, where the latter matches the runtime of Sch¨oning’s (original) algorithm.
+3.
+Fast deterministic classical PBS solver
+In [10], an improved deterministic classical PBS solver was introduced, with run time in O∗((2 + ǫ)r), where ǫ
+depends on tunable protocol parameters. We call this algorithm FastBall. These parameters can be chosen such
+that ǫ is arbitrarily small or even decaying in r, as explained later. As mentioned, the key idea of this algorithm is
+to also split the space of choices, selecting which literal will be ﬂipped in the recursive call, into covering balls. For
+the convenience of the reader, here we present the details of FastBall, adapted from [10]. Let t ∈
+N be a parameter
+(inﬂuencing ǫ in the overall runtime), and C ⊆{1, . . . , k}t be a k−arry covering code with radius t/k (where k speciﬁes
+the clause upper bound in the kSAT problem to be solved). Since t and k are constants, the optimal code can be
+found in constant time. The key steps and performance aspects of the algorithm are given next abbreviated and
+adapted from [10].
+
+--- PAGE 17 ---
+17
+1: procedure FastBall(F, x, r, C)
+2:
+If x satisﬁes F
+3:
+return x
+4:
+else if r = 0
+5:
+return FALSE
+6:
+else
+7:
+G ←a maximal set of pairwise disjoint k-clauses of F unsatisﬁed by x
+8:
+if |G| < t,
+⊲Case 1
+9:
+for each assignment β of variables in G
+10:
+call PromiseBall(F|β, x, r),
+11:
+else if |G| ≥t
+⊲Case 2
+12:
+H ←{C1, . . . , Ct} ⊆G
+13:
+for each w ∈C
+14:
+call FastBall(F, x[H, w], r −∆, C)
+⊲∆: = t −2t/k
+15: end procedure
+The parameter ∆inﬂuences ǫ, as will be clariﬁed presently. The expression x[H, w] corresponds to a modiﬁed
+assignment, where the variables selected by the code-word w from the subset of variables occurring in the subset of
+clauses H have been ﬂipped.
+The objective of the algorithm is to achieve the run time of essentially O∗((k −1)r), which would be the runtime
+achieved by the randomized algorithm of Sch¨oning, used as a PBS solver. We now brieﬂy discuss the runtime of this
+algorithm.
+In the case the problem is such that the algorithm always encounters Case 1 in line 8, the authors in [10] show
+that each F|β has no clauses of size larger than k −1. In this case, Proposition 7 in [10] shows that PromiseBall can
+solve the problem in O∗((k −1)r), yielding the overall runtime is O∗(2kt(k −1)r). Since 2kt is a constant, this is
+O∗((k −1)r), achieving the objective.
+The more complex case involves occurrences of Case 2 (in line 11). Here, recurrence calls occur, which may encounter
+Case 1 deeper in the tree, or not. The slowest case occurs when we remain in Case 2 throughout recurrence calls.
+If we set ∆= t −2t/k, it was shown in [10] that the runtime of FastBall, which, up to polynomial factors, is the
+number of leaves in the recursion tree, is O∗ (t2(k −1)∆)r/∆
+= O∗ (t2/∆(k −1))r
+. Since t2/∆goes to 1 as t grows,
+for any ǫ > 0 we can choose t = t(ǫ) such that (t2/∆(k −1))r ≤(k −1 + ǫ)r, which is the main result. Note that t can
+also be chosen to be a very slowly growing function of n, t = logk log2(n), which guarantees that the runtime of the
+algorithm, intuitively, approaches the expression of the form O∗((k −1)r) as n grows (see [26]).
+4.
+Quantum speedup of FastBall with a small quantum device
+The algorithm FastBall recursively calls itself on smaller instances, where the value of r is reduced in steps of ∆
+(where ∆= t/3 for 3SAT), and ∆is a function which depends on ǫ alone – hence if ǫ is ﬁxed, ∆is a constant.
+At each recurrence step, the algorithm ﬁrst checks whether a criterion which would ensure that PromiseBall
+would terminate in O∗((k −1)r) (O∗(2r) for 3SAT) steps, is satisﬁed (Case 1). In that case, the algorithm runs
+PromiseBall, the quantum enhancement of which was investigated in the main body of the paper. The faster
+runtime in that case is ensured by the property that the formula in question actually has at most (k −1) (2 for 3SAT)
+variables per unsatisﬁed clause. In that case, a quantum enhancement is achieved by the standard hybrid approach,
+where QBall is run as soon as the instance becomes small enough. Note that since the relevant formula has only
+k −1 variables per clause, QBall can be adapted in this case to yield a runtime of O∗((k −1)r/2) if r is small enough.
+Then, we obtain an interpolated time between Sch¨oning-level performance, and something quadratically faster. We
+do not need to delve on further details, since this is not the worst-case performance of the algorithm, which occurs
+if Case 2 persists. We cannot beforehand know at which step, if at all, the criteria for Case 1 will be satisﬁed, so we
+call QBall in Case 2 as well, as soon as the recursive step in line 14 calls an instance with suﬃciently small r. This
+QBall-enhanced version of FastBall is a hybrid algorithm which we call QFastBall.
+We now estimate the runtime of QFastBall. Recall that we assume a quantum computer with M = cn qubits,
+where c ∈(0, 1) is an arbitrary constant. To obtain the runtime of QFastBall, we ﬁrst determine the largest value
+of ˜r = ˜r(c, n) such that such a quantum computer can solve PBS of radius ˜r.
+Recall that QBall requires O(r log(n/r) + r + log n) qubits to solve PBS with n variables and radius r. Suppose
+the exact scaling is of this number of qubits is Ar ln(n/r)+Br +O(log n) for constants A, B > 0 [27]. Let β(c) > 0 be
+such that Aβ(c) ln(1/β(c))+Bβ(c) = c. Then, the quantum device can solve PBS for all r ≤˜r = β(c)n−O(log n). For
+completeness, it can be shown that β(c) = −c/(AW(−ce−B/A/A)), where W is the principal branch of the Lambert
+
+--- PAGE 18 ---
+18
+W function (note that W(x) < 0 for x ∈(−1/e, 0)). We will not need the precise form of β(c), it is easy to see,
+however, that for small values of c, β(c) = Θ(c/ log(1/c)).
+Suppose now that QFastBall calls QBall with radius rcall. Clearly, ˜r ≥rcall > ˜r −∆for each call to QBall.
+Note that the value of rcall could be diﬀerent for each call to QBall depending on whether we call it deep in
+PromiseBall (Case 1) or in Case 2. The number of calls to QBall is however at most O((2t2/∆)r−(˜r−∆)), since the
+number of leaves in the recursion tree, which has depth at most r −(˜r −∆), before QBall is called, is bounded by
+this quantity. The runtime of QFastBall is therefore given by product of this quantity and the runtime O∗(3rcall/2)
+of QBall, i.e., at most O∗((2t2/∆)r−(˜r−∆) · 3˜r/2) = O∗((2t2/∆)r−˜r · 3˜r/2), since ∆and t are constants. Plugging in
+the expression for ˜r and noting that the O(log n) contribution is absorbed by the O∗notation, we obtain a runtime of
+T2,QFastBall(ρ, n) = O∗
+
+(2 + ǫ)ρn
+ √
+3
+2 + ǫ
+!β(c)n
+
+(34)
+= O∗
+(2 + ǫ)ρn2−f(c)n
+(35)
+for solving PBS with n variables and radius r using QFastBall with a quantum device of M = cn qubits, where as
+before ǫ can be made arbitrarily small, and f(c) = (1 −log2
+√
+3)β(c) ≈0.21β(c), where in the last step, we bounded
+√
+3/(2 + ǫ) <
+√
+3/2.
+5.
+Total runtime for 3SAT
+We now estimate the runtime of the entire algorithm for solving 3SAT using the space splitting algorithm in
+combination with QFastBall. Substituting (35) into (33), and recalling that we can choose d = O(1) such that the
+second term in (33) is the dominating term of T (n), we obtain
+T (n) = O∗
+2(1−h(ρ))n(2 + ǫ)ρn2−f(c)n
+.
+(36)
+Note that the last factor in (36), induced by the quantum enhancement, is independent of ρ, and that the ﬁrst two
+factors together constitute the runtime of the space splitting algorithm using just FastBall. The optimal value of
+ρ for (36) is therefore the same as the optimal value of ρ for just using FastBall, which (up to corrections in ǫ) is
+ρ = 1/3. Using this value, we obtain a total runtime of
+T (n) = O∗
+2(γ0+ε−f(c))n
+,
+(37)
+where ε = log2(1 + ǫ/2)/3 can be made arbitrarily small, as stated in the main body of the paper.
