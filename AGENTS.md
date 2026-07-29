@@ -99,3 +99,43 @@ Fall back to Grep/Glob/Read **only** when the graph doesn't cover what you need.
 2. Use `detect_changes` for code review.
 3. Use `get_affected_flows` to understand impact.
 4. Use `query_graph` pattern="tests_for" to check coverage.
+## Task-Specific Addendum: Reversible LP-Bound Oracle (h)
+
+### Scope
+Implement a fixed-precision, gate-model reversible circuit for the LP
+relaxation bound h (Definition/Section IV-B "Bounding oracle"), which
+was previously NOT synthesized. Pair this with a formal correctness
+lemma bounding the precision loss.
+
+### Non-negotiable process
+1. Before writing any circuit: locate and cite REAL primary sources for
+   reversible division/multiplication (e.g. search for Cuccaro adder,
+   Draper QFT adder, Thapliyal/Khosropour reversible divider, Vedral-
+   Barenco-Ekert adder — do not assume these exist as I've named them;
+   verify each via actual search and quote exact title/authors/venue/year).
+   If a citation cannot be verified, output `UNRESOLVED: citation` and
+   stop — do not invent a plausible-sounding reference.
+2. Derive the precision lemma BEFORE writing simulation code that
+   assumes it's true. State it as: "for k-bit fixed-point truncation of
+   item efficiencies, the LP bound error is bounded by ε(k) = ___,
+   and Theorem 1 correctness is preserved iff ε(k) < (ZLB gap floor)."
+   Show the derivation step by step. Do not assert the bound without
+   deriving it from the truncation error propagation.
+3. Attempt a counterexample to the lemma before accepting it (per
+   AGENTS.md "Mathematical Claims" rule). If a counterexample is found,
+   report it and revise — do not discard silently.
+4. Implement circuit → verify by exhaustive statevector simulation
+   against the EXACT (non-truncated) LP bound on the existing 700-instance
+   benchmark set. Report mismatch count explicitly, even if it is 0.
+   Do not report "verified" without the mismatch count in the same line.
+5. Classify every reported number per the existing MEASURED/DERIVED/
+   SCHEDULED/SIMULATED/HARDCODED taxonomy.
+6. Every claim of the form "circuit correctly implements h" must specify
+   which instances/seeds/precision level it was checked against. Global
+   claims ("h is correct") without a tested set attached are forbidden.
+
+### Mandatory logging (see /research_log/ below)
+Nothing gets discarded. Every derivation, failed attempt, rejected
+citation, and precision/error tradeoff explored gets logged, even
+dead ends — especially dead ends, since they prevent redoing failed
+paths later.
