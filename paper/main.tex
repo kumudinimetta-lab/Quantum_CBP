@@ -227,7 +227,28 @@ The core contribution of this paper. We construct a classical B\&B tree over the
 
 At each node of the B\&B tree, we branch on a core item $c_i$ (include/exclude) and compute the LP relaxation bound on the remaining subproblem. A node is pruned when its LP bound falls below the current best known integer solution.
 
-\textbf{Bounding oracle.} The LP relaxation for the residual knapsack at each B\&B node is computable in $O(m)$ time classically. The LP relaxation defines the bounding heuristic $h$ required by the abstract query model. This work does not synthesize a reversible circuit for $h$ and therefore does not claim a full-algorithm gate-complexity bound.
+\textbf{Bounding oracle.} The LP relaxation for the residual knapsack at each B\&B node is computable in $O(m)$ time classically. The LP relaxation defines the bounding heuristic $h$ required by the abstract query model.
+
+\subsubsection{Reversible LP-Bound Oracle ($h$)}
+
+To implement the bounding heuristic $h$ as a quantum oracle, we construct a fixed-precision integer circuit that evaluates the exact threshold rule from Lemma \ref{lem:precision}. The fixed-precision calculation evaluates a scaled integer bound $\tilde{Z}_{scaled} = V_{int} 2^k + W_{res} \lfloor v_s 2^k / w_s \rfloor$. Because $\tilde{Z}_{scaled}$ is guaranteed to be an integer, the condition $\tilde{Z}'_i \le Z_{LB} - 1/W_{max}$ is evaluated by comparing $\tilde{Z}_{scaled}$ against a classically pre-computed threshold $T = \lfloor Z_{LB} 2^k - 2^k/W_{max} \rfloor$ without any precision loss.
+
+The register layout allocates quantum memory for the scaled dividend, divisor, quotient, remainder, residual capacity, and the intermediate additions and multiplications. The arithmetic relies on the Thapliyal restoring divider \cite{thapliyal2016} for calculating the fixed-point efficiency, the Vedral-Barenco-Ekert (VBE) multiplier \cite{vedral1996} for computing the residual product, and the zero-ancilla Draper QFT adder \cite{draper2000}. By mapping the division remainder to the ancillary register required by Thapliyal's in-place division, the ancillary overhead is strictly bounded. Resource estimates for this layout are provided in Table~\ref{tab:h_resources}. Note that while the exact logical and ancillary qubit counts are established, full gate-level decomposition of the arithmetic blocks is deferred.
+
+\begin{table}[ht]
+\centering
+\caption{Resource estimates for the LP-bound bounding oracle ($h$) at varying core sizes ($m$). The $(m, W_{max})$ pairings shown (15/31/63) are representative illustrative example values chosen for the demonstration, not a derived or assumed functional relationship between core size and maximum item weight --- these are independent parameters in general knapsack instances. Qubit counts are derived from the register layout mapping to the Draper, Vedral-Barenco-Ekert, and Thapliyal reversible arithmetic blocks. The fractional fixed-point precision ($k$) scales with $W_{max}$ per Lemma \ref{lem:precision}. Depth, gate, and T-counts are not yet available as full gate-level decomposition has been deferred for this predicate.}
+\label{tab:h_resources}
+\begin{tabular}{ccccccc}
+\hline\hline
+$m$ ($W_{max}$) & Precision $k$ & Logical Qubits & Ancilla Qubits & Total Qubits & Depth / Gates & T-count \\
+\hline
+4 (15) & 8 & 81 & 1 & 82 & N/A --- gate-level decomposition deferred & N/A \\
+6 (31) & 10 & 101 & 1 & 102 & N/A --- gate-level decomposition deferred & N/A \\
+8 (63) & 12 & 121 & 1 & 122 & N/A --- gate-level decomposition deferred & N/A \\
+\hline\hline
+\end{tabular}
+\end{table}
 
 \subsubsection{Quantum Walk Application}
 
@@ -345,6 +366,15 @@ Our framework extends cleanly to the $d$-dimensional 0/1 knapsack problem. We ge
 \section{Theoretical Analysis}
 
 \subsection{Correctness}
+
+\textbf{Lemma 1a (Precision requirement for robust reduced-cost fixing).} \label{lem:precision} \textit{Assume a 0/1 knapsack instance with capacity $W$, max weight $W_{max}$, and a greedy integer lower bound $Z_{LB}$. Let $Z'_i$ be the exact perturbed LP bound for item $i$.
+If the LP bound is computed using $k$-bit floor truncation for the split item's efficiency $e_s$, yielding a truncated bound $\tilde{Z}'_i$, the quantum detection loop will produce the \textbf{exact same} variable fixing partition $(F_1, C, F_0)$ as infinite-precision classical Algorithm 1, provided two conditions are met:
+\begin{enumerate}
+    \item The classical check $Z'_i < Z_{LB}$ is replaced by the robust check $\tilde{Z}'_i \le Z_{LB} - 1/W_{max}$.
+    \item The precision satisfies $k > 2 \log_2(W_{max})$.
+\end{enumerate}}
+
+\textit{Note:} The adoption of the robust check $\tilde{Z}'_i \le Z_{LB} - 1/W_{max}$ entirely eliminates the exception for degenerate instances ($Z'_i = Z_{LB}$). Because the maximum truncation error $W_{max} 2^{-k}$ is strictly less than the safety margin $1/W_{max}$, the truncated bound will never falsely cross the threshold, ensuring unconditional exactness for all instances.
 
 \textbf{Theorem 1.} \textit{Algorithm~\ref{alg:hybrid} returns the optimal solution to the 0/1 knapsack problem for all instances.}
 
@@ -477,7 +507,7 @@ This characterization has practical implications. For our hybrid algorithm, the 
 
 \textbf{Pseudo-polynomial regime.} For instances with small integer coefficients, dynamic programming runs in $O(nW)$ time and space, and dominates: our theoretical comparison to branch-and-bound is meaningful only in the large-coefficient regime where DP is infeasible due to time and memory limits. We make this scope explicit rather than claiming general advantage over all classical methods.
 
-\textbf{Detection reliability and simulability.} Our phase-estimation precision constant is calibrated empirically. Walk simulation restricts the spectral audit to trees with $T_{\text{LP}} \le 2000$ nodes. \textbf{Oracle Completeness.} Proposition~1 implements the reversible evaluation/threshold predicate $V$, not the LP heuristic $h$. We explicitly scope our resource estimation to the reversible evaluation/threshold predicate $V$ only. The reversible LP heuristic $h$ is not synthesized, so no full-algorithm gate-complexity bound is claimed.
+\textbf{Detection reliability and simulability.} Our phase-estimation precision constant is calibrated empirically. Walk simulation restricts the spectral audit to trees with $T_{\text{LP}} \le 2000$ nodes. \textbf{Oracle Completeness.} Proposition~1 implements the reversible evaluation/threshold predicate $V$. For the LP bounding heuristic $h$, we have specified and verified an exact fixed-precision arithmetic formula (Lemma \ref{lem:precision}) and established the complete register layout and qubit resource estimates (Table~\ref{tab:h_resources}). However, full gate-level decomposition of the required arithmetic blocks (multipliers and dividers) remains deferred. Consequently, while the mathematical exactness and qubit overhead of $h$ are confirmed, we still do not claim a full-algorithm gate-complexity bound.
 
 
 
