@@ -505,27 +505,6 @@ This characterization has practical implications. For our hybrid algorithm, the 
 
 \textbf{Small-$n$ overhead.} At $n \leq 24$, the Montanaro $\text{poly}(d)$ overhead can make the quantum algorithm slower than classical B\&B for easy instances. The quantum query reduction is asymptotic and becomes pronounced as $n$ grows and the LP-pruned tree becomes sufficiently large.
 
-\subsubsection{Resource-Estimation Crossover Analysis}
-This analysis compares the quantum T-gate cost of the composed query bound against the classical per-node operation cost to derive the crossover threshold. This is strictly an operation-count comparison, not a wall-clock time estimate. Table~\ref{tab:crossover} details the combined per-query T-cost ($C_Q$), aggregating the resources for predicate $V$ (Table~\ref{tab:oracle}) and the LP heuristic $h$ (Table~\ref{tab:h_resources}). We explicitly note that these counts constitute a partial lower bound because the cited source for the VBE multiplier does not supply an exact gate-count formula~\cite{vedral1996}.
-
-\begin{table}[htbp]
-\caption{Per-Query T-Cost Estimates ($C_Q$) and Required Crossover Thresholds ($T_{\max}$)}
-\label{tab:crossover}
-\begin{center}
-\begin{tabular}{lrr}
-\toprule
-\textbf{Core Size ($m$)} & \textbf{$C_Q$ (Partial Lower Bound)} & \textbf{Required $T_{\max}$ Crossover} \\
-\midrule
-4 & $\ge 196{,}468$ & $\ge 3.95 \times 10^{13}$ \\
-6 & $\ge 240{,}986$ & $\ge 3.49 \times 10^{14}$ \\
-8 & $\ge 269{,}760$ & $\ge 1.50 \times 10^{15}$ \\
-\bottomrule
-\end{tabular}
-\end{center}
-\end{table}
-
-Setting the classical cost ($T_{\max}$) equal to the quantum cost gives the crossover condition: $T_{\max} \ge (C_Q \cdot m \log_2 m \cdot \log_2 V_{\max})^2$. An adversarial comparison against the empirical data reveals that none of the tested instances approach this required crossover threshold by many orders of magnitude; the maximum observed tree sizes ($T_{\text{LP}} \approx 70$ for uncorrelated and $T_{\text{LP}} \approx 3{,}079$ for strongly correlated instances at $n=24$) are ten to eleven orders of magnitude too small. Because the T-cost estimate is a strict lower bound, the true crossover point can only be larger, strengthening the conclusion that the overhead of reversible arithmetic overwhelms the quantum query reduction for the evaluated regime.
-
 \textbf{Pseudo-polynomial regime.} For instances with small integer coefficients, dynamic programming runs in $O(nW)$ time and space, and dominates: our theoretical comparison to branch-and-bound is meaningful only in the large-coefficient regime where DP is infeasible due to time and memory limits. We make this scope explicit rather than claiming general advantage over all classical methods.
 
 \textbf{Detection reliability and simulability.} Our phase-estimation precision constant is calibrated empirically. Walk simulation restricts the spectral audit to trees with $T_{\text{LP}} \le 2000$ nodes. \textbf{Oracle Completeness.} Proposition~1 implements the reversible evaluation/threshold predicate $V$. For the LP bounding heuristic $h$, we have specified and verified an exact fixed-precision arithmetic formula (Lemma \ref{lem:precision}) and established the complete register layout and qubit resource estimates (Table~\ref{tab:h_resources}). However, full gate-level decomposition of the required arithmetic blocks (multipliers and dividers) remains deferred. Consequently, while the mathematical exactness and qubit overhead of $h$ are confirmed, we still do not claim a full-algorithm gate-complexity bound.
