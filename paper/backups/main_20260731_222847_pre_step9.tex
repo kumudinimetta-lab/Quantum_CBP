@@ -376,7 +376,7 @@ If the LP bound is computed using $k$-bit floor truncation for the split item's 
 
 \textit{Note:} The adoption of the robust check $\tilde{Z}'_i \le Z_{LB} - 1/W_{max}$ entirely eliminates the exception for degenerate instances ($Z'_i = Z_{LB}$). Because the maximum truncation error $W_{max} 2^{-k}$ is strictly less than the safety margin $1/W_{max}$, the truncated bound will never falsely cross the threshold, ensuring unconditional exactness for all instances.
 
-\textbf{Theorem 1.} \textit{Algorithm~\ref{alg:hybrid} returns the optimal solution to the 0/1 knapsack problem with probability at least $1 - 2^{-r}$ after $r$ independent repetitions of the quantum detection phase, for all instances.}
+\textbf{Theorem 1.} \textit{Algorithm~\ref{alg:hybrid} returns the optimal solution to the 0/1 knapsack problem for all instances.}
 
 \textit{Proof.} We show that no optimal item is permanently excluded by the filtering phase.
 
