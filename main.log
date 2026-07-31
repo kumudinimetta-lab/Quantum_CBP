@@ -1,9 +1,9 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2026.5.1)  31 JUL 2026 22:32
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2026.5.1)  29 JUL 2026 01:34
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**./main.tex
-(main.tex
+**./paper/main.tex
+(paper/main.tex
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-04>
 (C:\Users\Shiva\AppData\Local\Programs\MiKTeX\tex/latex/ieeetran\IEEEtran.cls
@@ -368,35 +368,141 @@ Underfull \hbox (badness 6995) in paragraph at lines 29--29
 rob-lem,
  []
 
+
+LaTeX Warning: Citation `ref2' on page 1 undefined on input line 36.
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
+
+LaTeX Warning: Citation `ref6' on page 1 undefined on input line 38.
+
+
+LaTeX Warning: Citation `ref9' on page 1 undefined on input line 38.
+
+
+LaTeX Warning: Citation `ref13' on page 1 undefined on input line 40.
+
+
+LaTeX Warning: Citation `ref14' on page 1 undefined on input line 40.
+
+
+LaTeX Warning: Citation `bonnetain2020improved' on page 1 undefined on input li
+ne 40.
+
+
+LaTeX Warning: Citation `ref15' on page 1 undefined on input line 40.
+
 [1{C:/Users/Shiva/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/Sh
 iva/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}
 
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 71--72
-[]\OT1/ptm/m/it/10 Implementable quan-tum knap-sack and hy-brids. \OT1/ptm/m/n/
-10 A
- []
+
+LaTeX Warning: Citation `ref1' on page 2 undefined on input line 65.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 71--72
-\OT1/ptm/m/n/10 sec-ond line pri-or-i-tizes con-structibil-ity on gate-model
- []
+LaTeX Warning: Citation `ref2' on page 2 undefined on input line 65.
 
 
-Underfull \hbox (badness 1424) in paragraph at lines 71--72
-\OT1/ptm/m/n/10 hard-ware. Grover-based knap-sack solvers [[]], [[]] and
- []
+LaTeX Warning: Citation `ref3' on page 2 undefined on input line 65.
 
 
-Underfull \hbox (badness 1769) in paragraph at lines 71--72
-\OT1/ptm/m/n/10 Quantum-inspired meta-heuris-tics (ge-netic [[]], wolf-pack
- []
+LaTeX Warning: Citation `ref4' on page 2 undefined on input line 65.
 
 
-Underfull \hbox (badness 3536) in paragraph at lines 71--72
-\OT1/ptm/m/n/10 prov-able query re-duc-tion. The most rel-e-vant prov-able,
- []
+LaTeX Warning: Citation `ref5' on page 2 undefined on input line 65.
+
+
+LaTeX Warning: Citation `ref6' on page 2 undefined on input line 67.
+
+
+LaTeX Warning: Citation `ref8' on page 2 undefined on input line 67.
+
+
+LaTeX Warning: Citation `ref9' on page 2 undefined on input line 67.
+
+
+LaTeX Warning: Citation `ref10' on page 2 undefined on input line 67.
+
+
+LaTeX Warning: Citation `ref7' on page 2 undefined on input line 67.
+
+
+LaTeX Warning: Citation `ref25' on page 2 undefined on input line 67.
+
+
+LaTeX Warning: Citation `ref11' on page 2 undefined on input line 69.
+
+
+LaTeX Warning: Citation `ref12' on page 2 undefined on input line 69.
+
+
+LaTeX Warning: Citation `ref13' on page 2 undefined on input line 69.
+
+
+LaTeX Warning: Citation `ref14' on page 2 undefined on input line 69.
+
+
+LaTeX Warning: Citation `bonnetain2020improved' on page 2 undefined on input li
+ne 69.
+
+
+LaTeX Warning: Citation `ref15' on page 2 undefined on input line 69.
+
+
+LaTeX Warning: Citation `ref16' on page 2 undefined on input line 71.
+
+
+LaTeX Warning: Citation `ref19' on page 2 undefined on input line 71.
+
+
+LaTeX Warning: Citation `ref20' on page 2 undefined on input line 71.
+
+
+LaTeX Warning: Citation `ref21' on page 2 undefined on input line 71.
+
+
+LaTeX Warning: Citation `ref18' on page 2 undefined on input line 71.
+
+
+LaTeX Warning: Citation `ref26' on page 2 undefined on input line 71.
+
+
+LaTeX Warning: Citation `ref27' on page 2 undefined on input line 71.
+
+
+LaTeX Warning: Citation `ref17' on page 2 undefined on input line 71.
+
+
+LaTeX Warning: Citation `ref22' on page 2 undefined on input line 71.
+
+
+LaTeX Warning: Citation `ref23' on page 2 undefined on input line 71.
+
+
+LaTeX Warning: Citation `ref24' on page 2 undefined on input line 71.
+
+
+LaTeX Warning: Citation `ref18' on page 2 undefined on input line 73.
+
+
+LaTeX Warning: Citation `ref17' on page 2 undefined on input line 73.
+
+
+LaTeX Warning: Citation `bonnetain2020improved' on page 2 undefined on input li
+ne 73.
+
+
+LaTeX Warning: Citation `ref18' on page 2 undefined on input line 84.
+
+
+LaTeX Warning: Citation `ref17' on page 2 undefined on input line 84.
+
+
+LaTeX Warning: Citation `bonnetain2020improved' on page 2 undefined on input li
+ne 84.
 
 LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 8
 6.
@@ -408,9 +514,27 @@ Overfull \hbox (136.01279pt too wide) in paragraph at lines 81--100
  []
 
 [2]
+
+LaTeX Warning: Citation `ref1' on page 3 undefined on input line 121.
+
+
+LaTeX Warning: Citation `ref4' on page 3 undefined on input line 149.
+
+
+LaTeX Warning: Citation `ref9' on page 3 undefined on input line 153.
+
+
+LaTeX Warning: Citation `ref18' on page 3 undefined on input line 159.
+
+
+LaTeX Warning: Citation `ref4' on page 3 undefined on input line 172.
+
+
+LaTeX Warning: Citation `ref2' on page 3 undefined on input line 176.
+
 LaTeX Font Info:    Trying to load font information for OMS+ptm on input line 2
 02.
- (C:\Users\Shiva\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\omsptm.fd
+(C:\Users\Shiva\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\omsptm.fd
 File: omsptm.fd 
 )
 LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <10> not available
@@ -419,116 +543,169 @@ LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <10> not available
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[3]
-Overfull \hbox (207.33768pt too wide) in paragraph at lines 242--251
- [][] 
- []
 
-[4]
-Underfull \hbox (badness 2418) in paragraph at lines 279--280
+LaTeX Warning: Citation `ref18' on page 3 undefined on input line 224.
+
+[3]
+
+LaTeX Warning: Citation `ref18' on page 4 undefined on input line 235.
+
+
+Underfull \hbox (badness 2418) in paragraph at lines 259--260
 \OT1/ptm/m/n/10 quan-tum sub-rou-tines re-quire a con-structible or-a-cle that
  []
 
 
-Overfull \hbox (63.60062pt too wide) in paragraph at lines 288--299
+Overfull \hbox (63.60062pt too wide) in paragraph at lines 268--279
  [] 
  []
 
 
-Underfull \hbox (badness 3965) in paragraph at lines 328--329
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+Underfull \hbox (badness 3965) in paragraph at lines 308--309
 [] []\OT1/ptm/b/n/10 Phase 1: $\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 F[]; C; F[]\OT
 1/cmr/m/n/10 )\OML/cmm/m/it/10 ; W[]; V[] \OMS/cmsy/m/n/10  $ \OT1/ptm/m/sc/10 
 RC-Fix$\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 w; v; W\OT1/cmr/m/n/10 )$
  []
 
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[4]
+
+LaTeX Warning: Citation `ref18' on page 5 undefined on input line 365.
+
 [5]
-Overfull \hbox (58.42372pt too wide) in paragraph at lines 410--410
+
+LaTeX Warning: Citation `bonnetain2020improved' on page 6 undefined on input li
+ne 383.
+
+
+Overfull \hbox (79.57393pt too wide) in paragraph at lines 383--383
  [] 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 412--413
+Underfull \hbox (badness 10000) in paragraph at lines 385--386
 []\OT1/ptm/m/n/10 Our al-go-rithm achieves $\OML/cmm/m/it/10 O  []$
  []
 
 
-Underfull \hbox (badness 1810) in paragraph at lines 424--425
+LaTeX Warning: Citation `ref3' on page 6 undefined on input line 397.
+
+
+Underfull \hbox (badness 1810) in paragraph at lines 397--398
 []\OT1/ptm/m/n/10 Experiments used five stan-dard in-stance classes from
  []
 
+
+LaTeX Warning: File `figures/alpha_scaling.pdf' not found on input line 405.
+
+
+! Package pdftex.def Error: File `figures/alpha_scaling.pdf' not found: using d
+raft setting.
+
+See the pdftex.def package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.405 ...\columnwidth]{figures/alpha_scaling.pdf}}
+                                                  
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
 [6]
-Underfull \hbox (badness 7740) in paragraph at lines 438--439
-[]\OT1/ptm/b/n/10 Phase-Estimation Sep-a-ra-tion: \OT1/ptm/m/n/10 889/889 an-a-
-lyt-i-cal
+Underfull \hbox (badness 4013) in paragraph at lines 416--417
+\OT1/ptm/m/n/10 The re-main-ing 145 trees yield $\OML/cmm/m/it/10 w[] \OMS/cmsy
+/m/n/10 2 \OT1/cmr/m/n/10 [1\OML/cmm/m/it/10 =\OT1/cmr/m/n/10 2 \OMS/cmsy/m/n/1
+0 ^^@
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 438--439
-\OT1/ptm/m/n/10 de-tec-tion cri-te-rion agree-ment with known
+Underfull \hbox (badness 2495) in paragraph at lines 416--417
+\OT1/cmr/m/n/10 2[]\OML/cmm/m/it/10 ;  \OT1/cmr/m/n/10 1\OML/cmm/m/it/10 =\OT1/
+cmr/m/n/10 2)$\OT1/ptm/m/n/10 ---values in-dis-tin-guish-able from $\OT1/cmr/m/
+n/10 1\OML/cmm/m/it/10 =\OT1/cmr/m/n/10 2$ \OT1/ptm/m/n/10 un-
  []
 
 
-Underfull \hbox (badness 3449) in paragraph at lines 441--442
+Underfull \hbox (badness 3449) in paragraph at lines 420--421
 \OT1/ptm/m/n/10 ex-hibit strong dis-tri-bu-tional sep-a-ra-tion be-tween marked
 
  []
 
 
-Underfull \hbox (badness 1824) in paragraph at lines 441--442
+Underfull \hbox (badness 1824) in paragraph at lines 420--421
 \OT1/ptm/m/n/10 Mann-Whitney U test on the 889 com-pleted sim-u-lated
  []
 
 
-Underfull \hbox (badness 1558) in paragraph at lines 441--442
+Underfull \hbox (badness 1558) in paragraph at lines 420--421
 \OT1/ptm/m/n/10 trees ($\OML/cmm/m/it/10 T[] \OMS/cmsy/m/n/10 ^^T \OT1/cmr/m/n/
 10 2000$\OT1/ptm/m/n/10 ). The marked ac-cep-tance prob-a-bil-
  []
 
 
-Overfull \hbox (12.0pt too wide) in paragraph at lines 445--445
+LaTeX Warning: File `figures/spectral_histogram.pdf' not found on input line 42
+5.
+
+
+! Package pdftex.def Error: File `figures/spectral_histogram.pdf' not found: us
+ing draft setting.
+
+See the pdftex.def package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.425 ...mnwidth]{figures/spectral_histogram.pdf}}
+                                                  
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+Overfull \hbox (12.0pt too wide) in paragraph at lines 430--430
  [] 
  []
 
 [7]
-Overfull \hbox (46.34209pt too wide) in paragraph at lines 476--490
+Overfull \hbox (46.34209pt too wide) in paragraph at lines 461--475
  [] 
  []
 
 
-Overfull \hbox (19.51434pt too wide) in paragraph at lines 515--524
- [] 
- []
+LaTeX Warning: File `figures/hardware_results.pdf' not found on input line 479.
 
-[8]
-Underfull \hbox (badness 5592) in paragraph at lines 531--532
+
+
+! Package pdftex.def Error: File `figures/hardware_results.pdf' not found: usin
+g draft setting.
+
+See the pdftex.def package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.479 ...lumnwidth]{figures/hardware_results.pdf}}
+                                                  
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+LaTeX Warning: Citation `ref22' on page 8 undefined on input line 495.
+
+
+Underfull \hbox (badness 5592) in paragraph at lines 501--502
 []\OT1/ptm/b/n/10 Detection re-li-a-bil-ity and sim-u-la-bil-ity. \OT1/ptm/m/n/
 10 Our phase-
  []
 
-
-Underfull \hbox (badness 3601) in paragraph at lines 538--539
+[8]
+Underfull \hbox (badness 3601) in paragraph at lines 508--509
 \OT1/ptm/m/n/10 reduced-cost vari-able fix-ing with Mon-ta-naro's quan-tum
  []
 
-(main.bbl
-Underfull \hbox (badness 2478) in paragraph at lines 54--56
-[]\OT1/ptm/m/n/8 S. Jaques and A. G. Rat-tew, ``Qram: A sur-vey and cri-tique,'
-'
- []
-
-[9]
-Underfull \hbox (badness 1748) in paragraph at lines 164--167
-\OT1/ptm/m/n/8 branch-and-bound al-go-rithm for solv-ing in-te-ger lin-ear pro-
-grams,''
- []
-
-
-Underfull \hbox (badness 2027) in paragraph at lines 195--197
-[]\OT1/ptm/m/n/8 T. G. Draper, ``Ad-di-tion on a quan-tum com-puter,'' \OT1/ptm
-/m/it/8 arXiv:quant-
- []
-
-)
+No file main.bbl.
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -540,22 +717,24 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[10
-
-] (main.aux)
+[9] (main.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-04>
  ***********
+
+
+LaTeX Warning: There were undefined references.
+
  ) 
 Here is how much of TeX's memory you used:
- 4696 strings out of 474486
- 74252 string characters out of 5743756
- 1956542 words of memory out of 5000000
- 26896 multiletter control sequences out of 15000+600000
- 611183 words of font info for 147 fonts, out of 8000000 for 9000
+ 4736 strings out of 474486
+ 77178 string characters out of 5743756
+ 1959542 words of memory out of 5000000
+ 26939 multiletter control sequences out of 15000+600000
+ 608951 words of font info for 145 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 57i,14n,65p,2810b,596s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 57i,14n,65p,2932b,596s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/Shiva/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
 cmex10.pfb><C:/Users/Shiva/AppData/Local/Programs/MiKTeX/fonts/type1/public/ams
 fonts/cmextra/cmex8.pfb><C:/Users/Shiva/AppData/Local/Programs/MiKTeX/fonts/typ
@@ -589,9 +768,9 @@ va/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/Users/Shi
 va/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmbi8a.pfb><C:/Users/Sh
 iva/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/Sh
 iva/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on main.pdf (10 pages, 406677 bytes).
+Output written on main.pdf (9 pages, 394386 bytes).
 PDF statistics:
- 186 PDF objects out of 1000 (max. 8388607)
+ 183 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

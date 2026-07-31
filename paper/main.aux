@@ -74,19 +74,25 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-F}}Meet-in-the-Middle Framework}{3}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {IV}Proposed Algorithm}{3}{}\protected@file@percent }
 \citation{ref24}
+\citation{thapliyal2016}
+\citation{vedral1996}
+\citation{draper2000}
 \citation{ref24}
 \@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Reduced-Cost Variable Fixing}}{4}{}\protected@file@percent }
 \newlabel{alg:filter}{{1}{4}{}{}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-A}}Phase 1: LP Preprocessing via Reduced-Cost Variable Fixing}{4}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}Phase 2: Quantum Branch-and-Bound on Core}{4}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {IV-B}1}Classical B\&B Tree Structure}{4}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {IV-B}2}Quantum Walk Application}{4}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {IV-B}2}Reversible LP-Bound Oracle ($h$)}{4}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Resource estimates for the LP-bound bounding oracle ($h$) at varying core sizes ($m$). The $(m, W_{max})$ pairings shown (15/31/63) are representative illustrative example values chosen for the demonstration, not a derived or assumed functional relationship between core size and maximum item weight --- these are independent parameters in general knapsack instances. Qubit counts are derived from the register layout mapping to the Draper, Vedral-Barenco-Ekert, and Thapliyal reversible arithmetic blocks. The fractional fixed-point precision ($k$) scales with $W_{max}$ per Lemma \ref {lem:precision}. Depth, gate, and T-counts are not yet available as full gate-level decomposition has been deferred for this predicate.}}{4}{}\protected@file@percent }
+\newlabel{tab:h_resources}{{II}{4}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {IV-B}3}Quantum Walk Application}{4}{}\protected@file@percent }
 \@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces Classical Threshold-Search Outer Loop (Phase 2)}}{4}{}\protected@file@percent }
 \newlabel{alg:qbb}{{2}{4}{}{}{}}
-\newlabel{sec:oracle-impl}{{\mbox  {IV-B}3}{4}{}{}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {IV-B}3}Reversible Knapsack Oracle (Answer-Agnostic)}{4}{}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Exact Logical Predicate Resources and Analytical T-Count Estimates}}{4}{}\protected@file@percent }
-\newlabel{tab:oracle}{{II}{4}{}{}{}}
+\newlabel{sec:oracle-impl}{{\mbox  {IV-B}4}{5}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {IV-B}4}Reversible Knapsack Oracle (Answer-Agnostic)}{5}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Exact Logical Predicate Resources and Analytical T-Count Estimates}}{5}{}\protected@file@percent }
+\newlabel{tab:oracle}{{III}{5}{}{}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Phase 3: Classical Post-Processing}{5}{}\protected@file@percent }
 \@writefile{loa}{\contentsline {algorithm}{\numberline {3}{\ignorespaces Classical Reconstruction}}{5}{}\protected@file@percent }
 \newlabel{alg:postprocess}{{3}{5}{}{}{}}
@@ -95,33 +101,39 @@
 \newlabel{alg:hybrid}{{4}{5}{}{}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-E}}Algorithmic Extensions}{5}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {IV-E}1}Multidimensional Knapsack Extension}{5}{}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Core size ratio $\alpha $ vs. dimensionality $d$ ($n=24$)}}{5}{}\protected@file@percent }
-\newlabel{tab:multidim}{{III}{5}{}{}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Core size ratio $\alpha $ vs. dimensionality $d$ ($n=24$)}}{5}{}\protected@file@percent }
+\newlabel{tab:multidim}{{IV}{5}{}{}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {V}Theoretical Analysis}{5}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-A}}Correctness}{5}{}\protected@file@percent }
-\newlabel{eq:totalcomplexity}{{6}{5}{}{}{}}
+\newlabel{lem:precision}{{\mbox  {V-A}}{5}{}{}{}}
 \citation{bonnetain2020improved}
 \citation{ref3}
+\newlabel{eq:totalcomplexity}{{6}{6}{}{}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-B}}Discussion: Structural Interpretation}{6}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-C}}Comparison with Prior Work}{6}{}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Comparison of Knapsack/Subset-Sum Algorithms}}{6}{}\protected@file@percent }
-\newlabel{tab:comparison}{{IV}{6}{}{}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Comparison of Knapsack/Subset-Sum Algorithms}}{6}{}\protected@file@percent }
+\newlabel{tab:comparison}{{V}{6}{}{}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {VI}Experimental Results}{6}{}\protected@file@percent }
 \newlabel{sec:experiments}{{VI}{6}{}{}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-A}}Experimental Setup}{6}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-B}}Variable Fixing Results}{6}{}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Average Core Ratio $\alpha = m/n$ by Instance Type}}{6}{}\protected@file@percent }
-\newlabel{tab:fixing}{{V}{6}{}{}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-C}}Spectral Validation of the Quantum Walk}{6}{}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {VI}{\ignorespaces Taxonomy of Spectral Validation}}{7}{}\protected@file@percent }
-\newlabel{tab:measured}{{VI}{7}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-B}}Variable Fixing Results}{7}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {VI}{\ignorespaces Average Core Ratio $\alpha = m/n$ by Instance Type}}{7}{}\protected@file@percent }
+\newlabel{tab:fixing}{{VI}{7}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-C}}Spectral Validation of the Quantum Walk}{7}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {VII}{\ignorespaces Taxonomy of Spectral Validation}}{7}{}\protected@file@percent }
+\newlabel{tab:measured}{{VII}{7}{}{}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-D}}Classical Runtime and Memory Characterization}{7}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {VII}Discussion}{7}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-A}}Instance-Dependent Query-Complexity Behavior}{7}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-B}}Hardware Validation Insights}{7}{}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {VII}{\ignorespaces IBM Hardware Results vs. Simulator Success Probability}}{7}{}\protected@file@percent }
-\newlabel{tab:hardware}{{VII}{7}{}{}{}}
 \citation{ref31}
+\citation{vedral1996}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-B}}Hardware Validation Insights}{8}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {VIII}{\ignorespaces IBM Hardware Results vs. Simulator Success Probability}}{8}{}\protected@file@percent }
+\newlabel{tab:hardware}{{VIII}{8}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-C}}Limitations}{8}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {VII-C}1}Resource-Estimation Crossover Analysis}{8}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {IX}{\ignorespaces Per-Query T-Cost Estimates ($C_Q$) and Required Crossover Thresholds ($T_{\max }$)}}{8}{}\protected@file@percent }
+\newlabel{tab:crossover}{{IX}{8}{}{}{}}
 \bibstyle{IEEEtran}
 \bibdata{references}
 \bibcite{ref2}{1}
@@ -132,10 +144,6 @@
 \bibcite{bonnetain2020improved}{6}
 \bibcite{ref18}{7}
 \bibcite{ref1}{8}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-C}}Limitations}{8}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {VIII}Conclusion}{8}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {IX}Data Availability and Reproducibility}{8}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{References}{8}{}\protected@file@percent }
 \bibcite{ref3}{9}
 \bibcite{ref4}{10}
 \bibcite{ref5}{11}
@@ -146,6 +154,9 @@
 \bibcite{ref13}{16}
 \bibcite{ref9}{17}
 \bibcite{ref34}{18}
+\@writefile{toc}{\contentsline {section}{\numberline {VIII}Conclusion}{9}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {IX}Data Availability and Reproducibility}{9}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{References}{9}{}\protected@file@percent }
 \bibcite{ref14}{19}
 \bibcite{ref15}{20}
 \bibcite{ref19}{21}
@@ -165,4 +176,7 @@
 \bibcite{ref31}{35}
 \bibcite{ref32}{36}
 \bibcite{ref33}{37}
-\gdef \@abspage@last{9}
+\bibcite{thapliyal2016}{38}
+\bibcite{vedral1996}{39}
+\bibcite{draper2000}{40}
+\gdef \@abspage@last{10}

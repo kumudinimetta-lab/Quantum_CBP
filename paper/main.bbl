@@ -181,4 +181,18 @@ S.~Bravyi, D.~Gosset, and R.~K{\"o}nig, ``Quantum advantage with shallow
 {Qiskit Development Team}, ``Qiskit: An open-source framework for quantum
   computing,'' \url{https://qiskit.org}, 2023.
 
+\bibitem{thapliyal2016}
+H.~Thapliyal, T.~S.~S. Varun, and E.~Munoz-Coreas, ``Quantum circuit design of
+  integer division optimizing ancillary qubits and t-count,''
+  \emph{arXiv:1609.01241}, 2016.
+
+\bibitem{vedral1996}
+V.~Vedral, A.~Barenco, and A.~Ekert, ``Quantum networks for elementary
+  arithmetic operations,'' \emph{Physical Review A}, vol.~54, no.~1, pp.
+  147--153, 1996.
+
+\bibitem{draper2000}
+T.~G. Draper, ``Addition on a quantum computer,''
+  \emph{arXiv:quant-ph/0008033}, 2000.
+
 \end{thebibliography}
