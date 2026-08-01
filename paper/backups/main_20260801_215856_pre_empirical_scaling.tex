@@ -506,30 +506,6 @@ Inverse strongly & 500 & 5/5 & 5/5 \\
 \end{table}
 
 
-\subsection{Empirical Scaling of $T_{\text{LP}}$ with LP Gap and Core Size}
-
-We empirically characterize the scaling of $T_{\text{LP}}$ with instance parameters using a regression model fit to our benchmark dataset. We fit the model $\log(T_{\text{LP}}) \sim \log(\text{gap}) + m$, where gap is the true integrality gap $Z_{\text{LP}} - Z^*$ computed against the exact optimal value, and $m$ is the core size. The pooled model yields $R^2 = 0.469$ (5-fold CV $R^2 = 0.460$), but this masks substantial class dependency.
-
-\begin{table}[htbp]
-\caption{Per-Class Regression Fits for $\log(T_{\text{LP}}) \sim \log(\text{gap}) + m$}
-\label{tab:tlp_regression}
-\begin{center}
-\begin{tabular}{lrr}
-\toprule
-\textbf{Instance Class} & $\boldsymbol{R^2}$ & \textbf{CV $\boldsymbol{R^2}$} \\
-\midrule
-Uncorrelated & 0.627 & 0.584 \\
-Weakly correlated & 0.594 & 0.479 \\
-Strongly correlated & 0.601 & 0.560 \\
-Subset sum & 0.010 & -0.074 \\
-Inverse strongly & 0.583 & 0.540 \\
-\bottomrule
-\end{tabular}
-\end{center}
-\end{table}
-
-The coefficient for $\log(\text{gap})$ is $\approx 1.01$ and highly significant ($p < 0.001$) for strongly correlated instances, but statistically indistinguishable from zero ($p = 0.919$) for uncorrelated instances, and mathematically undefined for subset sum (where the gap is identically zero for all instances). This behavior is consistent with the established structural properties of these instances (as seen in Table~\ref{tab:fixing}). Core size $m$, however, is a consistent positive predictor across all valid classes (coefficients $\approx 0.11\text{--}0.13$). We do not claim any universal closed-form bound on $T_{\text{LP}}$; this is a fitted empirical trend specific to the tested instance distributions and parameter ranges ($n \le 24$).
-
 \section{Discussion}
 
 \subsection{Instance-Dependent Query-Complexity Behavior}
@@ -619,7 +595,7 @@ We presented a hybrid algorithm that couples LP-guided reduced-cost variable fix
 
 Experiments on 700 instances across five Pisinger difficulty classes confirmed 100\% correctness against exact dynamic programming. Critically, a computational simulation of the quantum walk tested the underlying effective spectral-gap inequality and phase-zero weight constraints across 889 completed simulated trees ($T_{\text{LP}} \le 2000$), providing computational evidence that the implemented LP-pruned walk satisfies the tested spectral conditions underlying Montanaro's detection analysis. A fault-tolerant resource estimate for our answer-agnostic reversible oracle establishes baseline component costs for the predicate $V$, and a NISQ characterization on IBM's \texttt{ibm\_fez} processor (156-qubit Heron~r2) identified the correct solution as the top-1 measured state for $n \leq 4$ while delineating the noise boundary at $n \geq 5$.
 
-Future work includes: (a)~extending the analysis to multi-dimensional and multi-objective knapsack variants; (b)~implementing decomposed gate-level oracles to reduce circuit depth and extend the hardware-viable range beyond $n = 4$ core items; (c)~integrating quantum error mitigation techniques to improve hardware success probabilities at larger core sizes; (d)~deriving tighter analytical bounds on $T_{\text{LP}}$ as a function of instance parameters such as the LP integrality gap (while our empirical characterization is a step toward understanding this scaling, a formal bound remains open); and (e)~evaluating the algorithm on next-generation fault-tolerant quantum processors as they become available.
+Future work includes: (a)~extending the analysis to multi-dimensional and multi-objective knapsack variants; (b)~implementing decomposed gate-level oracles to reduce circuit depth and extend the hardware-viable range beyond $n = 4$ core items; (c)~integrating quantum error mitigation techniques to improve hardware success probabilities at larger core sizes; (d)~deriving tighter analytical bounds on $T_{\text{LP}}$ as a function of instance parameters such as the LP integrality gap; and (e)~evaluating the algorithm on next-generation fault-tolerant quantum processors as they become available.
 
 
 
