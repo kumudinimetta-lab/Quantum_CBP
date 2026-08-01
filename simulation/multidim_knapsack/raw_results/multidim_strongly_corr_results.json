@@ -1,0 +1,38 @@
+[
+  {
+    "d": 1,
+    "n_trials": 20,
+    "mean_alpha": 0.9583333333333334,
+    "std_alpha": 0.13110110602126893,
+    "ci_95": 0.05745759305783699,
+    "min_alpha": 0.4583333333333333,
+    "max_alpha": 1.0
+  },
+  {
+    "d": 2,
+    "n_trials": 20,
+    "mean_alpha": 1.0,
+    "std_alpha": 0.0,
+    "ci_95": 0.0,
+    "min_alpha": 1.0,
+    "max_alpha": 1.0
+  },
+  {
+    "d": 3,
+    "n_trials": 20,
+    "mean_alpha": 1.0,
+    "std_alpha": 0.0,
+    "ci_95": 0.0,
+    "min_alpha": 1.0,
+    "max_alpha": 1.0
+  },
+  {
+    "d": 4,
+    "n_trials": 20,
+    "mean_alpha": 1.0,
+    "std_alpha": 0.0,
+    "ci_95": 0.0,
+    "min_alpha": 1.0,
+    "max_alpha": 1.0
+  }
+]
