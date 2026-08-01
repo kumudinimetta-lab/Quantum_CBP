@@ -451,60 +451,6 @@ For these extremely small scales, classical B\&B without exact LP preprocessing 
 
 The hybrid state-vector simulation runtime is not an estimate of physical quantum execution time and is therefore excluded from claims of wall-clock quantum acceleration. We do not report any wall-clock quantum speedup.
 
-\subsection{Comparison Against Google OR-Tools at Scale}
-
-We benchmarked the algorithm against Google OR-Tools (version 9.15.6755) across 5 instance classes, with 5 trials each, scaling $n$ up to 1000 for tractable classes and hard-stopping at $n=500$ for strongly and inverse-strongly correlated classes once intractability was reached. Across every class and size, Phase 1 (reduced-cost fixing) resolved 0 of the tested instances outright; Phase 2 core-solving was required in 100\% of cases tested, providing large-scale context for the variable fixing effectiveness reported for smaller $n$ in Section VI-B (Table~\ref{tab:fixing}). Of 90 total instances attempted across all classes and sizes, 69 were fully solved to certified optimality by both solvers, with zero mismatches between this paper's reported optimal value and OR-Tools' optimal value in every one of those 69 cases; this supports the correctness of our implementation. 
-
-For the remaining 21 instances, cutoffs were reached (OR-Tools at 20s, our B\&B at $1{,}000{,}000$ nodes); because cutoff time is not solve time, no timing comparison is drawn from these rows, and Table~\ref{tab:ortools_cat_b} reports only the timeout counts. Table~\ref{tab:ortools_cat_a} details the performance for the 69 fully solved instances.
-
-\begin{table}[htbp]
-\caption{Category (a): Both Solvers Reached Certified Optimal}
-\label{tab:ortools_cat_a}
-\begin{center}
-\begin{tabular}{lcccccc}
-\toprule
-\textbf{Instance Class} & $\boldsymbol{n}$ & \textbf{Successes} & \textbf{Core $m$} & \textbf{OR-Tools (s)} & \textbf{Our B\&B (s)} & \textbf{Notes} \\
-\midrule
-Uncorrelated & 100 & 5/5 & 18.2 & 0.0001 & 0.0031 & \\
-Uncorrelated & 200 & 5/5 & 27.2 & 0.0000 & 0.0210 & \\
-Uncorrelated & 500 & 5/5 & 78.0 & 0.0002 & 0.0984 & \\
-Uncorrelated & 1000 & 5/5 & 75.6 & 0.0001 & 0.3301 & \\
-Weakly correlated & 100 & 5/5 & 79.4 & 0.0000 & 0.0032 & \\
-Weakly correlated & 200 & 5/5 & 56.4 & 0.0002 & 0.0107 & \\
-Weakly correlated & 500 & 5/5 & 91.6 & 0.0001 & 0.0729 & \\
-Weakly correlated & 1000 & 5/5 & 126.2 & 0.0001 & 0.3253 & \\
-Subset sum & 100 & 5/5 & 100.0 & 0.0000 & 0.0028 & \\
-Subset sum & 200 & 5/5 & 200.0 & 0.0000 & 0.0109 & \\
-Subset sum & 500 & 5/5 & 500.0 & 0.0000 & 0.0733 & \\
-Subset sum & 1000 & 5/5 & 1000.0 & 0.0001 & 0.2970 & \\
-Strongly correlated & 100 & 3/5 & 100.0 & 0.0809 & 0.0877 & \\
-Strongly correlated & 200 & 2/5 & 200.0 & 0.0130 & 0.0607 & Warning: $n=2$, not a stable avg \\
-Inverse strongly & 100 & 3/5 & 36.0 & 0.0563 & 0.0191 & \\
-Inverse strongly & 200 & 1/5 & 25.0 & 0.0017 & 0.0108 & Warning: $n=1$, not a stable avg \\
-\bottomrule
-\end{tabular}
-\end{center}
-\end{table}
-
-\begin{table}[htbp]
-\caption{Category (b): Cutoffs Reached}
-\label{tab:ortools_cat_b}
-\begin{center}
-\begin{tabular}{lccc}
-\toprule
-\textbf{Instance Class} & $\boldsymbol{n}$ & \textbf{OR-Tools Timeouts} & \textbf{Our B\&B Timeouts} \\
-\midrule
-Strongly correlated & 100 & 2/5 & 2/5 \\
-Strongly correlated & 200 & 3/5 & 3/5 \\
-Strongly correlated & 500 & 5/5 & 5/5 \\
-Inverse strongly & 100 & 2/5 & 2/5 \\
-Inverse strongly & 200 & 4/5 & 4/5 \\
-Inverse strongly & 500 & 5/5 & 5/5 \\
-\bottomrule
-\end{tabular}
-\end{center}
-\end{table}
-
 
 \section{Discussion}
 
