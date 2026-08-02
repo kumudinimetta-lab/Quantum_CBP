@@ -384,6 +384,21 @@ If the LP bound is computed using $k$-bit floor truncation for the split item's 
 \textit{Note:} The adoption of the robust check $\tilde{Z}'_i \le Z_{LB} - 1/W_{max}$ entirely eliminates the exception for degenerate instances ($Z'_i = Z_{LB}$). Because the maximum truncation error $W_{max} 2^{-k}$ is strictly less than the safety margin $1/W_{max}$, the truncated bound will never falsely cross the threshold, ensuring unconditional exactness for all instances.
 
 
+\textbf{Lemma 1b (Monotonicity of the Marginal-Loss Formula).} \label{lem:monotonicity} \textit{For any item $i \ne s$, the true perturbed LP bound satisfies $Z'_i \le \hat{Z}'_i$, where $\hat{Z}'_i$ is the derived formula assuming no split shift ($\hat{Z}'_i = Z_{LP} - w_i |e_i - e_s|$). The formula provides an upper bound on the true perturbed value, and equality holds when the no-split-shift condition is satisfied.}
+
+\textbf{Theorem 2 (Core Containment).} \textit{Let $C_{RC}$ be the reduced-cost core produced by Algorithm~\ref{alg:hybrid}, and let $C_{\delta^*}$ be the $\delta$-band core from Definition~3 with $\delta^* = \frac{Z_{LP} - Z_{LB}}{w_{\min} \cdot e_s}$, where $w_{\min} = \min_{i} w_i$. Assume items are sorted in strictly decreasing efficiency order. Then $C_{RC} \subseteq C_{\delta^*}$.}
+
+\textit{Proof.} Let $i \in C_{RC}$, meaning item $i$ was not fixed and $Z'_i \ge Z_{LB}$. By Lemma 1b, $Z'_i \le \hat{Z}'_i = Z_{LP} - w_i |e_i - e_s|$. Thus, $Z_{LB} \le Z_{LP} - w_i |e_i - e_s|$, which rearranges to $w_i |e_i - e_s| \le Z_{LP} - Z_{LB}$, and therefore $|e_i - e_s| \le \frac{Z_{LP} - Z_{LB}}{w_i} \le \delta^* \cdot e_s$. This implies $i \in C_{\delta^*}$. $\square$
+
+\textbf{Remark.} The no-split-shift condition is not required as a hypothesis for Theorem 2. While violating it breaks the formula's equivalence, Lemma 1b shows it only makes the true $Z'_i$ smaller, which can only cause more items to be fixed, preserving the containment direction. The proof also establishes a tighter item-dependent bound $|e_i - e_s| \le (Z_{LP} - Z_{LB})/w_i$.
+
+\textbf{Proposition 1 (Composed Counting Bound).} \textit{Assume the hypotheses of Theorem 2, and that there exists a minimum efficiency spacing $\Delta > 0$ such that $|e_i - e_j| \ge \Delta$ for all $i \ne j$. Then the core size is bounded by $|C_{RC}| \le \lfloor \frac{2(Z_{LP} - Z_{LB})}{w_{\min} \cdot \Delta} \rfloor + 1$.}
+
+\textit{Proof.} By Theorem 2, $|C_{RC}| \le |C_{\delta^*}|$. The band $C_{\delta^*}$ has width $2 \delta^* e_s$. With spacing $\Delta$, this interval contains at most $\lfloor 2\delta^* e_s / \Delta \rfloor + 1$ items. $\square$
+
+\textbf{Consequence for $T_{LP}$ and Verification.} The LP-pruned B\&B tree on the core satisfies $T_{LP} \le 2^{|C_{RC}|}$. Combined with Montanaro's quantum B\&B, this yields a quantum query complexity bounded by $O(2^{(Z_{LP} - Z_{LB})/(w_{\min} \Delta)} \cdot m \log m \log V_{\max})$. However, there are three important caveats: (1) The $\Delta$-spacing is a structural hypothesis not guaranteed universally (e.g., strongly correlated instances cluster efficiencies, shrinking $\Delta$); (2) $w_{\min}$ can be small; and (3) $2^m$ is a worst-case tree bound, whereas the actual tree is typically smaller. 
+The containment theorem and Monotonicity Lemma were tested via a rational arithmetic test over 2,000 instances (16,518 item-level checks), and independently reproduced across 3,000 instances (20,339 checks) with zero containment violations observed.
+
 \textbf{Theorem 1.} \textit{Algorithm~\ref{alg:hybrid} returns the optimal solution to the 0/1 knapsack problem with probability at least $1 - 2^{-r}$ after $r$ independent repetitions of the quantum detection phase, for all instances.}
 
 \textit{Proof.} We show that no optimal item is permanently excluded by the filtering phase.
@@ -398,21 +413,6 @@ Consider any optimal solution $x^*$ and any item $j$ with $x_j^* = 1$. There are
 For case (2), the algorithm tests thresholds via a classical binary-search outer loop. At each threshold, it invokes Montanaro's quantum detection primitive, which correctly identifies if a valid assignment exceeding the threshold exists with high probability. By bounding the failure probability at each of the $O(\log V_{\max})$ steps, the binary search converges to the optimal core assignment with high probability.
 
 Since $F_1$ items are provably optimal, $F_0$ items are provably non-optimal, and the quantum phase finds the optimal core assignment, the combined solution $F_1 \cup x^*_C$ is globally optimal. Repeated applications with independent randomness yield success probability $1 - 2^{-r}$ after $r$ independent runs. \hfill$\blacksquare$
-
-\textbf{Lemma 1b (Monotonicity of the Marginal-Loss Formula).} \label{lem:monotonicity} \textit{For any item $i \ne s$, the true perturbed LP bound satisfies $Z'_i \le \hat{Z}'_i$, where $\hat{Z}'_i$ is the derived formula assuming no split shift ($\hat{Z}'_i = Z_{LP} - w_i |e_i - e_s|$). The formula provides an upper bound on the true perturbed value, and equality holds when the no-split-shift condition is satisfied.}
-
-\textbf{Theorem 2 (Core Containment).} \textit{Let $C_{RC}$ be the reduced-cost core produced by Algorithm~\ref{alg:hybrid}, and let $C_{\delta^*}$ be the $\delta$-band core from Definition~3 with $\delta^* = \frac{Z_{LP} - Z_{LB}}{w_{\min} \cdot e_s}$, where $w_{\min} = \min_{i} w_i$. Assume items are sorted in strictly decreasing efficiency order. Then $C_{RC} \subseteq C_{\delta^*}$.}
-
-\textit{Proof.} Let $i \in C_{RC}$, meaning item $i$ was not fixed and $Z'_i \ge Z_{LB}$. By Lemma 1b, $Z'_i \le \hat{Z}'_i = Z_{LP} - w_i |e_i - e_s|$. Thus, $Z_{LB} \le Z_{LP} - w_i |e_i - e_s|$, which rearranges to $w_i |e_i - e_s| \le Z_{LP} - Z_{LB}$, and therefore $|e_i - e_s| \le \frac{Z_{LP} - Z_{LB}}{w_i} \le \delta^* \cdot e_s$. This implies $i \in C_{\delta^*}$. $\square$
-
-\textbf{Remark.} The no-split-shift condition is not required as a hypothesis for Theorem 2. While violating it breaks the formula's equivalence, Lemma 1b shows it only makes the true $Z'_i$ smaller, which can only cause more items to be fixed, preserving the containment direction. The proof also establishes a tighter item-dependent bound $|e_i - e_s| \le (Z_{LP} - Z_{LB})/w_i$.
-
-\textbf{Proposition 2 (Composed Counting Bound).} \textit{Assume the hypotheses of Theorem 2, and that there exists a minimum efficiency spacing $\Delta > 0$ such that $|e_i - e_j| \ge \Delta$ for all $i \ne j$. Then the core size is bounded by $|C_{RC}| \le \lfloor \frac{2(Z_{LP} - Z_{LB})}{w_{\min} \cdot \Delta} \rfloor + 1$.}
-
-\textit{Proof.} By Theorem 2, $|C_{RC}| \le |C_{\delta^*}|$. The band $C_{\delta^*}$ has width $2 \delta^* e_s$. With spacing $\Delta$, this interval contains at most $\lfloor 2\delta^* e_s / \Delta \rfloor + 1$ items. $\square$
-
-\textbf{Consequence for $T_{LP}$ and Verification.} The LP-pruned B\&B tree on the core satisfies $T_{LP} \le 2^{|C_{RC}|}$. Combined with Montanaro's quantum B\&B, this yields a quantum query complexity bounded by $O(2^{(Z_{LP} - Z_{LB})/(w_{\min} \Delta)} \cdot m \log m \log V_{\max})$. However, there are three important caveats: (1) The $\Delta$-spacing is a structural hypothesis not guaranteed universally (e.g., strongly correlated instances cluster efficiencies, shrinking $\Delta$); (2) $w_{\min}$ can be small; and (3) $2^m$ is a worst-case tree bound, whereas the actual tree is typically smaller. 
-The containment theorem and Monotonicity Lemma were tested via a rational arithmetic test over 2,000 instances (16,518 item-level checks), and independently reproduced across 3,000 instances (20,339 checks) with zero containment violations observed.
 
 \textbf{Proposition 1 (Composed Query Complexity).} \textit{The implemented threshold-search composition algorithm solves the 0/1 knapsack problem using a classical outer loop to test thresholds. This implementation composes a classical binary-search outer loop with the fixed-threshold detection primitive, requiring at most $O(\log V_{\max})$ fixed-threshold detection calls. If each detection call evaluates a tree of size $T_{\tau_i}$, bounded by Montanaro's primitive taking $O(\sqrt{T_{\tau_i}}\,m\log m)$ queries, the total implemented algorithm query bound is}
 \begin{equation}
@@ -615,13 +615,12 @@ This analysis compares the quantum T-gate cost of the composed query bound again
 \begin{center}
 \begin{tabular}{lrr}
 \toprule
-\textbf{Core Size ($m$)} & \textbf{$C_Q$} & \textbf{Required $T_{\max}$ Crossover} \\
+\textbf{Core Size ($m$)} & \textbf{$C_Q$ (Partial Lower Bound)} & \textbf{Required $T_{\max}$ Crossover} \\
 \midrule
-4$^\S$ & $\approx 1{,}388{,}704$ & $\approx 1.88 \times 10^{15}$ \\
+4 & $\approx 1{,}388{,}704$ & $\approx 1.88 \times 10^{15}$ \\
 6 & $\ge 240{,}986$ & $\ge 3.49 \times 10^{14}$ \\
 8 & $\ge 269{,}760$ & $\ge 1.50 \times 10^{15}$ \\
 \bottomrule
-\multicolumn{3}{l}{\footnotesize $^\S$MEASURED: $\approx$ denotes a synthesized gate count (Table~\ref{tab:h_resources}). $\ge$ rows remain partial lower bounds (gate-level decomposition deferred).}
 \end{tabular}
 \end{center}
 \end{table}
