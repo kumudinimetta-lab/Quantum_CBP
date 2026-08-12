@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2026.5.1)  31 JUL 2026 22:32
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2026.5.1)  5 AUG 2026 21:13
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -345,31 +345,33 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 fg
 File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 ))
-LaTeX Font Info:    Calculating math sizes for size <11> on input line 22.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 22.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 25.
 
  (C:\Users\Shiva\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 22.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 25.
 
 
 (C:\Users\Shiva\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 2
-7.
+5.
 
 (C:\Users\Shiva\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ot1pcr.fd
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 )
-Underfull \hbox (badness 6995) in paragraph at lines 29--29
+Underfull \hbox (badness 6995) in paragraph at lines 27--27
 []\OT1/ptm/b/it/9 Index Terms\OT1/ptm/b/n/9 ---quantum com-put-ing, knap-sack p
 rob-lem,
  []
 
-[1{C:/Users/Shiva/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/Sh
-iva/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [1{C:/Users/Shiva/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/S
+hiva/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}
 
 
 ]
@@ -403,110 +405,87 @@ LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 8
 (C:\Users\Shiva\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ts1ptm.fd
 File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 )
-Overfull \hbox (136.01279pt too wide) in paragraph at lines 81--100
- [] 
- []
-
-[2]
+[2] [3]
 LaTeX Font Info:    Trying to load font information for OMS+ptm on input line 2
 02.
- (C:\Users\Shiva\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\omsptm.fd
+
+(C:\Users\Shiva\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\omsptm.fd
 File: omsptm.fd 
 )
 LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <10> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 202.
 
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-[3]
-Overfull \hbox (207.33768pt too wide) in paragraph at lines 242--251
+Overfull \hbox (33.33115pt too wide) in paragraph at lines 243--255
  [][] 
  []
 
-[4]
-Underfull \hbox (badness 2418) in paragraph at lines 279--280
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+Underfull \hbox (badness 2418) in paragraph at lines 283--284
 \OT1/ptm/m/n/10 quan-tum sub-rou-tines re-quire a con-structible or-a-cle that
  []
 
-
-Overfull \hbox (63.60062pt too wide) in paragraph at lines 288--299
- [] 
- []
-
-
-Underfull \hbox (badness 3965) in paragraph at lines 328--329
+[4]
+Underfull \hbox (badness 3965) in paragraph at lines 336--337
 [] []\OT1/ptm/b/n/10 Phase 1: $\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 F[]; C; F[]\OT
 1/cmr/m/n/10 )\OML/cmm/m/it/10 ; W[]; V[] \OMS/cmsy/m/n/10  $ \OT1/ptm/m/sc/10 
 RC-Fix$\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 w; v; W\OT1/cmr/m/n/10 )$
  []
 
 [5]
-Overfull \hbox (58.42372pt too wide) in paragraph at lines 410--410
- [] 
+Underfull \hbox (badness 5077) in paragraph at lines 417--419
+\OML/cmm/m/it/10 m [] m [] V[]\OT1/cmr/m/n/10 )$\OT1/ptm/m/n/10 . How-ever, the
+re are three im-por-tant
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 412--413
+[6]
+Underfull \hbox (badness 10000) in paragraph at lines 461--462
 []\OT1/ptm/m/n/10 Our al-go-rithm achieves $\OML/cmm/m/it/10 O  []$
  []
 
 
-Underfull \hbox (badness 1810) in paragraph at lines 424--425
+Underfull \hbox (badness 1810) in paragraph at lines 473--474
 []\OT1/ptm/m/n/10 Experiments used five stan-dard in-stance classes from
  []
 
-[6]
-Underfull \hbox (badness 7740) in paragraph at lines 438--439
+[7]
+Underfull \hbox (badness 7740) in paragraph at lines 505--506
 []\OT1/ptm/b/n/10 Phase-Estimation Sep-a-ra-tion: \OT1/ptm/m/n/10 889/889 an-a-
 lyt-i-cal
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 438--439
+Underfull \hbox (badness 10000) in paragraph at lines 505--506
 \OT1/ptm/m/n/10 de-tec-tion cri-te-rion agree-ment with known
  []
 
 
-Underfull \hbox (badness 3449) in paragraph at lines 441--442
+Underfull \hbox (badness 3449) in paragraph at lines 508--509
 \OT1/ptm/m/n/10 ex-hibit strong dis-tri-bu-tional sep-a-ra-tion be-tween marked
 
  []
 
 
-Underfull \hbox (badness 1824) in paragraph at lines 441--442
+Underfull \hbox (badness 1824) in paragraph at lines 508--509
 \OT1/ptm/m/n/10 Mann-Whitney U test on the 889 com-pleted sim-u-lated
  []
 
 
-Underfull \hbox (badness 1558) in paragraph at lines 441--442
+Underfull \hbox (badness 1558) in paragraph at lines 508--509
 \OT1/ptm/m/n/10 trees ($\OML/cmm/m/it/10 T[] \OMS/cmsy/m/n/10 ^^T \OT1/cmr/m/n/
 10 2000$\OT1/ptm/m/n/10 ). The marked ac-cep-tance prob-a-bil-
  []
 
-
-Overfull \hbox (12.0pt too wide) in paragraph at lines 445--445
- [] 
- []
-
-[7]
-Overfull \hbox (46.34209pt too wide) in paragraph at lines 476--490
- [] 
- []
-
-
-Overfull \hbox (19.51434pt too wide) in paragraph at lines 515--524
- [] 
- []
-
-[8]
-Underfull \hbox (badness 5592) in paragraph at lines 531--532
+[8] [9] [10]
+Underfull \hbox (badness 5592) in paragraph at lines 714--715
 []\OT1/ptm/b/n/10 Detection re-li-a-bil-ity and sim-u-la-bil-ity. \OT1/ptm/m/n/
 10 Our phase-
  []
 
 
-Underfull \hbox (badness 3601) in paragraph at lines 538--539
+Underfull \hbox (badness 3601) in paragraph at lines 721--722
 \OT1/ptm/m/n/10 reduced-cost vari-able fix-ing with Mon-ta-naro's quan-tum
  []
 
@@ -516,7 +495,7 @@ Underfull \hbox (badness 2478) in paragraph at lines 54--56
 '
  []
 
-[9]
+[11]
 Underfull \hbox (badness 1748) in paragraph at lines 164--167
 \OT1/ptm/m/n/8 branch-and-bound al-go-rithm for solv-ing in-te-ger lin-ear pro-
 grams,''
@@ -540,58 +519,57 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[10
-
-] (main.aux)
+[12] (main.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-04>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 4696 strings out of 474486
- 74252 string characters out of 5743756
- 1956542 words of memory out of 5000000
- 26896 multiletter control sequences out of 15000+600000
- 611183 words of font info for 147 fonts, out of 8000000 for 9000
+ 4687 strings out of 474486
+ 74158 string characters out of 5743756
+ 1958542 words of memory out of 5000000
+ 26885 multiletter control sequences out of 15000+600000
+ 611854 words of font info for 139 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 57i,14n,65p,2810b,596s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 57i,15n,65p,3148b,596s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/Shiva/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
-cmex10.pfb><C:/Users/Shiva/AppData/Local/Programs/MiKTeX/fonts/type1/public/ams
-fonts/cmextra/cmex8.pfb><C:/Users/Shiva/AppData/Local/Programs/MiKTeX/fonts/typ
-e1/public/amsfonts/cmextra/cmex9.pfb><C:/Users/Shiva/AppData/Local/Programs/MiK
-TeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/Shiva/AppData/Local/Pro
-grams/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi5.pfb><C:/Users/Shiva/AppData/L
-ocal/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi6.pfb><C:/Users/Shiva/A
-ppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi7.pfb><C:/Users
-/Shiva/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><
+cmbx6.pfb><C:/Users/Shiva/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsf
+onts/cm/cmex10.pfb><C:/Users/Shiva/AppData/Local/Programs/MiKTeX/fonts/type1/pu
+blic/amsfonts/cmextra/cmex8.pfb><C:/Users/Shiva/AppData/Local/Programs/MiKTeX/f
+onts/type1/public/amsfonts/cmextra/cmex9.pfb><C:/Users/Shiva/AppData/Local/Prog
+rams/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/Shiva/AppData/L
+ocal/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi5.pfb><C:/Users/Shiva/A
+ppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi6.pfb><C:/Users
+/Shiva/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi7.pfb><
 C:/Users/Shiva/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmm
-i9.pfb><C:/Users/Shiva/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfont
-s/cmextra/cmmib8.pfb><C:/Users/Shiva/AppData/Local/Programs/MiKTeX/fonts/type1/
-public/amsfonts/cm/cmr10.pfb><C:/Users/Shiva/AppData/Local/Programs/MiKTeX/font
-s/type1/public/amsfonts/cm/cmr5.pfb><C:/Users/Shiva/AppData/Local/Programs/MiKT
-eX/fonts/type1/public/amsfonts/cm/cmr6.pfb><C:/Users/Shiva/AppData/Local/Progra
-ms/MiKTeX/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/Shiva/AppData/Local
-/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Users/Shiva/AppDat
-a/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr9.pfb><C:/Users/Shiva
-/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Us
-ers/Shiva/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy5.pf
+i8.pfb><C:/Users/Shiva/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfont
+s/cm/cmmi9.pfb><C:/Users/Shiva/AppData/Local/Programs/MiKTeX/fonts/type1/public
+/amsfonts/cmextra/cmmib8.pfb><C:/Users/Shiva/AppData/Local/Programs/MiKTeX/font
+s/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/Shiva/AppData/Local/Programs/MiK
+TeX/fonts/type1/public/amsfonts/cm/cmr5.pfb><C:/Users/Shiva/AppData/Local/Progr
+ams/MiKTeX/fonts/type1/public/amsfonts/cm/cmr6.pfb><C:/Users/Shiva/AppData/Loca
+l/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/Shiva/AppDa
+ta/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Users/Shiv
+a/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr9.pfb><C:/Use
+rs/Shiva/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pf
 b><C:/Users/Shiva/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
-cmsy6.pfb><C:/Users/Shiva/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsf
-onts/cm/cmsy7.pfb><C:/Users/Shiva/AppData/Local/Programs/MiKTeX/fonts/type1/pub
-lic/amsfonts/cm/cmsy8.pfb><C:/Users/Shiva/AppData/Local/Programs/MiKTeX/fonts/t
-ype1/public/amsfonts/cm/cmsy9.pfb><C:/Users/Shiva/AppData/Local/Programs/MiKTeX
-/fonts/type1/public/amsfonts/symbols/msam10.pfb><C:/Users/Shiva/AppData/Local/P
-rograms/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb><C:/Users/Shiva/A
-ppData/Local/Programs/MiKTeX/fonts/type1/urw/courier/ucrb8a.pfb><C:/Users/Shiva
-/AppData/Local/Programs/MiKTeX/fonts/type1/urw/courier/ucrr8a.pfb><C:/Users/Shi
-va/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/Users/Shi
-va/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmbi8a.pfb><C:/Users/Sh
-iva/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/Sh
-iva/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on main.pdf (10 pages, 406677 bytes).
+cmsy5.pfb><C:/Users/Shiva/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsf
+onts/cm/cmsy6.pfb><C:/Users/Shiva/AppData/Local/Programs/MiKTeX/fonts/type1/pub
+lic/amsfonts/cm/cmsy7.pfb><C:/Users/Shiva/AppData/Local/Programs/MiKTeX/fonts/t
+ype1/public/amsfonts/cm/cmsy8.pfb><C:/Users/Shiva/AppData/Local/Programs/MiKTeX
+/fonts/type1/public/amsfonts/cm/cmsy9.pfb><C:/Users/Shiva/AppData/Local/Program
+s/MiKTeX/fonts/type1/public/amsfonts/symbols/msam10.pfb><C:/Users/Shiva/AppData
+/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb><C:/Users
+/Shiva/AppData/Local/Programs/MiKTeX/fonts/type1/urw/courier/ucrb8a.pfb><C:/Use
+rs/Shiva/AppData/Local/Programs/MiKTeX/fonts/type1/urw/courier/ucrr8a.pfb><C:/U
+sers/Shiva/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/U
+sers/Shiva/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmbi8a.pfb><C:/
+Users/Shiva/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/
+Users/Shiva/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
+Output written on main.pdf (12 pages, 438304 bytes).
 PDF statistics:
- 186 PDF objects out of 1000 (max. 8388607)
+ 197 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

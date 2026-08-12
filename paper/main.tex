@@ -13,11 +13,9 @@
 
 \title{LP-Pruned Quantum Branch-and-Bound for the 0/1 Knapsack Problem: Query-Complexity Analysis and Spectral Validation}
 
-\author{ \IEEEauthorblockN{ Shiva Sai$^{1}$, Kumudini$^{1}$, Purusharth$^{1}$, Rakshit$^{2}$, Veerabhadra$^{2}$, C. Thirmal$^{2}$ }
+\author{ \IEEEauthorblockN{ Shiva Sai, Kumudini, Purusharth, Rakshit, Veerabhadra }
 
-\IEEEauthorblockA{$^{1}$Student, IIT Bachupally, India}
-
-\IEEEauthorblockA{$^{2}$Professor, Harvard University, USA} }
+\IEEEauthorblockA{Student, VNR VJIET, Bachupally, Hyderabad, India} }
 
 \maketitle
 
@@ -74,12 +72,12 @@ The remainder of this paper is organized as follows. Section~II reviews related 
 
 \textit{Closest prior work and our position.} Three works are nearest to ours. Montanaro's quantum B\&B \cite{ref24} is provable and QRAQM-free but \emph{generic}: it bounds a quantum walk on an abstract tree of size $T$ by $\tilde{O}(\sqrt{T}\,d)$ without analyzing any specific problem, the role of LP bounds, or the induced tree size for knapsack. The QTG of Wilkening et al.\ \cite{ref23} is knapsack-specific and gate-model, but feeds feasible-solution superpositions to a \emph{variational} (QAOA) routine and performs no LP-based variable fixing, inheriting QAOA's lack of guarantees. Bonnetain et al.\ \cite{bonnetain2020improved} restore provability to walk-based subset-sum yet still assume QRAQM. Our algorithm uniquely combines: (a)~\emph{exact} LP reduced-cost fixing with Montanaro's provable, QRAQM-free quantum B\&B specifically for knapsack, (b)~an analysis of the resulting LP-pruned tree size $T_{\text{LP}} \le T$, and (c)~computational spectral validation of the explicit walk operator on completed simulable trees. Table~\ref{tab:related} contrasts these properties.
 
-\begin{table}[htbp]
+\begin{table*}[t]
 \caption{Capability comparison with the closest prior quantum methods. The lower block lists capabilities that, to our knowledge, no prior method provides simultaneously.}
 \label{tab:related}
 \begin{center}
 \footnotesize
-\setlength{\tabcolsep}{4pt}
+\setlength{\tabcolsep}{6pt}
 \begin{tabular}{lcccc}
 \toprule
 \textbf{Capability} & \textbf{Mont.} & \textbf{QTG} & \textbf{Bonn.} & \textbf{Ours} \\
@@ -94,13 +92,13 @@ Instance-adaptive$^\dagger$            & No  & No  & No  & \textbf{Yes} \\
 Explicit walk spectral validation$^\ddagger$       & No  & No  & No  & \textbf{Yes} \\
 Hardware demonstration                 & No  & No  & No  & \textbf{Yes} \\
 \bottomrule
-\multicolumn{5}{l}{\footnotesize Mont.: Montanaro B\&B; QTG: Quantum Tree Generator; Bonn.: Bonnetain et al.} \\
-\multicolumn{5}{l}{\footnotesize $^\dagger$Query bound depends on the LP-pruned tree sizes encountered.}\\
-\multicolumn{5}{l}{\footnotesize $^\ddagger$Explicit walk spectra and analytical detection criteria are evaluated computationally on completed simulable trees.} \\
-\multicolumn{5}{l}{\footnotesize \textsuperscript{\S}Variational (QAOA): no performance guarantee.} \\
+\multicolumn{5}{p{0.7\textwidth}}{\footnotesize Mont.: Montanaro B\&B; QTG: Quantum Tree Generator; Bonn.: Bonnetain et al.} \\
+\multicolumn{5}{p{0.7\textwidth}}{\footnotesize $^\dagger$Query bound depends on the LP-pruned tree sizes encountered.}\\
+\multicolumn{5}{p{0.7\textwidth}}{\footnotesize $^\ddagger$Explicit walk spectra and analytical detection criteria are evaluated computationally on completed simulable trees.} \\
+\multicolumn{5}{p{0.7\textwidth}}{\footnotesize \textsuperscript{\S}Variational (QAOA): no performance guarantee.} \\
 \end{tabular}
 \end{center}
-\end{table}
+\end{table*}
 
 The upper block of Table~\ref{tab:related} shows that no single prior method is simultaneously provable, gate-model feasible, and knapsack-specific. The lower block isolates the capability our work contributes: an algorithm that couples \emph{exact} LP variable fixing to a provable, QRAQM-free quantum walk, is \emph{instance-adaptive}---with query complexity adapting to the LP-pruned tree sizes encountered---and whose spectral conditions and analytical detection criterion are computationally tested rather than assumed. This combination is what distinguishes the present work, and it is what we substantiate empirically in Section~\ref{sec:experiments}.
 
@@ -237,14 +235,11 @@ To implement the bounding heuristic $h$ as a quantum oracle, we construct a fixe
 
 The register layout allocates quantum memory for the scaled dividend, divisor, quotient, remainder, residual capacity, and the intermediate additions and multiplications. The arithmetic relies on the Thapliyal restoring divider \cite{thapliyal2016} for calculating the fixed-point efficiency, the Vedral-Barenco-Ekert (VBE) multiplier \cite{vedral1996} for computing the residual product, and the zero-ancilla Draper QFT adder \cite{draper2000}. By mapping the division remainder to the ancillary register required by Thapliyal's in-place division, the ancillary overhead is strictly bounded. Resource estimates for this layout are provided in Table~\ref{tab:h_resources}. Note that while the exact logical and ancillary qubit counts are established, full gate-level decomposition of the arithmetic blocks is deferred.
 
-\begin{table}[ht]
+\begin{table*}[t]
 \centering
-\caption{Resource estimates for the LP-bound bounding oracle ($h$) at varying core sizes ($m$). The $(m, W_{max})$ pairings shown (15/31/63) are representative illustrative example values chosen for the demonstration, not a derived or assumed functional relationship between core size and maximum item weight --- these are independent parameters in general knapsack instances. Qubit counts are derived from the register layout mapping to the Draper, Vedral-Barenco-Ekert, and Thapliyal reversible arithmetic blocks. The fractional fixed-point precision ($k$) scales with $W_{max}$ per Lemma \ref{lem:precision}. Depth, gate, and T-counts are not yet available as full gate-level decomposition has been deferred for this predicate.}
-
-
-We have subsequently synthesized and tested the gate-level circuit specifically for the $m=4$ ($W_{max}=15$) case, providing a non-deferred evaluation of oracle $h$. Against a stratified sample of 25 classical benchmark instances (representing varying hardness classes), the custom-simulated gate-level circuit achieved 0 mismatches against standard integer arithmetic, and passed an injected-fault unit test. The measured hardware metrics for $m=4$ yield 96 qubits, 8,170 gates, and a depth of 3,844. For the T-count, a naive estimate weighting Toffoli and controlled-controlled-phase (`ccp`) gates uniformly at 7 T-gates yields 17,633. However, utilizing the standard decomposition by Barenco et al.~\cite{barenco1995} (Lemma 6.1) for arbitrary doubly-controlled $C^2P(\theta)$ unitaries, which uses three controlled-phase rotations, and synthesizing these continuous rotations via the Ross-Selinger algorithm at precision $\epsilon=10^{-10}$, the T-count scales to roughly $\approx 1.2 \times 10^6$. We report both the naive and Ross-Selinger-scaled figures to distinguish the raw gate counts from the fault-tolerant synthesis penalty. Note that $m=6$ and $m=8$ remain at the analytical estimate status, as full synthesis was not extended to those larger core sizes.
-
+\caption{Resource estimates for the LP-bound bounding oracle ($h$) at varying core sizes ($m$).}
 \label{tab:h_resources}
+\footnotesize
 \begin{tabular}{ccccccc}
 \hline\hline
 $m$ ($W_{max}$) & Precision $k$ & Logical Qubits & Ancilla Qubits & Total Qubits & Depth / Gates & T-count \\
@@ -254,10 +249,10 @@ $m$ ($W_{max}$) & Precision $k$ & Logical Qubits & Ancilla Qubits & Total Qubits
 6 (31) & 10 & 101 & 1 & 102 & N/A --- gate-level decomposition deferred & N/A \\
 8 (63) & 12 & 121 & 1 & 122 & N/A --- gate-level decomposition deferred & N/A \\
 \hline\hline
-\multicolumn{7}{l}{\footnotesize $^\ddagger$Ross-Selinger estimate $\epsilon=10^{-10}$ using Barenco et al.~\cite{barenco1995} 3-rotation decomposition.} \\
-\multicolumn{7}{l}{\footnotesize $^\star$Naive estimate treating `ccp` gates as standard Toffolis (7 T-gates).} \\
+\multicolumn{7}{p{0.85\textwidth}}{\footnotesize Note: The $(m, W_{max})$ pairings shown (15/31/63) are representative illustrative example values chosen for demonstration. Qubit counts are derived from the register layout mapping to Draper, Vedral-Barenco-Ekert, and Thapliyal reversible arithmetic blocks. The fractional fixed-point precision ($k$) scales with $W_{max}$ per Lemma \ref{lem:precision}. We synthesized and tested the gate-level circuit for $m=4$ ($W_{max}=15$) achieving 0 mismatches against standard integer arithmetic on 25 benchmark instances. Measured hardware metrics for $m=4$ yield 96 qubits, 8,170 gates, and depth 3,844.} \\
+\multicolumn{7}{p{0.85\textwidth}}{\footnotesize $^\ddagger$Ross-Selinger estimate $\epsilon=10^{-10}$ using Barenco et al.~\cite{barenco1995} 3-rotation decomposition. $^\star$Naive estimate treating `ccp` gates as standard Toffolis (7 T-gates).} \\
 \end{tabular}
-\end{table}
+\end{table*}
 
 \subsubsection{Quantum Walk Application}
 
@@ -293,7 +288,7 @@ Table~\ref{tab:oracle} details the exact logical resource requirements for this 
 \caption{Exact Logical Predicate Resources and Analytical T-Count Estimates}
 \label{tab:oracle}
 \begin{center}
-\footnotesize
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{lccccc}
 \toprule
 \textbf{Core Size ($m$)} & \textbf{Qubits} & \textbf{Depth} & \textbf{Total Gates} & \textbf{2Q Gates} & \textbf{T-Count Estimate$^\dagger$} \\
@@ -302,9 +297,13 @@ Table~\ref{tab:oracle} details the exact logical resource requirements for this 
 6 & 22 & 300 & 1788 & 773 & $\approx 227{,}631$ \\
 8 & 25 & 327 & 2243 & 977 & $\approx 250{,}404$ \\
 \bottomrule
-\multicolumn{6}{l}{\footnotesize $^\dagger$Heuristic analytical estimate assuming Ross-Selinger arbitrary $R_z$ synthesis at $\epsilon = 10^{-10}$.} \\
-\multicolumn{6}{l}{\footnotesize The LP heuristic $h$ was NOT synthesized.}
-\end{tabular}
+\end{tabular}%
+}
+\begin{flushleft}
+\footnotesize
+$^\dagger$Heuristic analytical estimate assuming Ross-Selinger arbitrary $R_z$ synthesis at $\epsilon = 10^{-10}$.\\
+The LP heuristic $h$ was NOT synthesized.
+\end{flushleft}
 \end{center}
 \end{table}
 
@@ -359,13 +358,15 @@ Our framework extends cleanly to the $d$-dimensional 0/1 knapsack problem. We ge
 \caption{Core size ratio $\alpha$ vs. dimensionality $d$ for strongly correlated instances ($n=24$, 20 trials)}
 \label{tab:multidim}
 \begin{center}
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{lcccc}
 \toprule
 \textbf{Dimensionality} & $d=1$ & $d=2$ & $d=3$ & $d=4$ \\
 \midrule
 \textbf{Core Ratio $\alpha$ (Mean $\pm$ 95\% CI)} & $0.96 \pm 0.06$ & $1.00 \pm 0.00$ & $1.00 \pm 0.00$ & $1.00 \pm 0.00$ \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \end{center}
 \end{table}
 
@@ -434,7 +435,28 @@ The experiments suggest that the hybrid algorithm adapts across instance distrib
 
 Table~\ref{tab:comparison} summarizes the key differences.
 
-\begin{table}[htbp] \caption{Comparison of Knapsack/Subset-Sum Algorithms} \label{tab:comparison} \begin{center} \begin{tabular}{lcccc} \toprule \textbf{Algorithm} & \textbf{Reported Complexity Measure} & \textbf{Space} & \textbf{Prov.} & \textbf{QRAQM} \\ \midrule Horowitz--Sahni & $O(2^{n/2})$ & $O(2^{n/2})$ & Yes & N/A \\ Grover & $O(2^{n/2})$ & $O(n)$ & Yes & No \\ Bernstein et al. & $O(2^{0.241n})$ & $O(2^{0.241n})$ & No$^\dagger$ & Yes \\ Helm \& May & $O(2^{0.226n})$ & $O(2^{0.226n})$ & No$^\dagger$ & Yes \\ Montanaro B\&B & $\tilde{O}(\sqrt{T}\,d)$ queries & $O(\text{poly})$ & Yes & No \\ QTG+AA & $O(\sqrt{N_f})$ & $O(\text{poly})$ & Yes & No \\ \textbf{Ours} & $O(\sqrt{T_{\max}}\,m\log m\log V_{\max})$ & $O(\text{poly})$ & \textbf{Yes} & \textbf{No} \\ \bottomrule \multicolumn{5}{l}{\footnotesize $^\dagger$Relies on Heuristic 2, shown unsound by \cite{bonnetain2020improved}.} \\ \multicolumn{5}{l}{\footnotesize $T$: full B\&B tree. $T_{LP}$: LP-pruned tree ($T_{LP} \ll T$). $N_f$: feasible states.} \end{tabular} \end{center} \end{table}
+\begin{table*}[t]
+\caption{Comparison of Knapsack/Subset-Sum Algorithms}
+\label{tab:comparison}
+\begin{center}
+\footnotesize
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Algorithm} & \textbf{Reported Complexity Measure} & \textbf{Space} & \textbf{Prov.} & \textbf{QRAQM} \\
+\midrule
+Horowitz--Sahni & $O(2^{n/2})$ & $O(2^{n/2})$ & Yes & N/A \\
+Grover & $O(2^{n/2})$ & $O(n)$ & Yes & No \\
+Bernstein et al. & $O(2^{0.241n})$ & $O(2^{0.241n})$ & No$^\dagger$ & Yes \\
+Helm \& May & $O(2^{0.226n})$ & $O(2^{0.226n})$ & No$^\dagger$ & Yes \\
+Montanaro B\&B & $\tilde{O}(\sqrt{T}\,d)$ queries & $O(\text{poly})$ & Yes & No \\
+QTG+AA & $O(\sqrt{N_f})$ & $O(\text{poly})$ & Yes & No \\
+\textbf{Ours} & $O(\sqrt{T_{\max}}\,m\log m\log V_{\max})$ & $O(\text{poly})$ & \textbf{Yes} & \textbf{No} \\
+\bottomrule
+\multicolumn{5}{p{0.7\textwidth}}{\footnotesize $^\dagger$Relies on Heuristic 2, shown unsound by \cite{bonnetain2020improved}.} \\
+\multicolumn{5}{p{0.7\textwidth}}{\footnotesize $T$: full B\&B tree. $T_{LP}$: LP-pruned tree ($T_{LP} \ll T$). $N_f$: feasible states.}
+\end{tabular}
+\end{center}
+\end{table*}
 
 Our algorithm achieves $O\!\left(\sqrt{T_{\max}}\,m\log m\log V_{\max}\right)$ queries, combining the structural advantage of exact LP reduced-cost fixing with composed fixed-threshold quantum detection.
 
@@ -453,7 +475,25 @@ Experiments used five standard instance classes from Pisinger's classification~\
 \subsection{Variable Fixing Results}
 Table~\ref{tab:fixing} shows the filtering ratio $\alpha$ across instance types.
 
-\begin{table}[htbp] \caption{Average Core Ratio $\alpha = m/n$ by Instance Type} \label{tab:fixing} \begin{center} \begin{tabular}{lcccc} \toprule \textbf{Instance Type} & $\boldsymbol{\alpha}$ & $|F_1|/n$ & $|F_0|/n$ & \textbf{LP Gap} \\ \midrule Uncorrelated & 0.32 & 0.35 & 0.33 & Tight \\ Weakly correlated & 0.76 & 0.12 & 0.12 & Medium \\ Strongly correlated & 0.95 & 0.02 & 0.03 & Loose \\ Subset-sum & 1.00 & 0.00 & 0.00 & Very loose \\ Inverse strongly & 0.81 & 0.10 & 0.09 & Medium \\ \bottomrule \end{tabular} \end{center} \end{table}
+\begin{table}[htbp]
+\caption{Average Core Ratio $\alpha = m/n$ by Instance Type}
+\label{tab:fixing}
+\begin{center}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Instance Type} & $\boldsymbol{\alpha}$ & $|F_1|/n$ & $|F_0|/n$ & \textbf{LP Gap} \\
+\midrule
+Uncorrelated & 0.32 & 0.35 & 0.33 & Tight \\
+Weakly correlated & 0.76 & 0.12 & 0.12 & Medium \\
+Strongly correlated & 0.95 & 0.02 & 0.03 & Loose \\
+Subset-sum & 1.00 & 0.00 & 0.00 & Very loose \\
+Inverse strongly & 0.81 & 0.10 & 0.09 & Medium \\
+\bottomrule
+\end{tabular}%
+}
+\end{center}
+\end{table}
 
 \subsection{Spectral Validation of the Quantum Walk}
 Across the 1200 theoretically attempted conditions, 889 successfully completed within the simulable regime ($T_{\text{LP}} \le 2000$). We restrict our spectral conclusions strictly to these 889 simulable trees. The taxonomy is: 489 completed marked, 400 completed unmarked, 74 tree-cap marked, 74 seed-level empty-core conditions (37 bypassed, 37 empty), and 163 immediately pruned unmarked conditions. The selection-bias audit confirms that the pre-eigendecomposition core size $m$ is significantly larger for capped trees (median $m=16$) than for completed trees (median $m=10$).
@@ -469,7 +509,33 @@ The analytical phase-estimation acceptance probabilities exhibit strong distribu
 
 This Mann-Whitney test supports distributional separation of the analytical phase-estimation acceptance probabilities in the completed simulated subset. It does not support quantum speedup, runtime improvement, quantum advantage, or complexity improvement. The Clopper-Pearson intervals describe the observed satisfaction/agreement proportions in the completed simulable subset, and do not prove universal theorem validity.
 
-\begin{table}[htbp] \caption{Taxonomy of Spectral Validation} \label{tab:measured} \begin{center} \begin{tabular}{lc} \toprule \textbf{Category} & \textbf{Count} \\ \midrule Completed Marked (Phase Zero Validated) & 489 \\ Completed Unmarked (Spectral Gap Validated) & 400 \\ \midrule \textbf{Subtotal Simulable Trees} & \textbf{889 / 889} \\ \midrule Tree-Cap Marked (Truncated $T_{\text{LP}} > 2000$) & 74 \\ Unmarked (Immediately Pruned) & 163 \\ Seed-Level Empty Core & 74 \\ \midrule \textbf{Total Attempted Conditions} & \textbf{1200} \\ \bottomrule \multicolumn{2}{p{\columnwidth}}{\footnotesize Validated against theoretical detection criterion.} \end{tabular} \end{center} \end{table}
+\begin{table}[htbp]
+\caption{Taxonomy of Spectral Validation}
+\label{tab:measured}
+\begin{center}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lc}
+\toprule
+\textbf{Category} & \textbf{Count} \\
+\midrule
+Completed Marked (Phase Zero Validated) & 489 \\
+Completed Unmarked (Spectral Gap Validated) & 400 \\
+\midrule
+\textbf{Subtotal Simulable Trees} & \textbf{889 / 889} \\
+\midrule
+Tree-Cap Marked (Truncated $T_{\text{LP}} > 2000$) & 74 \\
+Unmarked (Immediately Pruned) & 163 \\
+Seed-Level Empty Core & 74 \\
+\midrule
+\textbf{Total Attempted Conditions} & \textbf{1200} \\
+\bottomrule
+\end{tabular}%
+}
+\begin{flushleft}
+\footnotesize Validated against theoretical detection criterion.
+\end{flushleft}
+\end{center}
+\end{table}
 
 \subsection{Classical Runtime and Memory Characterization}
 We benchmarked the wall-clock execution time and peak memory consumption of classical B\&B against LP-pruned classical B\&B on a standard Python 3 execution environment. Instrumentation used \texttt{time.perf\_counter\_ns()} and \texttt{tracemalloc}. Across 1500 benchmark records at scales $n \in \{12, 14, 16, 18, 20\}$, we performed a paired Wilcoxon signed-rank test on identical instances. 
@@ -484,10 +550,11 @@ We benchmarked the algorithm against Google OR-Tools (version 9.15.6755) across 
 
 For the remaining 21 instances, cutoffs were reached (OR-Tools at 20s, our B\&B at $1{,}000{,}000$ nodes); because cutoff time is not solve time, no timing comparison is drawn from these rows, and Table~\ref{tab:ortools_cat_b} reports only the timeout counts. Table~\ref{tab:ortools_cat_a} details the performance for the 69 fully solved instances.
 
-\begin{table}[htbp]
+\begin{table*}[t]
 \caption{Category (a): Both Solvers Reached Certified Optimal}
 \label{tab:ortools_cat_a}
 \begin{center}
+\footnotesize
 \begin{tabular}{lcccccc}
 \toprule
 \textbf{Instance Class} & $\boldsymbol{n}$ & \textbf{Successes} & \textbf{Core $m$} & \textbf{OR-Tools (s)} & \textbf{Our B\&B (s)} & \textbf{Notes} \\
@@ -511,12 +578,13 @@ Inverse strongly & 200 & 1/5 & 25.0 & 0.0017 & 0.0108 & Warning: $n=1$, not a st
 \bottomrule
 \end{tabular}
 \end{center}
-\end{table}
+\end{table*}
 
 \begin{table}[htbp]
 \caption{Category (b): Cutoffs Reached}
 \label{tab:ortools_cat_b}
 \begin{center}
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{lccc}
 \toprule
 \textbf{Instance Class} & $\boldsymbol{n}$ & \textbf{OR-Tools Timeouts} & \textbf{Our B\&B Timeouts} \\
@@ -528,7 +596,8 @@ Inverse strongly & 100 & 2/5 & 2/5 \\
 Inverse strongly & 200 & 4/5 & 4/5 \\
 Inverse strongly & 500 & 5/5 & 5/5 \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \end{center}
 \end{table}
 
@@ -541,6 +610,7 @@ We empirically characterize the scaling of $T_{\text{LP}}$ with instance paramet
 \caption{Per-Class Regression Fits for $\log(T_{\text{LP}}) \sim \log(\text{gap}) + m$}
 \label{tab:tlp_regression}
 \begin{center}
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{lrr}
 \toprule
 \textbf{Instance Class} & $\boldsymbol{R^2}$ & \textbf{CV $\boldsymbol{R^2}$} \\
@@ -551,7 +621,8 @@ Strongly correlated & 0.601 & 0.560 \\
 Subset sum & 0.010 & -0.074 \\
 Inverse strongly & 0.583 & 0.540 \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \end{center}
 \end{table}
 
@@ -577,7 +648,7 @@ Our IBM \texttt{ibm\_fez} experiments reveal a clear NISQ noise boundary for amp
 \caption{IBM Hardware Results vs. Simulator Success Probability}
 \label{tab:hardware}
 \begin{center}
-\footnotesize
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{lcccc}
 \toprule
 \textbf{Instance} & \textbf{Sim Prob} & \textbf{HW Prob} & \textbf{Transpiled Depth} & \textbf{2Q Gates} \\
@@ -591,7 +662,8 @@ Core-5B (Correlated) & 0.9613 & 0.0637 & 9273 & 3012 \\
 Core-6A (Hard) & 0.9992 & 0.0312 & 50520 & 16579 \\
 Core-6B (Subset-Sum) & 0.9981 & 0.0330 & 38129 & 12456 \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \end{center}
 \end{table}
 
@@ -617,6 +689,7 @@ This analysis compares the quantum T-gate cost of the composed query bound again
 \caption{Per-Query T-Cost Estimates ($C_Q$) and Required Crossover Thresholds ($T_{\max}$)}
 \label{tab:crossover}
 \begin{center}
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{lrr}
 \toprule
 \textbf{Core Size ($m$)} & \textbf{$C_Q$} & \textbf{Required $T_{\max}$ Crossover} \\
@@ -625,8 +698,12 @@ This analysis compares the quantum T-gate cost of the composed query bound again
 6 & $\ge 240{,}986$ & $\ge 3.49 \times 10^{14}$ \\
 8 & $\ge 269{,}760$ & $\ge 1.50 \times 10^{15}$ \\
 \bottomrule
-\multicolumn{3}{l}{\footnotesize $^\S$MEASURED: $\approx$ denotes a synthesized gate count (Table~\ref{tab:h_resources}). $\ge$ rows remain partial lower bounds (gate-level decomposition deferred).}
-\end{tabular}
+\end{tabular}%
+}
+\begin{flushleft}
+\footnotesize
+$^\S$MEASURED: $\approx$ denotes a synthesized gate count (Table II). $\ge$ rows remain partial lower bounds (gate-level decomposition deferred).
+\end{flushleft}
 \end{center}
 \end{table}
 

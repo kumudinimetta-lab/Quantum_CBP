@@ -195,4 +195,9 @@ V.~Vedral, A.~Barenco, and A.~Ekert, ``Quantum networks for elementary
 T.~G. Draper, ``Addition on a quantum computer,''
   \emph{arXiv:quant-ph/0008033}, 2000.
 
+\bibitem{barenco1995}
+A.~Barenco, C.~H. Bennett, R.~Cleve, D.~P. DiVincenzo, N.~Margolus, P.~Shor,
+  T.~Sleator, J.~A. Smolin, and H.~Weinfurter, ``Elementary gates for quantum
+  computation,'' \emph{Physical review A}, vol.~52, no.~5, p. 3457, 1995.
+
 \end{thebibliography}
