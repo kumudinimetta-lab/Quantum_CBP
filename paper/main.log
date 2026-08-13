@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2026.5.1)  13 AUG 2026 08:50
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2026.5.1)  13 AUG 2026 08:51
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -345,20 +345,20 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 fg
 File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 ))
-LaTeX Font Info:    Calculating math sizes for size <11> on input line 36.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 36.
+LaTeX Font Info:    Calculating math sizes for size <11> on input line 39.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 39.
 
  (C:\Users\Shiva\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 36.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 39.
 
 
 (C:\Users\Shiva\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 4
-1.
+4.
 
 (C:\Users\Shiva\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ot1pcr.fd
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
@@ -366,7 +366,7 @@ File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
-Underfull \hbox (badness 6995) in paragraph at lines 43--43
+Underfull \hbox (badness 6995) in paragraph at lines 46--46
 []\OT1/ptm/b/it/9 Index Terms\OT1/ptm/b/n/9 ---quantum com-put-ing, knap-sack p
 rob-lem,
  []
@@ -376,115 +376,115 @@ iva/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}
 
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 87--88
+Underfull \hbox (badness 10000) in paragraph at lines 90--91
 []\OT1/ptm/m/it/10 Implementable quan-tum knap-sack and hy-brids. \OT1/ptm/m/n/
 10 A
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 87--88
+Underfull \hbox (badness 10000) in paragraph at lines 90--91
 \OT1/ptm/m/n/10 sec-ond line pri-or-i-tizes con-structibil-ity on gate-model
  []
 
 
-Underfull \hbox (badness 1424) in paragraph at lines 87--88
+Underfull \hbox (badness 1424) in paragraph at lines 90--91
 \OT1/ptm/m/n/10 hard-ware. Grover-based knap-sack solvers [[]], [[]] and
  []
 
 
-Underfull \hbox (badness 1769) in paragraph at lines 87--88
+Underfull \hbox (badness 1769) in paragraph at lines 90--91
 \OT1/ptm/m/n/10 Quantum-inspired meta-heuris-tics (ge-netic [[]], wolf-pack
  []
 
 
-Underfull \hbox (badness 3536) in paragraph at lines 87--88
+Underfull \hbox (badness 3536) in paragraph at lines 90--91
 \OT1/ptm/m/n/10 prov-able query re-duc-tion. The most rel-e-vant prov-able,
  []
 
 [2]
 LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 1
-02.
+05.
  (C:\Users\Shiva\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ts1ptm.fd
 File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 )
 [3]
 LaTeX Font Info:    Trying to load font information for OMS+ptm on input line 2
-18.
+21.
  (C:\Users\Shiva\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\omsptm.fd
 File: omsptm.fd 
 )
 LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 218.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 221.
 
 [4]
-Overfull \hbox (33.33115pt too wide) in paragraph at lines 259--271
+Overfull \hbox (33.33115pt too wide) in paragraph at lines 262--274
  [][] 
  []
 
 
-Underfull \hbox (badness 2418) in paragraph at lines 299--300
+Underfull \hbox (badness 2418) in paragraph at lines 302--303
 \OT1/ptm/m/n/10 quan-tum sub-rou-tines re-quire a con-structible or-a-cle that
  []
 
 
-Underfull \hbox (badness 3965) in paragraph at lines 352--353
+Underfull \hbox (badness 3965) in paragraph at lines 355--356
 [] []\OT1/ptm/b/n/10 Phase 1: $\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 F[]; C; F[]\OT
 1/cmr/m/n/10 )\OML/cmm/m/it/10 ; W[]; V[] \OMS/cmsy/m/n/10  $ \OT1/ptm/m/sc/10 
 RC-Fix$\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 w; v; W\OT1/cmr/m/n/10 )$
  []
 
 [5] [6]
-Underfull \hbox (badness 5077) in paragraph at lines 433--435
+Underfull \hbox (badness 5077) in paragraph at lines 436--438
 \OML/cmm/m/it/10 m [] m [] V[]\OT1/cmr/m/n/10 )$\OT1/ptm/m/n/10 . How-ever, the
 re are three im-por-tant
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 477--478
+Underfull \hbox (badness 10000) in paragraph at lines 480--481
 []\OT1/ptm/m/n/10 Our al-go-rithm achieves $\OML/cmm/m/it/10 O  []$
  []
 
 
-Underfull \hbox (badness 1810) in paragraph at lines 489--490
+Underfull \hbox (badness 1810) in paragraph at lines 492--493
 []\OT1/ptm/m/n/10 Experiments used five stan-dard in-stance classes from
  []
 
 [7]
-Underfull \hbox (badness 7740) in paragraph at lines 521--522
+Underfull \hbox (badness 7740) in paragraph at lines 524--525
 []\OT1/ptm/b/n/10 Phase-Estimation Sep-a-ra-tion: \OT1/ptm/m/n/10 889/889 an-a-
 lyt-i-cal
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 521--522
+Underfull \hbox (badness 10000) in paragraph at lines 524--525
 \OT1/ptm/m/n/10 de-tec-tion cri-te-rion agree-ment with known
  []
 
 
-Underfull \hbox (badness 3449) in paragraph at lines 524--525
+Underfull \hbox (badness 3449) in paragraph at lines 527--528
 \OT1/ptm/m/n/10 ex-hibit strong dis-tri-bu-tional sep-a-ra-tion be-tween marked
 
  []
 
 
-Underfull \hbox (badness 1824) in paragraph at lines 524--525
+Underfull \hbox (badness 1824) in paragraph at lines 527--528
 \OT1/ptm/m/n/10 Mann-Whitney U test on the 889 com-pleted sim-u-lated
  []
 
 
-Underfull \hbox (badness 1558) in paragraph at lines 524--525
+Underfull \hbox (badness 1558) in paragraph at lines 527--528
 \OT1/ptm/m/n/10 trees ($\OML/cmm/m/it/10 T[] \OMS/cmsy/m/n/10 ^^T \OT1/cmr/m/n/
 10 2000$\OT1/ptm/m/n/10 ). The marked ac-cep-tance prob-a-bil-
  []
 
 [8] [9] [10]
-Underfull \hbox (badness 5592) in paragraph at lines 730--731
+Underfull \hbox (badness 5592) in paragraph at lines 733--734
 []\OT1/ptm/b/n/10 Detection re-li-a-bil-ity and sim-u-la-bil-ity. \OT1/ptm/m/n/
 10 Our phase-
  []
 
 
-Underfull \hbox (badness 3601) in paragraph at lines 737--738
+Underfull \hbox (badness 3601) in paragraph at lines 740--741
 \OT1/ptm/m/n/10 reduced-cost vari-able fix-ing with Mon-ta-naro's quan-tum
  []
 
@@ -566,7 +566,7 @@ sers/Shiva/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/U
 sers/Shiva/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmbi8a.pfb><C:/
 Users/Shiva/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/
 Users/Shiva/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on main.pdf (12 pages, 439268 bytes).
+Output written on main.pdf (12 pages, 439352 bytes).
 PDF statistics:
  197 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
